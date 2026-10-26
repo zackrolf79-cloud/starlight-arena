@@ -48,3 +48,10 @@ Each correct answer unlocks one of 8 skills in the event.
 - Animations are a stylized 2D side view and only approximate the real skills.
 - There are 8 questions per event, and judges' score variation is cosmetic.
 - Progress and photos stay in that one browser on that device.
+
+## 3D arena + Wrestling theme (v3)
+- **3D mode** (Three.js r170 vendored in `vendor/`, no CDN): `arena3d.js` builds the arena, crowd, spotlights, equipment, ring, ramp and pyro. The gymnast is a sprite billboard driven by the same 2D rig. Cameras swoop around, go first-person on the vault run-up, and look down the beam.
+- **Simple mode (2D)** is picked automatically on low-end devices, when WebGL fails, or when the game runs under 20 fps (saved). Toggle it with the 🖼 button. Override with `?mode=3d|simple|auto`.
+- **Theme:** gymnastics (default) or **Starlight Superstar Wrestling**, an original league with no real WWE names, logos, wrestlers or music. Each subject is a championship belt, the moves are cartoony showmanship, there is a ring entrance with an announcer and pyro, and a belt ceremony. Switch on the title or Studio screen, or use `?theme=wrestle|gym`.
+- **Music:** an original 36s arena-rock walkout and a 5s fanfare, synthesized with WebAudio (no audio files). Mute stops them.
+- Limits: the ring gear has one colorway; ES modules don't load over file:// (it falls back to Simple mode); software-GPU devices drop to Simple mode.
