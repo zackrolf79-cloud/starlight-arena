@@ -146,11 +146,11 @@ function tickC() {
 /* ---------------- character (painted sprite poses, tweened) ---------------- */
 // Each pose sprite: [origW, origH, hipX, hipY] (hip = rotation anchor, as fractions). 0.32 rig units per source px.
 const K = 0.32;
-const SPR = { stand: [141, 484, .5, .58], run1: [340, 483, .45, .6], run2: [383, 470, .45, .6], hurdle: [361, 462, .62, .7], crouch: [345, 391, .22, .6],
-  tuck: [313, 325, .5, .6], pike: [305, 310, .25, .18], stretch: [143, 610, .5, .6], stick: [282, 579, .5, .65], split: [482, 294, .5, .82],
-  passe: [204, 475, .5, .57], tbal: [393, 468, .5, .57], straddle: [439, 407, .5, .62], wobble: [358, 477, .5, .58], salute: [139, 493, .5, .59], celebrate: [267, 399, .5, .7],
+const SPR = { stand: [174, 484, .5, .58], run1: [330, 483, .45, .6], run2: [385, 470, .45, .6], hurdle: [358, 462, .62, .7], crouch: [337, 391, .22, .6],
+  tuck: [205, 325, .5, .6], pike: [269, 310, .25, .18], stretch: [153, 610, .5, .6], stick: [147, 579, .5, .65], split: [450, 294, .5, .82],
+  passe: [324, 475, .5, .57], tbal: [550, 468, .5, .57], straddle: [463, 407, .5, .62], wobble: [320, 477, .5, .58], salute: [209, 493, .5, .59], celebrate: [264, 399, .5, .7],
   /* wrestling ring gear (same character) */
-  rentr: [299, 471, .45, .6], rbelt: [253, 486, .5, .62], rflex: [244, 483, .5, .6], rpoint: [303, 486, .42, .6], rrun: [419, 489, .45, .62], rkick: [476, 335, .45, .55], rtuck: [313, 367, .5, .55], rland: [370, 417, .45, .62] };
+  rentr: [302, 471, .45, .6], rbelt: [248, 486, .5, .62], rflex: [240, 483, .5, .6], rpoint: [253, 486, .42, .6], rrun: [417, 489, .45, .62], rkick: [596, 335, .45, .55], rtuck: [400, 367, .5, .55], rland: [349, 417, .45, .62] };
 const RING = new Set(["rentr", "rbelt", "rflex", "rpoint", "rrun", "rkick", "rtuck", "rland"]);
 const RMAP = { stand: "rpoint", run1: "rrun", run2: "rrun", hurdle: "rrun", crouch: "rland", tuck: "rtuck", pike: "rtuck", stretch: "rkick", stick: "rflex", split: "rkick", passe: "rentr", tbal: "rentr", straddle: "rkick", wobble: "rpoint", salute: "rentr", celebrate: "rbelt" };
 const LEOS = [["starlight", "Starlight (pink & teal)"], ["galaxy", "Galaxy (purple & gold)"], ["ocean", "Ocean (blue & silver)"], ["ruby", "Ruby (red & gold)"], ["mint", "Mint (green & violet)"], ["sunset", "Sunset (orange & blue)"]];
