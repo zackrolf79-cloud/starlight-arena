@@ -17,8 +17,9 @@ const store = {
 let S = store.get(KEY, null) || { ev: {} };
 W.events.forEach(e => { S.ev[e.key] = S.ev[e.key] || { i: 0, scores: [], best: null }; });
 const save = () => store.set(KEY, S);
-const DEFAULT_LOOK = { hairStyle: "ponytail", hair: T.hair || "#6b3b1f", skin: T.skin || "#f3c39b", leo1: T.leotard[0], leo2: T.leotard[1], pattern: "stars", sparkles: true, sleeves: "long", scrunchie: "#2fd3d0", acc: "bow" };
+const DEFAULT_LOOK = { leo: "starlight", sparkles: true };
 let LOOK = Object.assign({}, DEFAULT_LOOK, store.get("starlight:look", {}));
+if (!["starlight","galaxy","ocean","ruby","mint","sunset"].includes(LOOK.leo)) LOOK = Object.assign({}, DEFAULT_LOOK, { sparkles: LOOK.sparkles !== false });
 let PORTRAIT = store.get("starlight:portrait", null);
 let MUTED = store.get("starlight:mute", false);
 
@@ -58,72 +59,59 @@ function tickC() {
   if (parts.length) requestAnimationFrame(tickC); else { cRun = false; cx.clearRect(0, 0, cv.width, cv.height); }
 }
 
-/* ---------------- character rig (SVG, colors from LOOK) ---------------- */
-let rigN = 0;
-function shade(hex, f) { const n = parseInt(hex.slice(1), 16); let r = n >> 16, g = n >> 8 & 255, b = n & 255; r = Math.round(r * f); g = Math.round(g * f); b = Math.round(b * f); return "#" + [r, g, b].map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0")).join(""); }
+/* ---------------- character (painted sprite poses, tweened) ---------------- */
+// Each pose sprite: [origW, origH, hipX, hipY] (hip = rotation anchor, as fractions). 0.32 rig units per source px.
+const K = 0.32;
+const SPR = { stand: [141, 484, .5, .58], run1: [340, 483, .45, .6], run2: [383, 470, .45, .6], hurdle: [361, 462, .62, .7], crouch: [345, 391, .22, .6],
+  tuck: [313, 325, .5, .6], pike: [305, 310, .25, .18], stretch: [143, 610, .5, .6], stick: [282, 579, .5, .65], split: [482, 294, .5, .82],
+  passe: [204, 475, .5, .57], tbal: [393, 468, .5, .57], straddle: [439, 407, .5, .62], wobble: [358, 477, .5, .58], salute: [139, 493, .5, .59], celebrate: [267, 399, .5, .7] };
+const LEOS = [["starlight", "Starlight (pink & teal)"], ["galaxy", "Galaxy (purple & gold)"], ["ocean", "Ocean (blue & silver)"], ["ruby", "Ruby (red & gold)"], ["mint", "Mint (green & violet)"], ["sunset", "Sunset (orange & blue)"]];
+const sprURL = (n, L = LOOK) => `assets/gym/${L.leo || "starlight"}-${n}.webp`;
+const heroURL = (L = LOOK) => sprURL("hero", L);
+// preload so pose swaps never flash
+function preload() { Object.keys(SPR).forEach(n => { const i = new Image(); i.src = sprURL(n); }); }
 function rigSVG(L = LOOK) {
-  const id = "r" + (++rigN), skin = L.skin, skinD = shade(skin, .82), hair = L.hair;
-  let fill = L.leo1, defs = "";
-  if (L.pattern === "galaxy") { defs += `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${L.leo1}"/><stop offset=".6" stop-color="${L.leo2}"/><stop offset="1" stop-color="${shade(L.leo1, .6)}"/></linearGradient>`; fill = `url(#${id}g)`; }
-  if (L.pattern === "stars") { defs += `<pattern id="${id}p" width="12" height="12" patternUnits="userSpaceOnUse"><rect width="12" height="12" fill="${L.leo1}"/><path d="M6 2l1.2 2.6 2.8.3-2.1 1.9.6 2.8L6 8.2 3.5 9.6l.6-2.8L2 4.9l2.8-.3z" fill="${L.leo2}"/></pattern>`; fill = `url(#${id}p)`; }
-  if (L.pattern === "stripes") { defs += `<pattern id="${id}p" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="8" height="8" fill="${L.leo1}"/><rect width="4" height="8" fill="${L.leo2}"/></pattern>`; fill = `url(#${id}p)`; }
-  if (L.pattern === "hearts") { defs += `<pattern id="${id}p" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${L.leo1}"/><path d="M5.5 8.5L2.5 5.5a1.7 1.7 0 0 1 3-2 1.7 1.7 0 0 1 3 2z" fill="${L.leo2}"/></pattern>`; fill = `url(#${id}p)`; }
-  const sleeve = L.sleeves === "long";
-  const arm = (side) => { const back = side === "l", c = back ? skinD : skin, sc = back ? shade(L.leo1, .75) : L.leo1;
-    return `<g data-j="${side}sh" transform="translate(0,-50)"><line x1="0" y1="0" x2="0" y2="26" stroke="${sleeve ? sc : c}" stroke-width="8" stroke-linecap="round"/>
-      <g data-j="${side}el" transform="translate(0,26)"><line x1="0" y1="0" x2="0" y2="24" stroke="${sleeve ? sc : c}" stroke-width="7" stroke-linecap="round"/><circle cx="0" cy="27" r="4.2" fill="${back ? skinD : skin}"/></g></g>`; };
-  const leg = (side) => { const back = side === "l", c = back ? skinD : skin, shoe = back ? shade(L.leo2, .75) : L.leo2;
-    return `<g data-j="${side}hip"><line x1="0" y1="0" x2="0" y2="34" stroke="${c}" stroke-width="10" stroke-linecap="round"/>
-      <g data-j="${side}kn" transform="translate(0,34)"><line x1="0" y1="0" x2="0" y2="31" stroke="${c}" stroke-width="8.5" stroke-linecap="round"/><path d="M-3 29 q4 -3 12 1 q2 4 -3 5 h-9z" fill="${shoe}"/></g></g>`; };
-  // hair styles (head center 3,-72)
-  const hs = L.hairStyle; let back = "", front = "";
-  if (hs === "ponytail") back = `<g data-j="tail" transform="translate(-10,-82)"><path d="M0 0 q-16 6 -14 26 q2 10 -6 18 q14 -4 16 -20 q2 -14 8 -22z" fill="${hair}"/><circle cx="0" cy="1" r="4.5" fill="${L.scrunchie}"/></g>`;
-  if (hs === "bun") back = `<circle cx="-6" cy="-92" r="9" fill="${hair}"/><ellipse cx="-4" cy="-84" rx="7" ry="3.2" fill="${L.scrunchie}"/>`;
-  if (hs === "braid") back = `<g data-j="tail" transform="translate(-11,-78)">${[0, 1, 2, 3, 4].map(k => `<ellipse cx="${-2 - k * 1.5}" cy="${4 + k * 8}" rx="5" ry="5.5" fill="${hair}" stroke="${shade(hair, .7)}" stroke-width="1"/>`).join("")}<circle cx="-9.5" cy="44" r="3.8" fill="${L.scrunchie}"/></g>`;
-  if (hs === "bob") back = `<path d="M-13 -82 q-4 16 2 24 q8 2 12 -2 l-2 -20z" fill="${hair}"/>`;
-  let acc = "";
-  if (L.acc === "bow") acc = `<g transform="translate(-6,-89) rotate(-20)"><path d="M0 0 l-9 -6 v12z M0 0 l9 -6 v12z" fill="${L.scrunchie}"/><circle r="2.6" fill="${shade(L.scrunchie, .8)}"/></g>`;
-  if (L.acc === "headband") acc = `<path d="M-12 -78 q14 -22 30 -6" stroke="${L.scrunchie}" stroke-width="3.6" fill="none" stroke-linecap="round"/>`;
-  if (L.acc === "tiara") acc = `<path d="M-6 -86 l3 -7 l3 5 l3 -8 l3 8 l3 -5 l3 7z" fill="#ffd34d" stroke="#fff6" stroke-width=".6"/><circle cx="3" cy="-92" r="1.6" fill="${L.scrunchie}"/>`;
-  const head = `${back}<circle cx="3" cy="-72" r="15" fill="${skin}"/>
-    <path d="M-12 -72 q0 -18 16 -17 q13 1 14 12 q-8 -5 -15 -3 q-6 1 -9 8 z" fill="${hair}"/>${acc}
-    <ellipse cx="11" cy="-72" rx="2" ry="2.6" fill="#2a1630"/><circle cx="11.6" cy="-73" r=".8" fill="#fff"/>
-    <path d="M9 -64 q4 3 7 -1" stroke="#a03a5a" stroke-width="1.6" fill="none" stroke-linecap="round"/><circle cx="7" cy="-66" r="2.4" fill="#ff8fb0" opacity=".5"/>`;
-  const spark = L.sparkles ? `<g class="spk">${[[-4, -40], [5, -28], [-2, -15], [6, -46], [0, -6]].map(([x, y], k) => `<circle cx="${x}" cy="${y}" r="1.3" fill="#fff"><animate attributeName="opacity" values="0;1;0" dur="${1.2 + k * .3}s" repeatCount="indefinite"/></circle>`).join("")}</g>` : "";
-  return `<defs>${defs}</defs><g data-j="root">
-    <g data-j="pony"></g>
-    ${leg("l")}
-    <g data-j="sp">${arm("l")}
-      <path d="M-11 4 q-3 -30 0 -54 q11 -9 22 0 q3 24 0 54 q-11 6 -22 0z" fill="${fill}"/>${spark}
-      <path d="M-11 4 q11 8 22 0" stroke="${L.leo2}" stroke-width="3" fill="none"/>
-      <rect x="-3" y="-60" width="7" height="8" rx="3" fill="${skin}"/>${head}${arm("r")}</g>
-    ${leg("r")}
-    <ellipse cx="0" cy="1" rx="11.5" ry="6" fill="${fill}"/></g>`;
+  const spark = L.sparkles ? `<g class="spk">${[[-14, -40], [16, -22], [-8, -5], [12, -52], [0, 20], [-18, 10]].map(([x, y], k) => `<path d="M${x} ${y - 4}l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z" fill="#fff"><animate attributeName="opacity" values="0;1;0" dur="${1.1 + k * .27}s" repeatCount="indefinite"/></path>`).join("")}</g>` : "";
+  return `<g data-j="root"><image class="spA" href="${sprURL("stand", L)}"/><image class="spB" href="" opacity="0"/>${spark}</g>`;
+}
+function pick(p) {
+  if (p.spr) return p.spr;
+  if (p.lhip <= -100 && p.lkn >= 120) return "tuck";
+  if (p.lhip <= -140 && p.lkn < 30) return "pike";
+  if (p.lhip >= 60 && p.rhip <= -80) return "split";
+  if (p.rhip <= -60 && p.rkn >= 100) return "passe";
+  if (p.lkn >= 80 && p.rkn >= 80 && p.lhip <= -40) return "crouch";
+  if (p.sp === 12 && Math.abs(p.lhip) === 40) return p.lhip < 0 ? "run1" : "run2";
+  if (p.rhip === -55) return "hurdle";
+  if (p.lhip >= 30 && p.rhip <= -30) return "straddle";
+  if (p.lsh === -95 && p.rsh === 70) return "tbal";
+  if (p.rsh <= -140 && p.lsh >= 0) return "salute";
+  if (p.lsh <= -150 && p.rsh >= 0) return "salute";
+  if (p.lsh <= -150) return Math.abs(((p.r || 0) % 360)) < 20 && p.y > -80 && p.rhip > -30 ? "stick" : "stretch";
+  return "stand";
 }
 const BASE = { x: 0, y: -66, r: 0, sx: 1, sp: 0, lsh: 10, lel: -12, rsh: -10, rel: -12, lhip: 2, lkn: 2, rhip: -2, rkn: 2, tail: 0 };
 class Rig {
-  constructor(g) { this.g = g; this.j = {}; g.querySelectorAll("[data-j]").forEach(n => this.j[n.dataset.j] = n); this.p = Object.assign({}, BASE); this.base = {}; this.apply(); this.tok = 0; }
-  apply() {
-    const p = this.p, J = this.j;
-    J.root.setAttribute("transform", `translate(${p.x},${p.y}) rotate(${p.r}) scale(${p.sx},1)`);
-    J.sp.setAttribute("transform", `rotate(${p.sp})`);
-    J.lsh.setAttribute("transform", `translate(0,-50) rotate(${p.lsh})`); J.rsh.setAttribute("transform", `translate(0,-50) rotate(${p.rsh})`);
-    J.lel.setAttribute("transform", `translate(0,26) rotate(${p.lel})`); J.rel.setAttribute("transform", `translate(0,26) rotate(${p.rel})`);
-    J.lhip.setAttribute("transform", `rotate(${p.lhip})`); J.rhip.setAttribute("transform", `rotate(${p.rhip})`);
-    J.lkn.setAttribute("transform", `translate(0,34) rotate(${p.lkn})`); J.rkn.setAttribute("transform", `translate(0,34) rotate(${p.rkn})`);
-    if (J.tail) { const base = J.tail.getAttribute("data-b") || J.tail.getAttribute("transform"); J.tail.setAttribute("data-b", base); J.tail.setAttribute("transform", `${base} rotate(${p.tail})`); }
+  constructor(g) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0; this.show("stand", true); this.apply(); }
+  show(n, now) {
+    if (n === this.cur) return; this.cur = n;
+    const [w, h, ax, ay] = SPR[n], W2 = w * K, H2 = h * K;
+    const [on, off] = [this.B, this.A]; this.A = on; this.B = off; // swap layers for a quick cross-fade
+    on.setAttribute("href", sprURL(n)); on.setAttribute("x", -ax * W2); on.setAttribute("y", -ay * H2); on.setAttribute("width", W2); on.setAttribute("height", H2);
+    on.style.transition = off.style.transition = now ? "none" : "opacity .09s linear"; on.setAttribute("opacity", 1); off.setAttribute("opacity", 0);
   }
-  set(p) { Object.assign(this.p, BASE, this.base, p); this.apply(); }
-  async play(frames) { // frames: [ [pose, ms, ease?], ... ]  pose is absolute over BASE+base
+  apply() { const p = this.p; this.root.setAttribute("transform", `translate(${p.x},${p.y}) rotate(${p.r}) scale(${p.sx},1)`); }
+  set(p) { Object.assign(this.p, BASE, this.base, p); this.show(pick(this.p), true); this.apply(); }
+  async play(frames) { // frames: [ [pose, ms, ease?], ... ]  pose is absolute over BASE+base; sprite chosen from target pose
     const tok = ++this.tok;
     for (const [pose, ms, ease] of frames) {
       if (tok !== this.tok) return;
       const from = Object.assign({}, this.p), to = Object.assign({}, BASE, this.base, pose);
-      if (to.tail === 0 || pose.tail === undefined) to.tail = Math.max(-40, Math.min(40, (to.r - from.r) * -.25));
+      this.show(pick(to));
       await new Promise(res => {
         const t0 = performance.now(), E = ease === "lin" ? (t => t) : ease === "out" ? (t => 1 - Math.pow(1 - t, 3)) : (t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
         const step = now => { if (tok !== this.tok) return res(); const t = Math.min(1, (now - t0) / ms), e = E(t);
-          for (const k in to) this.p[k] = from[k] + (to[k] - from[k]) * e; this.apply(); t < 1 ? requestAnimationFrame(step) : res(); };
+          for (const k in to) if (typeof to[k] === "number") this.p[k] = from[k] + (to[k] - from[k]) * e; this.apply(); t < 1 ? requestAnimationFrame(step) : res(); };
         requestAnimationFrame(step);
       });
     }
@@ -205,7 +193,7 @@ const BEAM = {
   dismount: () => [[{ x: 60 }, 300], [{ x: 150 }, 500], [{ x: 220 }, 400], ...flip(220, 120, 1, "tuck", 110, 0, 110), [M(P.up, { x: 340, y: 44, r: 360 }), 600], [{ x: 340, y: 44, r: 360 }, 400]]
 };
 const LIB = { vault: SK, floor: FL, bars: BARS, beam: BEAM };
-const wobble = (h) => { const b = h.x || 0, y = h.y; const f = []; [12, -14, 10, -8, 5, 0].forEach((r, i) => f.push([M(P.arms, h, { r: (h.r || 0) + r, x: b + (y < -150 ? r * .8 : 0), sp: r * .4, rhip: i % 2 ? -25 : 0, rkn: i % 2 ? 40 : 0 }), 170])); f.push([h, 250]); return f; };
+const wobble = (h) => { const b = h.x || 0, y = h.y; const f = []; [12, -14, 10, -8, 5, 0].forEach((r, i) => f.push([M(P.arms, h, { r: (h.r || 0) + r, x: b + (y < -150 ? r * .8 : 0), sp: r * .4, rhip: i % 2 ? -25 : 0, rkn: i % 2 ? 40 : 0, spr: i % 2 ? "tbal" : "wobble" }), 170])); f.push([M(h, { spr: h.spr || pick(M(BASE, h)) }), 250]); return f; };
 
 /* ---------------- equipment art per stage ---------------- */
 function equipment(key) {
@@ -224,7 +212,7 @@ function stageSVG(key, scale = 1.25) {
 }
 
 /* ---------------- portrait ---------------- */
-const portraitImg = (cls = "portrait") => `<img class="${cls}" alt="My gymnast" src="${PORTRAIT || T.gymnast}" style="${PORTRAIT ? "" : "object-position:50% 8%;object-fit:cover"}">`;
+const portraitImg = (cls = "portrait") => `<img class="${cls}" alt="My gymnast" src="${PORTRAIT || heroURL()}" style="${PORTRAIT ? "" : "object-position:50% 4%;object-fit:cover;background:#2a1460"}">`;
 
 /* ---------------- screens ---------------- */
 const medalFor = s => s == null ? "" : s >= 9.5 ? "🥇" : s >= 8.5 ? "🥈" : "🥉";
@@ -237,7 +225,7 @@ function title() {
     <h1 class="glow">${esc(W.title)}</h1><p class="sub">Welcome to the arena, <b>${esc(W.athleteName)}</b>! Answer questions to perform skills on Vault, Bars, Beam and Floor — then take the podium.</p>
     <div class="row"><button class="btn" id="go">${started ? "▶ Continue" : "✨ Start"}</button><button class="btn teal" id="studio">🎨 Design Your Gymnast</button></div>
     <p class="policy">🛈 This is <b>AI-made practice, not for graded work</b>. Questions are original practice about this week's topics — not your real quiz questions. Try first, use hints, and do your own schoolwork. Don't use this during a test.</p></div>
-    <div class="hero"><img src="${T.gymnast}" alt="Cartoon gymnast">${PORTRAIT ? portraitImg("portrait big") : ""}</div></section>`;
+    <div class="hero"><img src="${heroURL()}" alt="Cartoon gymnast">${PORTRAIT ? portraitImg("portrait big") : ""}</div></section>`;
   $("#go").onclick = () => { SFX.click(); map(); };
   $("#studio").onclick = () => { SFX.click(); studio(); };
 }
@@ -350,45 +338,33 @@ function finishEvent() {
 function podium() {
   const tot = W.events.reduce((a, e) => a + (S.ev[e.key].best || 0), 0);
   app.innerHTML = `<div class="top"><h2 class="glow" style="flex:1">🏆 Medal Ceremony</h2><button class="btn ghost" id="bk">🗺 Map</button></div>
-    <div class="podium" style="background-image:url(${T.podium})"><svg class="champsvg" viewBox="-95 -180 190 182">${rigSVG()}</svg>
+    <div class="podium" style="background-image:url(${T.podium})"><img class="champ" src="${sprURL("celebrate")}" alt="Champion gymnast">
     ${PORTRAIT ? `<img class="portrait" style="position:absolute;left:62%;top:8%;width:90px;height:90px" src="${PORTRAIT}" alt="My gymnast">` : ""}
     <div class="medals">${W.events.map(e => `<div><span>${medalFor(S.ev[e.key].best)}</span>${esc(e.name)}<br><b>${S.ev[e.key].best != null ? fmt(S.ev[e.key].best) : "—"}</b></div>`).join("")}<div><span>⭐</span>All-around<br><b>${fmt(tot)}</b></div></div></div>
     <p style="text-align:center">Amazing work, ${esc(W.athleteName)}! Remember: this was practice — show what you know on your real assignments on your own. 💜</p>`;
   $("#bk").onclick = map;
-  const rig = new Rig($(".champsvg [data-j=root]").parentNode);
-  const loop = async () => { while (document.body.contains(rig.g)) { await rig.play(SK.finalpose()); await rig.play([[M(P.up), 500], [{ ...P.up, sp: -10 }, 400], [{}, 600]]); } };
-  loop(); confetti(250); SFX.cheer();
+  confetti(250); SFX.cheer();
 }
 
 /* ---------------- Design Your Gymnast studio ---------------- */
-const OPTS = {
-  hairStyle: [["ponytail", "Ponytail"], ["bun", "Bun"], ["braid", "Braid"], ["bob", "Bob"]],
-  hair: ["#2a1a12", "#6b3b1f", "#a0602d", "#e3b25a", "#c0392b", "#9b59ff", "#ff7ac8"],
-  skin: ["#fbe0c8", "#f3c39b", "#e0a477", "#c68653", "#8d5a37", "#5e3a22"],
-  leo1: ["#7b3fe4", "#d23fc1", "#2fd3d0", "#1f3fbf", "#e53950", "#111133", "#18a86b"],
-  leo2: ["#2fd3d0", "#ffd34d", "#ff8be0", "#ffffff", "#b48cff", "#ff6b3d"],
-  pattern: [["solid", "Solid"], ["stars", "Stars"], ["stripes", "Stripes"], ["galaxy", "Galaxy"], ["hearts", "Hearts"]],
-  sleeves: [["long", "Long sleeves"], ["tank", "Tank"]],
-  scrunchie: ["#2fd3d0", "#ff5fd2", "#ffd34d", "#ffffff", "#7b3fe4", "#e53950"],
-  acc: [["none", "None"], ["bow", "Bow"], ["headband", "Headband"], ["tiara", "Tiara"]],
-  sparkles: [[true, "Sparkles on ✨"], [false, "No sparkles"]]
-};
-const LABELS = { hairStyle: "Hair style", hair: "Hair color", skin: "Skin tone", leo1: "Leotard color", leo2: "Accent color", pattern: "Leotard pattern", sleeves: "Sleeves", scrunchie: "Scrunchie / bow color", acc: "Accessory", sparkles: "Sparkles" };
 function studio() {
   app.innerHTML = `<div class="top"><h2 class="glow" style="flex:1">🎨 Design Your Gymnast</h2><button class="btn ghost" id="bk">🗺 Map</button><button class="btn ghost" id="home">⌂</button></div>
-   <div class="studio"><div><div class="preview"><svg viewBox="-80 -135 160 215" id="pv"></svg></div>
+   <div class="studio"><div><div class="preview"><img id="hero" src="${heroURL()}" alt="My gymnast"><svg viewBox="-110 -150 220 230" id="pv"></svg></div>
      <div class="panel" style="margin-top:12px"><h3>📷 Upload my gymnast</h3>
        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">${portraitImg()}<label class="btn teal" style="cursor:pointer">Choose picture<input type="file" accept="image/*" id="up" hidden></label>${PORTRAIT ? `<button class="btn ghost" id="rm">Remove</button>` : ""}</div>
        <p class="tip">💡 Tip: Make a gymnast picture in ChatGPT with a grown-up, save it, and upload it here.<br><small>Your picture stays in this browser only — it is never uploaded anywhere. Use a drawing, not a real photo of you.</small></p></div></div>
    <div class="panel" id="opts"></div></div>`;
   $("#bk").onclick = map; $("#home").onclick = title;
-  const draw = () => { $("#pv").innerHTML = rigSVG(); const r = new Rig($("#pv")); r.set({ y: 0, ...P.up }); r.base = {}; r.play([[{ y: 0, lsh: -150, rsh: 40, sp: -6, rhip: -20, rkn: 40 }, 600], [{ y: 0, ...P.up }, 600]]); };
+  let dTok = 0;
+  const draw = async () => { const my = ++dTok; $("#hero").src = heroURL(); $("#pv").innerHTML = rigSVG(); const r = new Rig($("#pv")); r.set({ y: 0 });
+    const demo = [[{ y: 0, ...P.up }, 500], [{ y: 0, ...P.lunge, y: 8 }, 400], [{ y: 0, ...P.split, y: -40 }, 450, "out"], [{ y: 0, ...P.crouch, y: 16 }, 300], [{ y: 0, ...P.arms }, 500], [{ y: 0, ...P.passe }, 600], [{ y: 0 }, 500]];
+    while (my === dTok && document.body.contains(r.g)) await r.play(demo); };
   const renderOpts = () => {
-    $("#opts").innerHTML = Object.keys(OPTS).map(k => `<div class="opt"><label class="h">${LABELS[k]}</label><div class="swatches">${OPTS[k].map(v => Array.isArray(v)
-      ? `<button class="chip ${LOOK[k] === v[0] ? "on" : ""}" data-k="${k}" data-v='${JSON.stringify(v[0])}'>${v[1]}</button>`
-      : `<button class="sw ${LOOK[k] === v ? "on" : ""}" style="background:${v}" aria-label="${LABELS[k]} ${v}" data-k="${k}" data-v='${JSON.stringify(v)}'></button>`).join("")}</div></div>`).join("")
+    $("#opts").innerHTML = `<div class="opt"><label class="h">Leotard</label><div class="leos">${LEOS.map(([v, n]) => `<button class="leo ${LOOK.leo === v ? "on" : ""}" data-k="leo" data-v='"${v}"'><img src="assets/gym/${v}-hero.webp" alt=""><span>${n}</span></button>`).join("")}</div></div>
+      <div class="opt"><label class="h">Sparkles</label><div class="swatches">${[[true, "Sparkles on ✨"], [false, "No sparkles"]].map(([v, n]) => `<button class="chip ${LOOK.sparkles === v ? "on" : ""}" data-k="sparkles" data-v='${v}'>${n}</button>`).join("")}</div></div>
+      <p class="tip">Your gymnast keeps her high bun and pink-and-teal scrunchie in every event. Pick a leotard and she'll wear it on vault, bars, beam and floor.</p>`
       + `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn" id="sv">💾 Save my look</button><button class="btn ghost" id="rs">Reset</button></div><div id="msg" class="feedback"></div>`;
-    $("#opts").querySelectorAll("[data-k]").forEach(b => b.onclick = () => { LOOK[b.dataset.k] = JSON.parse(b.dataset.v); SFX.click(); store.set("starlight:look", LOOK); renderOpts(); draw(); });
+    $("#opts").querySelectorAll("[data-k]").forEach(b => b.onclick = () => { LOOK[b.dataset.k] = JSON.parse(b.dataset.v); SFX.click(); store.set("starlight:look", LOOK); preload(); renderOpts(); draw(); });
     $("#sv").onclick = () => { store.set("starlight:look", LOOK); SFX.right(); confetti(60); $("#msg").textContent = "Saved! Your gymnast will compete in every event."; };
     $("#rs").onclick = () => { LOOK = Object.assign({}, DEFAULT_LOOK); store.set("starlight:look", LOOK); renderOpts(); draw(); };
   };
@@ -400,6 +376,7 @@ function studio() {
   if ($("#rm")) $("#rm").onclick = () => { PORTRAIT = null; localStorage.removeItem("starlight:portrait"); studio(); };
 }
 
+preload();
 window.__game = { map, podium, studio, startEvent, title, S, W }; // for testing
 title();
 })();

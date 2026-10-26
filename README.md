@@ -28,6 +28,7 @@ Each correct answer unlocks one of 8 skills in the event.
 - `theme.background`, `theme.podium` and `theme.gymnast` are image paths in `assets/`.
 - `theme.colors` sets the accent colors.
 - Event card art is set by each event's `icon`.
+- **Gymnast sprites** are in `assets/gym/{leotard}-{pose}.webp`. There are 6 leotard variants (starlight, galaxy, ocean, ruby, mint, sunset) and 16 side-view poses plus `hero`. `SPR` in `game.js` lists each pose's size and hip anchor. Animation tweens position and rotation between pose sprites, and the sprite for each keyframe is picked from the pose data.
 
 ## AI policy (GVA)
 - All questions are original practice. Never paste real quiz/test questions or their answers.
@@ -36,12 +37,14 @@ Each correct answer unlocks one of 8 skills in the event.
 - The only personal info is a first name (`athleteName`).
 
 ## Design Your Gymnast and photo privacy
-- The studio sets hair, skin, leotard, sparkles and accessories. Your choices are saved in localStorage.
+- The studio lets you pick one of 6 painted leotard variants and turn sparkles on or off. Your choices are saved in localStorage.
 - "Upload my gymnast" resizes the picture in the browser and saves it in localStorage. It is **never uploaded** anywhere.
 - Tip shown in the game: "Make a gymnast picture in ChatGPT with a grown-up, save it, and upload it here."
 
 ## Limits
-- The uploaded picture is used as a portrait only (title, HUD, map, podium). The animated body uses the chosen studio colors.
+- The uploaded picture is used as a portrait only (title, HUD, map, podium). The animated gymnast is the painted character in the chosen leotard.
+- Hair, skin and scrunchie are fixed to the reference design. Only the leotard colors change, and they are recolored from the original art.
+- Skills use about 16 key poses with a short cross-fade between them, so motion is smooth but not frame-by-frame animation.
 - Animations are a stylized 2D side view and only approximate the real skills.
 - There are 8 questions per event, and judges' score variation is cosmetic.
 - Progress and photos stay in that one browser on that device.

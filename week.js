@@ -10,9 +10,9 @@ window.WEEK = {
   subtitle: "Week of Oct 26 · Grade 5",
   athleteName: "Aniston",              // FIRST NAME ONLY (privacy)
   theme: {
-    background: "assets/arena.jpg",
-    podium: "assets/podium.jpg",
-    gymnast: "assets/gymnast.png",
+    background: "assets/arena.webp",
+    podium: "assets/podium.webp",
+    gymnast: "assets/gym/starlight-hero.webp",
     accent: "#ff5fd2", accent2: "#38e8e0", gold: "#ffd34d",
     leotard: ["#7b3fe4", "#d23fc1", "#2fd3d0"], hair: "#6b3b1f", skin: "#f3c39b"
   },
@@ -20,7 +20,7 @@ window.WEEK = {
   /* ---------------------------- VAULT = MATH ---------------------------- */
   {
     key: "vault", name: "Vault", subject: "Math", topic: "Dividing whole numbers & decimals",
-    icon: "assets/vault.jpg", color: "#ff5fd2",
+    icon: "assets/vault.webp", color: "#ff5fd2",
     skills: ["Power Run", "Round-off Entry", "Handspring", "Tuck Salto", "Pike Salto", "Layout", "Full Twist", "Stuck Landing!"],
     anims:  ["run", "roundoff", "handspring", "tuck", "pike", "layout", "twist", "stick"],
     notes: [
@@ -77,7 +77,7 @@ window.WEEK = {
   /* -------------------------- UNEVEN BARS = ELA -------------------------- */
   {
     key: "bars", name: "Uneven Bars", subject: "ELA", topic: "Roots & affixes, homophones, author's purpose",
-    icon: "assets/bars.jpg", color: "#ffd34d",
+    icon: "assets/bars.webp", color: "#ffd34d",
     skills: ["Glide Kip", "Cast to Handstand", "Clear Hip Circle", "Giant Swing", "Pirouette Turn", "Transition Leap", "Double Giant", "Flyaway Dismount"],
     anims:  ["kip", "cast", "hipcircle", "giant", "pirouette", "transition", "giant2", "flyaway"],
     notes: [
@@ -134,7 +134,7 @@ window.WEEK = {
   /* ------------------------ BALANCE BEAM = SCIENCE ------------------------ */
   {
     key: "beam", name: "Balance Beam", subject: "Science", topic: "Electrical energy & transformations",
-    icon: "assets/beam.jpg", color: "#38e8e0",
+    icon: "assets/beam.webp", color: "#38e8e0",
     skills: ["Relevé Pose", "Split Leap", "Full Turn", "Handstand", "Cartwheel", "Split Jump", "Back Walkover", "Salto Dismount"],
     anims:  ["releve", "leap", "pirouette", "handstand", "cartwheel", "splitjump", "walkover", "dismount"],
     notes: [
@@ -190,7 +190,7 @@ window.WEEK = {
   /* ------------------------- FLOOR = SOCIAL STUDIES ------------------------- */
   {
     key: "floor", name: "Floor Exercise", subject: "Social Studies", topic: "Middle & Southern Colonies",
-    icon: "assets/floor.jpg", color: "#b48cff",
+    icon: "assets/floor.webp", color: "#b48cff",
     skills: ["Opening Pose", "Round-off", "Back Handspring", "Back Tuck", "Switch Leap", "Layout", "Full Twist", "Final Pose!"],
     anims:  ["salute", "roundoff", "handspring", "tuck", "leap", "layout", "twist", "finalpose"],
     notes: [
