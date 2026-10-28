@@ -128,3 +128,38 @@ body.wrestle .glow{text-shadow:0 0 12px #8ff7f0,0 0 30px #ff5fd2}
 .ceremony .belts div.won{opacity:1;filter:none;box-shadow:0 0 18px #ffd34d}
 .ceremony .belts img{width:100%}.ceremony .belts small{display:block;font-size:11px}
 .ceremony .champ{bottom:30%;height:52%}
+/* ---- wrestling match: bars, flashes, POW words, taunt bubbles, camera shake ---- */
+.stage.match .callout{top:17%}
+.mbar{position:absolute;left:1.5%;right:1.5%;top:2%;display:flex;align-items:center;gap:1.5%;z-index:5;pointer-events:none;font:800 clamp(10px,1.6vw,16px) "Arial Black",Impact,sans-serif;color:#fff;text-shadow:0 2px 0 #000}
+.mbar .side{flex:1;display:flex;flex-direction:column;gap:3px}.mbar .them{align-items:flex-end;text-align:right}
+.mbar small{font:700 clamp(9px,1.2vw,12px) system-ui,sans-serif;opacity:.9}
+.mbar .meter{width:100%;height:clamp(9px,1.6vw,16px);background:rgba(10,4,40,.7);border:2px solid #fff;border-radius:8px;overflow:hidden;transform:skewX(-14deg)}
+.mbar .meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ffd34d,#ff5fd2);transition:width .6s cubic-bezier(.3,1.4,.5,1)}
+.mbar .them .meter{transform:skewX(14deg) scaleX(-1)}.mbar .them .meter i{background:linear-gradient(90deg,var(--o,#7a5cff),#8ff7f0)}
+.mbar .vs{font:900 clamp(16px,3vw,30px) Impact,sans-serif;color:#ffd34d;text-shadow:0 0 10px #ff5fd2,0 3px 0 #000}
+.stage .flash{position:absolute;inset:0;z-index:4;pointer-events:none;background:radial-gradient(circle at 55% 55%,#fff 0,rgba(255,240,170,.6) 25%,transparent 60%);opacity:0}
+.stage .flash.on{animation:flash .28s ease-out}.stage .flash.big{animation:flash .45s ease-out}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+.pow{position:absolute;z-index:6;transform:translate(-50%,-50%);pointer-events:none;font:900 clamp(22px,4.5vw,46px) Impact,"Arial Black",sans-serif;color:#ffd34d;-webkit-text-stroke:2px #3a0b5e;text-shadow:0 4px 0 #ff5fd2;animation:pow .9s ease-out forwards}
+.pow.big{font-size:clamp(30px,6.5vw,68px);color:#fff}
+@keyframes pow{0%{transform:translate(-50%,-50%) scale(.2) rotate(-12deg);opacity:0}20%{transform:translate(-50%,-50%) scale(1.25) rotate(6deg);opacity:1}70%{opacity:1}100%{transform:translate(-50%,-90%) scale(1);opacity:0}}
+.bubble{position:absolute;z-index:6;transform:translate(-50%,-100%);max-width:34%;background:#fff;color:#2a0f5e;font:800 clamp(11px,1.7vw,17px) system-ui,sans-serif;padding:8px 12px;border-radius:14px;box-shadow:0 3px 0 #2a0f5e;animation:slam .4s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
+.bubble:after{content:"";position:absolute;bottom:-9px;left:50%;border:9px solid transparent;border-top-color:#fff;border-bottom:0}
+.announce.match{bottom:4%}
+.announce span.hot{text-shadow:0 0 14px #ffd34d,0 3px 0 #000}
+.announce span.boo{background:rgba(60,10,40,.75);text-shadow:0 0 12px #7a5cff,0 3px 0 #000}
+.announce span.count{font-size:clamp(40px,8vw,90px);background:none;color:#ffd34d}
+.stage.shake{animation:shake .32s linear}.stage.shake2{animation:shake2 .5s linear}
+@keyframes shake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+@keyframes shake2{10%{transform:translate(-9px,4px)}25%{transform:translate(8px,-5px)}40%{transform:translate(-7px,3px)}55%{transform:translate(6px,-3px)}70%{transform:translate(-4px,2px)}85%{transform:translate(2px,-1px)}}
+.ent2d .walker.opp{animation-duration:9s;filter:drop-shadow(0 0 18px #7a5cff)}
+.ent2d .walker.me{animation-duration:5.5s}
+/* Top-rope Cheetah Pounce: 2D camera push-in on the corner + the crowd rising to its feet */
+.stage>svg{transition:transform .8s cubic-bezier(.2,.7,.3,1);transform-origin:0 0}
+.stage.match{transition:background-position .5s ease-out}
+.stage.perch:not(.is3d)>svg{transform:translate(9%,14%) scale(1.15)}
+.stage.tilt:not(.is3d)>svg{transform:translateY(36%);transition-duration:.3s}
+.stage.tilt:not(.is3d){background-position:50% 0%}
+.stage.rise::after{content:"🙌 📣 🐆 🙌 🙌 📣 🐆 🙌 🙌 📣 🐆 🙌 🙌 📣";position:absolute;left:0;right:0;bottom:-4px;text-align:center;font-size:clamp(18px,3.4vw,34px);letter-spacing:.3em;white-space:nowrap;pointer-events:none;animation:rise .9s ease-out both,bounce .35s .9s ease-in-out infinite alternate;filter:drop-shadow(0 2px 3px #000)}
+@keyframes rise{from{transform:translateY(110%)}to{transform:translateY(0)}}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-14%)}}

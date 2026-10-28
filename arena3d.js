@@ -5,7 +5,7 @@ import * as THREE from "./vendor/three.module.min.js";
 
 const S = 0.01;                                   // 1 rig unit = 1 cm
 const BASEY = { vault: 0, bars: 0, beam: 1.25, floor: 0.1, ring: 1.0 };
-let R = null, scene, cam, raf = 0, ctx = null, fps = { n: 0, t: 0, bad: 0 };
+let R = null, scene, cam, raf = 0, ctx = null, fps = { n: 0, t: 0, bad: 0 }, sideRopes = { l: [], r: [] };
 const loader = new THREE.TextureLoader(), texCache = {};
 function tex(url) { if (!texCache[url]) { const t = loader.load(url); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; texCache[url] = t; } return texCache[url]; }
 const std = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .55, metalness: .1 }, o));
@@ -85,19 +85,24 @@ function equipment(key) {
     const w = lam(0xffffff); [[0, 5.8, 11.6, .06], [0, -5.8, 11.6, .06]].forEach(([x, z, a, b]) => { g.add(box(a, .02, b, w, x, .11, z)); g.add(box(b, .02, a, w, z, .11, x)); });
     const star = new THREE.Mesh(new THREE.CircleGeometry(1.2, 5), new THREE.MeshBasicMaterial({ color: 0xffd34d })); star.rotation.x = -Math.PI / 2; star.position.y = .105; g.add(star);
   } else if (key === "ring") {
+    sideRopes = { l: [], r: [] };
     const skirt = canvasTex(512, 128, (c, w, h) => { c.fillStyle = "#2a0f5e"; c.fillRect(0, 0, w, h); for (let i = 0; i < 40; i++) { c.fillStyle = ["#ff5fd2", "#8ff7f0", "#ffd34d"][i % 3]; c.font = "28px serif"; c.fillText("★", Math.random() * w, 20 + Math.random() * (h - 20)); } c.fillStyle = "#fff"; c.font = "bold 54px Georgia"; c.textAlign = "center"; c.fillText("SSW", w / 2, h / 2 + 18); });
     g.add(new THREE.Mesh(new THREE.BoxGeometry(6.4, 1, 6.4), [lam(0xffffff, { map: skirt }), lam(0xffffff, { map: skirt }), lam(0xf4f0ff), lam(0x000000), lam(0xffffff, { map: skirt }), lam(0xffffff, { map: skirt })]).translateY(.5));
     g.add(box(6.2, .04, 6.2, std(0xf1ecff, { roughness: .9 }), 0, 1.02, 0));
     const ropeC = [0xff5fd2, 0xffffff, 0x8ff7f0], post = std(0xd0d0e0, { metalness: .8, roughness: .2 });
     [[-3, -3], [3, -3], [3, 3], [-3, 3]].forEach(([x, z]) => { g.add(cyl(.08, 1.75, post, x, 1.85, z)); g.add(box(.22, .32, .22, std(0xff5fd2), x, 2.55, z)); });
     [1.45, 1.9, 2.35].forEach((y, i) => { const m = std(ropeC[i], { emissive: ropeC[i], emissiveIntensity: .25 });
-      g.add(cyl(.035, 6, m, 0, y, -3, 0, Math.PI / 2)); g.add(cyl(.035, 6, m, 0, y, 3, 0, Math.PI / 2)); g.add(cyl(.035, 6, m, -3, y, 0, Math.PI / 2)); g.add(cyl(.035, 6, m, 3, y, 0, Math.PI / 2)); });
+      g.add(cyl(.035, 6, m, 0, y, -3, 0, Math.PI / 2)); g.add(cyl(.035, 6, m, 0, y, 3, 0, Math.PI / 2)); const L = cyl(.035, 6, m, -3, y, 0, Math.PI / 2), Rr = cyl(.035, 6, m, 3, y, 0, Math.PI / 2); g.add(L, Rr); sideRopes.l.push(L); sideRopes.r.push(Rr); });
     // entrance ramp + stage + video wall + pyro
-    g.add(box(2.6, 1, 11, lam(0x3a1a7a), 0, .5, -9.6)); g.add(box(2.6, .03, 11, std(0xb48cff, { roughness: .2, metalness: .5 }), 0, 1.01, -9.6));
+    const spots = canvasTex(128, 512, (c, w, h) => { c.fillStyle = "#ff6fc4"; c.fillRect(0, 0, w, h); for (let i = 0; i < 70; i++) { const x = (i * 37) % w, y = (i * 83) % h, r = 5 + (i % 4) * 2; c.fillStyle = "#1a0a14"; c.beginPath(); c.ellipse(x, y, r * 1.3, r, i, 0, 7); c.fill(); c.fillStyle = "#ffb3e0"; c.beginPath(); c.ellipse(x, y, r * .55, r * .4, i, 0, 7); c.fill(); } });
+    g.add(box(2.6, 1, 11, lam(0x5a1048), 0, .5, -9.6)); g.add(box(2.6, .03, 11, lam(0xffffff, { map: spots }), 0, 1.01, -9.6)); // Pink Cheetah ramp (cheetah-print runway)
     [-1.32, 1.32].forEach(x => g.add(box(.08, .08, 11, new THREE.MeshBasicMaterial({ color: 0xff5fd2 }), x, 1.04, -9.6)));
-    g.add(box(10, 1, 4, lam(0x2a0f5e), 0, .5, -17));
-    const wall = canvasTex(512, 256, (c, w, h, t = performance.now() / 1000) => { const gr = c.createLinearGradient(0, 0, w, h); gr.addColorStop(0, `hsl(${(t * 40) % 360},80%,45%)`); gr.addColorStop(1, `hsl(${(t * 40 + 120) % 360},80%,35%)`); c.fillStyle = gr; c.fillRect(0, 0, w, h); c.fillStyle = "#fff"; c.textAlign = "center"; c.font = "bold 40px Georgia"; c.fillText(ctx.label || "", w / 2, h / 2 - 10); c.font = "bold 30px Georgia"; c.fillStyle = "#ffe27a"; c.fillText("“THE STARLIGHT”", w / 2, h / 2 + 34); });
-    const vw = new THREE.Mesh(new THREE.PlaneGeometry(8, 4), new THREE.MeshBasicMaterial({ map: wall })); vw.position.set(0, 3.6, -18.9); g.add(vw); ctx.wall = wall;
+    g.add(box(10, 1, 4, lam(0x4a0e44), 0, .5, -17));
+    const tron = new Image(); tron.src = "assets/ring/titantron.webp"; // giant Pink Cheetah titantron (cheetah face, crown, paw prints)
+    const wall = canvasTex(512, 288, (c, w, h, t = performance.now() / 1000) => { c.fillStyle = "#2a0630"; c.fillRect(0, 0, w, h); if (tron.complete && tron.naturalWidth) { const z = 1 + Math.sin(t * 1.3) * .015; c.drawImage(tron, w * (1 - z) / 2, h * (1 - z) / 2, w * z, h * z); }
+      c.strokeStyle = `hsl(${320 + Math.sin(t * 3) * 25},100%,${60 + Math.sin(t * 6) * 15}%)`; c.lineWidth = 8; c.strokeRect(4, 4, w - 8, h - 8);
+      if (ctx.label) { c.fillStyle = "rgba(20,0,20,.55)"; c.fillRect(0, h - 34, w, 34); c.fillStyle = "#fff"; c.textAlign = "center"; c.font = "bold 22px Georgia"; c.fillText(ctx.label, w / 2, h - 10); } });
+    const vw = new THREE.Mesh(new THREE.PlaneGeometry(8, 4.5), new THREE.MeshBasicMaterial({ map: wall })); vw.position.set(0, 3.6, -18.9); g.add(vw); ctx.wall = wall;
     [-2.4, 2.4].forEach(x => [-1.2, 1.2].forEach(dx => g.add(box(.5, 6, .5, std(0x8888a8, { metalness: .7 }), x + dx * 2.2, 3, -18.6))));
   }
   return g;
@@ -132,7 +137,8 @@ export function mount(stage, opts) {
   scene = new THREE.Scene(); cam = new THREE.PerspectiveCamera(50, 2, .05, 80);
   ctx.A = arena(ctx.key); scene.add(ctx.A.g); scene.add(equipment(ctx.key));
   ctx.hero = makeHero(); scene.add(ctx.hero.pivot, ctx.hero.blob);
-  ctx.fx = pyro(); scene.add(ctx.fx.pts);
+  ctx.extra = (ctx.actors || []).map(a => { const b = makeHero(); scene.add(b.pivot, b.blob); return Object.assign(b, a); }); // opponent + referee billboards
+  ctx.fx = pyro(); scene.add(ctx.fx.pts); if (ctx.key === "ring") ctx.fx.pts.material.color.set(0xff8ad8); // pink pyro
   ctx.camPos = new THREE.Vector3(0, 3, 9); ctx.look = new THREE.Vector3(0, 1.2, 0); cam.position.copy(ctx.camPos);
   ctx.stage = stage; fps = { n: 0, t: performance.now(), bad: 0 };
   const loop = now => { raf = requestAnimationFrame(loop); if (!document.body.contains(cvs)) return unmount(); frame(now); };
@@ -145,6 +151,13 @@ export function perform(name) { if (!ctx) return; ctx.mode = "perform"; ctx.t0 =
 export function idle() { if (!ctx) return; ctx.mode = "idle"; ctx.t0 = performance.now(); }
 export function firstPerson(ms) { if (ctx) ctx.fpUntil = performance.now() + ms; }
 export function entrance(ms) { if (!ctx) return; ctx.mode = "entrance"; ctx.t0 = performance.now(); ctx.entMs = ms; ctx.fx.burst(-3.5, 1, -17.5, 250, 9); ctx.fx.burst(3.5, 1, -17.5, 250, 9); }
+export function impact(x, big = 1) { if (!ctx) return; ctx.shakeT = performance.now(); ctx.shakeA = big > 1 ? .16 : .08; ctx.fx.burst(x * S, BASEY[ctx.key] + 1, .3, big > 1 ? 160 : 70, 5); }
+export function shake(a = .1) { if (!ctx) return; ctx.shakeT = performance.now(); ctx.shakeA = a; }
+export function rope(side) { if (ctx) ctx.ropeT = { side, t: performance.now() }; }
+export function hype(level = 2.4, ms = 1500) { if (ctx) ctx.hypeTo = { level, until: performance.now() + ms }; }
+export function pin() { if (!ctx) return; ctx.mode = "pin"; ctx.t0 = performance.now(); }
+export function perch() { if (!ctx) return; ctx.mode = "perch"; ctx.t0 = performance.now(); ctx.fx.burst(-3, 2.6, 3, 90, 5); } // top-rope push-in
+export function gainer() { if (!ctx) return; ctx.mode = "gainer"; ctx.t0 = performance.now(); } // side tracking shot for the flip
 export function celebrate() { if (!ctx) return; const x = ctx.key === "ring" ? 3 : 2; ctx.fx.burst(-x, 1, 0, 150, 7); ctx.fx.burst(x, 1, 0, 150, 7); }
 
 const tmp = new THREE.Vector3();
@@ -157,8 +170,9 @@ function frame(now) {
   const A = ctx.A, key = ctx.key, by = BASEY[key];
   A.beams.forEach(b => { const tx = Math.sin(t * .5 + b.ph) * 3, tz = Math.cos(t * .4 + b.ph) * 2; b.s.target.position.set(tx, 0, tz); b.cone.lookAt(tx, 0, tz); b.cone.rotateX(-Math.PI / 2); });
   // crowd bounce: update a slice each frame (cheap on tablets)
-  const m4 = new THREE.Matrix4(), N = A.seats.length, hype = ctx.mode === "idle" ? 1 : 2.4;
-  for (let i = (ctx.slice = ((ctx.slice || 0) + 1) % 3); i < N; i += 3) { const s = A.seats[i]; m4.makeTranslation(s.x, s.y + Math.max(0, Math.sin(t * s.sp + s.ph)) * .09 * hype, s.z); A.crowd.setMatrixAt(i, m4); }
+  const m4 = new THREE.Matrix4(), N = A.seats.length, hype = ctx.hypeTo && ctx.hypeTo.until > now ? ctx.hypeTo.level : ctx.mode === "idle" ? 1 : 2.4;
+  ctx.rise = (ctx.rise || 0) + (((ctx.mode === "perch" || ctx.mode === "gainer" || ctx.mode === "pin") ? .16 : 0) - (ctx.rise || 0)) * Math.min(1, dt * 3); // crowd rises to its feet
+  for (let i = (ctx.slice = ((ctx.slice || 0) + 1) % 3); i < N; i += 3) { const s = A.seats[i]; m4.makeTranslation(s.x, s.y + ctx.rise + Math.max(0, Math.sin(t * s.sp + s.ph)) * .09 * hype, s.z); A.crowd.setMatrixAt(i, m4); }
   A.crowd.instanceMatrix.needsUpdate = true; A.stickPts.material.size = .18 + Math.sin(t * 6) * .05;
   if (ctx.wall && (ctx.wallT = (ctx.wallT || 0) + dt) > .15) { ctx.wallT = 0; const w = ctx.wall.userData; w.draw(w.g, w.c.width, w.c.height); ctx.wall.needsUpdate = true; }
   ctx.fx.step(dt);
@@ -176,6 +190,19 @@ function frame(now) {
   h.plane.scale.set(w * (p.sx || 1), hh, 1); h.plane.position.set((.5 - ax) * w * (p.sx || 1), (ay - .5) * hh, 0);
   const groundY = key === "beam" && Math.abs(hx) < 2.7 && hy > 1.4 ? 1.255 : key === "ring" && Math.abs(hx) < 3.1 && Math.abs(hz) < 3.1 ? 1.03 : key === "ring" && hz < -3 ? 1.04 : key === "floor" ? .11 : key === "vault" && hx > 1.1 && hx < 3.5 ? .205 : .02;
   h.blob.position.set(hx, groundY + .005, hz); const air = Math.max(0, hy - .66 - groundY); h.blob.scale.setScalar(Math.max(.3, 1 - air * .4)); h.blob.material.opacity = Math.max(.1, .35 - air * .1);
+  // opponent + referee (wrestling match): same billboard maths, standing in the ring with Aniston
+  const ent = ctx.mode === "entrance";
+  (ctx.extra || []).forEach(b => { const q = b.rig.p, nm = b.rig.cur, sp = ctx.spr(nm), kk = b.k || 1; b.pivot.visible = b.blob.visible = !ent;
+    if (ent) return; if (b.cur !== nm) { b.cur = nm; b.mat.map = tex(ctx.url(nm)); b.mat.needsUpdate = true; }
+    const bw = sp[0] * ctx.K * S * kk, bh = sp[1] * ctx.K * S * kk, bx = q.x * S * kk, bz = b.z || 0, byy = by - q.y * kk * S;
+    b.pivot.position.set(bx, byy, bz); b.pivot.rotation.set(0, Math.max(-1.1, Math.min(1.1, Math.atan2(cam.position.x - bx, cam.position.z - bz))), 0); b.pivot.rotateZ(-(q.r || 0) * Math.PI / 180);
+    b.plane.scale.set(bw * (q.sx || 1), bh, 1); b.plane.position.set((.5 - sp[2]) * bw * (q.sx || 1), (sp[3] - .5) * bh, 0);
+    b.blob.position.set(bx, 1.035, bz); b.blob.scale.setScalar(Math.max(.3, 1 - Math.max(0, byy - 1.66) * .4)); });
+  // rope wobble after a rope run / bounce
+  if (ctx.ropeT) { const u = (now - ctx.ropeT.t) / 700, arr = ctx.ropeT.side < 0 ? sideRopes.l : sideRopes.r, x0 = ctx.ropeT.side < 0 ? -3 : 3;
+    arr.forEach((m, i) => { m.position.x = x0 + (u >= 1 ? 0 : Math.sin(u * 22 + i) * .12 * (1 - u) * ctx.ropeT.side); }); if (u >= 1) ctx.ropeT = null; }
+  // match camera centre: between Aniston and her opponent
+  const mid = ctx.extra && ctx.extra[0] ? (hx + ctx.extra[0].rig.p.x * S) / 2 : hx;
 
   // --- cameras ---
   let fov = 50, roll = 0; const look = tmp; let fp = false;
@@ -189,18 +216,29 @@ function frame(now) {
   } else if (ctx.fpUntil > now && key === "beam") {
     fp = true; fov = 70; roll = Math.sin(t * 2.3) * .04;
     ctx.camPos.set(hx + .08, 1.25 + 1.48 + Math.sin(t * 7) * .015, Math.sin(t * 1.7) * .02); look.set(hx + 2.6, 1.05, 0); ctx.snap = true;
+  } else if (ctx.mode === "perch") { // low angle at the corner, pushing in on her on the top rope
+    const u = Math.min(1, (now - ctx.t0) / 1600); ctx.camPos.set(hx + 2.4 - u * .9, hy - .9 + u * .35, 3.6 - u * 1.5); look.set(hx + .2, hy + .15, 0); fov = 50 - u * 8;
+  } else if (ctx.mode === "gainer") { // side-on tracking shot so the full backflip rotation reads
+    ctx.camPos.set(hx * .6 - .3, by + 1.6, 5.2); look.set(hx * .85 + .2, Math.max(by + .9, hy - .2), 0);
+  } else if (ctx.mode === "pin") {
+    const u = (now - ctx.t0) / 1000; ctx.camPos.set(1 + Math.sin(u * .4) * 1.2, by + 1.5, 4.1); look.set(1.1, by + .05, 0);
+  } else if (ctx.mode === "perform" && ctx.extra && ctx.extra.length) {
+    const u = (now - ctx.t0) / 1000, ang = -.55 + Math.min(1.1, u * .35), rad = Math.max(5.5, 7.5 - u * .6), ht = Math.max(1.3, 2.6 - u * .4);
+    ctx.camPos.set(mid + Math.sin(ang) * rad, by + ht, Math.cos(ang) * rad); look.set(mid, Math.max(by + .8, hy * .5 + (by + .8) * .5), 0);
   } else if (ctx.mode === "perform") {
     const u = (now - ctx.t0) / 1000, ang = -.75 + Math.min(1.5, u * .45), rad = Math.max(3.6, 6 - u * .7), ht = Math.max(.9, 2.6 - u * .5);
     ctx.camPos.set(hx + Math.sin(ang) * rad, by + ht, Math.cos(ang) * rad + hz); look.set(hx, hy, hz);
   } else {
     const a = Math.sin(t * .18) * .6, cx = key === "vault" ? -.5 : key === "bars" ? 0 : 0, rad = key === "floor" ? 9 : key === "ring" ? 9.5 : 7;
-    ctx.camPos.set(cx + Math.sin(a) * rad, by + 2.3, Math.cos(a) * rad); look.set(hx * .5 + cx * .5, by + .9, 0);
+    const c0 = ctx.extra && ctx.extra.length ? mid : hx * .5 + cx * .5; ctx.camPos.set(cx + Math.sin(a) * rad, by + 2.3, Math.cos(a) * rad); look.set(c0, by + .9, 0);
   }
   h.plane.visible = !fp;
   const k = ctx.snap ? 1 : 1 - Math.pow(.02, dt); ctx.snap = fp;
   cam.position.lerp(ctx.camPos, k); ctx.look.lerp(look, k); cam.lookAt(ctx.look); cam.rotateZ(roll);
+  let jit = null; if (ctx.shakeT) { const u = (now - ctx.shakeT) / 380; if (u < 1) { const a = ctx.shakeA * (1 - u); jit = new THREE.Vector3((Math.random() - .5) * a, (Math.random() - .5) * a, 0); cam.position.add(jit); } else ctx.shakeT = 0; }
   if (Math.abs(cam.fov - fov) > .1) { cam.fov += (fov - cam.fov) * Math.min(1, dt * 8); cam.updateProjectionMatrix(); }
   R.render(scene, cam);
+  if (jit) cam.position.sub(jit);
 }
-window.Arena3D = { supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate };
+window.Arena3D = { supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate, impact, shake, rope, hype, pin, perch, gainer };
 window.dispatchEvent(new Event("arena3d-ready"));

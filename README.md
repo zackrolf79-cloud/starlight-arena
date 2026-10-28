@@ -55,3 +55,11 @@ Each correct answer unlocks one of 8 skills in the event.
 - **Theme:** gymnastics (default) or **Starlight Superstar Wrestling**, an original league with no real WWE names, logos, wrestlers or music. Each subject is a championship belt, the moves are cartoony showmanship, there is a ring entrance with an announcer and pyro, and a belt ceremony. Switch on the title or Studio screen, or use `?theme=wrestle|gym`.
 - **Music:** an original 36s arena-rock walkout and a 5s fanfare, synthesized with WebAudio (no audio files). Mute stops them.
 - Limits: the ring gear has one colorway; ES modules don't load over file:// (it falls back to Simple mode); software-GPU devices drop to Simple mode.
+
+## Real matches + The Pink Cheetah (v4)
+- **Every wrestling round is now a match against an original cartoon heel**, one per belt: Dr. Remainder (vault/math), The Typo Tornado (bars), Short Circuit Sasha (beam) and Baron Tea-Tax (floor). Each one has idle, attack, hit, taunt and pinned poses (`assets/opp/`). A match runs entrances → faceoff → questions → finisher → pin → belt ceremony. There is a cartoon referee (`assets/ref/`), a crowd, an announcer, Energy and Momentum bars, camera shake, impact flashes, rope bounce and WebAudio SFX. All of it works in both 3D and Simple 2D.
+- **Right answer:** a non-violent cartoon move, and the opponent's momentum drops. **Wrong answer:** the opponent reverses and taunts, then the hint and coach walk-through come before the answer is shown (GVA policy unchanged: hints first, original questions, the "AI-made practice" label, first name only).
+- **Aniston is "THE PINK CHEETAH"**: pink and black cheetah-print full-coverage gear, a cheetah-face emblem, pink lace-up boots, and wavy hair with pink streaks. The arena is pink and purple, with a cheetah-print ramp, a cheetah titantron (`assets/ring/titantron.webp`) and pink pyro.
+- **Finisher, the Top-Rope Cheetah Pounce:** she climbs the turnbuckle and poses on the top rope while the crowd rises and the camera pushes in. Then she does a **gainer**: she takes off forward, does a full backflip while travelling toward the opponent, and lands in the cover. After that come the ref's 1-2-3, the bell and the belt.
+- `?slowmo=N` (1–8) slows every animation. It is only for testing and screenshots.
+- Gymnastics is unchanged.

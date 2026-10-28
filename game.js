@@ -30,14 +30,24 @@ const has3D = () => !!(window.Arena3D && window.Arena3D.supported());
 const use3D = () => has3D() && (MODE3D === "3d" || (MODE3D === "auto" && !lowEnd()));
 /* Original kid-friendly league — no real promotions, wrestlers, logos or music. */
 const WR = {
-  league: "Starlight Superstar Wrestling", short: "SSW", ringName: n => `${n} “The Starlight”`,
+  league: "Starlight Superstar Wrestling", short: "SSW", ringName: n => `${n} “The Pink Cheetah”`,
   ev: {
-    vault: { name: "Math Mayhem Championship", belt: "assets/ring/belt-vault.webp", moves: ["Ring Entrance Pose", "Rope Run Rebound", "Sparkle Crossbody", "Turnbuckle Tuck Flip", "Shooting Star Dropkick", "Moonsault Spin", "Double Rope Rebound", "Championship Pose!"] },
-    bars: { name: "Word Warrior Championship", belt: "assets/ring/belt-bars.webp", moves: ["Crowd Pump", "Prefix Pounce", "Homophone Hurricane Flip", "Root Rocket Flip", "Author's Purpose Dropkick", "Spelling Bee Moonsault", "Rope-a-Rhyme Rebound", "Word Champ Pose!"] },
-    beam: { name: "Power Surge Championship", belt: "assets/ring/belt-beam.webp", moves: ["Power-Up Pose", "Circuit Sprint", "Lightning Crossbody", "Battery Backflip", "Static Spark Dropkick", "Energy Moonsault", "Current Rebound", "Full Charge Pose!"] },
-    floor: { name: "Colony Clash Championship", belt: "assets/ring/belt-floor.webp", moves: ["Colony Callout", "Breadbasket Bounce", "Charter Crossbody", "Tri-corner Tuck Flip", "Liberty Bell Dropkick", "Thirteen Star Moonsault", "Middle Colony Rebound", "Champion of the Colonies!"] }
+    vault: { name: "Math Mayhem Championship", belt: "assets/ring/belt-vault.webp", moves: ["Lock-Up Takedown", "Rope Run Shoulder Block", "Sparkle Crossbody", "Long-Division Suplex Toss", "Shooting Star Dropkick", "Turnbuckle Tuck Flip", "Moonsault Spin", "Top-Rope Cheetah Pounce!"] },
+    bars: { name: "Word Warrior Championship", belt: "assets/ring/belt-bars.webp", moves: ["Prefix Lock-Up", "Rope-a-Rhyme Shoulder Block", "Homophone Crossbody", "Root Word Suplex Toss", "Author's Purpose Dropkick", "Context Clue Tuck Flip", "Spelling Bee Moonsault", "Top-Rope Cheetah Pounce!"] },
+    beam: { name: "Power Surge Championship", belt: "assets/ring/belt-beam.webp", moves: ["Power-Up Lock-Up", "Circuit Sprint Shoulder Block", "Lightning Crossbody", "Battery Suplex Toss", "Static Spark Dropkick", "Turbine Tuck Flip", "Energy Moonsault", "Top-Rope Cheetah Pounce!"] },
+    floor: { name: "Colony Clash Championship", belt: "assets/ring/belt-floor.webp", moves: ["Colony Lock-Up", "Breadbasket Shoulder Block", "Charter Crossbody", "Tri-corner Suplex Toss", "Liberty Bell Dropkick", "Mayflower Tuck Flip", "Thirteen Star Moonsault", "Top-Rope Cheetah Pounce!"] }
   },
-  anims: ["entrance", "roperun", "crossbody", "tuckflip", "dropkick", "moonsault", "rebound", "champ"]
+  anims: ["entrance", "roperun", "crossbody", "tuckflip", "dropkick", "moonsault", "rebound", "champ"],
+  kinds: ["lockup", "shoulder", "crossbody", "suplex", "dropkick", "tuckflip", "moonsault", "finisher"],
+  /* original cartoon "heel" opponents — made-up kid characters, one per belt */
+  opp: {
+    vault: { name: "Dr. Remainder", tag: "the Division Villain", color: "#a6e22e", taunts: ["Your numbers don't add up!", "I always have something LEFT OVER!", "Carry the one? Never!"], boo: "Dr. Remainder divides and conquers!" },
+    bars: { name: "The Typo Tornado", tag: "the Spelling Spinner", color: "#ff4d4d", taunts: ["Speling duzn't mattur!", "I mix up EVERY word!", "Grammar? Never heard of her!"], boo: "The Typo Tornado scrambles the letters!" },
+    beam: { name: "Short Circuit Sasha", tag: "the Static Shocker", color: "#ffd21f", taunts: ["Bzzzt! You're out of power!", "I'll blow your fuse!", "Zero volts for you!"], boo: "Short Circuit Sasha zaps back!" },
+    floor: { name: "Baron Tea-Tax", tag: "the Royal Rascal", color: "#e0303a", taunts: ["Pay your tea tax, colonist!", "No vote for YOU!", "Hand over those pennies!"], boo: "Baron Tea-Tax pulls a royal reversal!" }
+  },
+  calls: ["WHAT A MOVE!", "THE CROWD GOES WILD!", "OH MY! WHAT A COMEBACK!", "UNBELIEVABLE!", "SHE'S ON FIRE!", "LISTEN TO THIS CROWD!", "TEXTBOOK! LITERALLY!", "IT'S TIME… FOR THE CHEETAH POUNCE!"],
+  pows: ["BAM!", "BOING!", "WHOOSH!", "KA-POW!", "SPARKLE!", "ZOOM!", "WHAM!", "STAR POWER!"]
 };
 const WRESTLE = () => THEME === "wrestle";
 const evName = e => WRESTLE() ? WR.ev[e.key].name : e.name;
@@ -53,11 +63,20 @@ function tone(f, t0, dur, type = "sine", vol = .15) {
   const t = c.currentTime + t0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + dur);
   o.connect(g).connect(c.destination); o.start(t); o.stop(t + dur + .05);
 }
+const SLOW = Math.max(1, Math.min(8, +new URLSearchParams(location.search).get("slowmo") || 1)); // ?slowmo=3 = slow-motion replay (also used by the screenshot tests)
 const SFX = {
   click: () => tone(660, 0, .08, "triangle", .08),
   right: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, i * .08, .3, "triangle")),
   wrong: () => { tone(220, 0, .25, "sawtooth", .07); tone(196, .15, .3, "sawtooth", .06); },
   whoosh: () => { const c = ac(); if (!c || MUTED) return; const b = c.createBuffer(1, c.sampleRate * .4, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); f.type = "bandpass"; f.frequency.value = 1200; g.gain.value = .12; s.buffer = b; s.connect(f).connect(g).connect(c.destination); s.start(); },
+  noise: (dur, vol, type, freq, shape = i => 1) => { const c = ac(); if (!c || MUTED) return; const b = c.createBuffer(1, c.sampleRate * dur, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * shape(i / d.length); const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); f.type = type; f.frequency.value = freq; g.gain.value = vol; s.buffer = b; s.connect(f).connect(g).connect(c.destination); s.start(); },
+  // cartoon mat "thud": low pitch-drop + short noise slap (no realistic hit sounds)
+  thud: (big) => { const c = ac(); if (!c || MUTED) return; const o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.frequency.setValueAtTime(big ? 140 : 180, t); o.frequency.exponentialRampToValueAtTime(40, t + .25); g.gain.setValueAtTime(big ? .5 : .35, t); g.gain.exponentialRampToValueAtTime(.001, t + .35); o.connect(g).connect(c.destination); o.start(t); o.stop(t + .4); SFX.noise(.18, big ? .35 : .22, "lowpass", 900, x => 1 - x); },
+  boing: () => { const c = ac(); if (!c || MUTED) return; const o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.type = "triangle"; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(520, t + .12); o.frequency.exponentialRampToValueAtTime(180, t + .45); g.gain.setValueAtTime(.14, t); g.gain.exponentialRampToValueAtTime(.001, t + .5); o.connect(g).connect(c.destination); o.start(t); o.stop(t + .55); },
+  bell: (n = 3) => { for (let i = 0; i < n; i++) [[1318, .14], [1975, .07], [2637, .04]].forEach(([f, v]) => tone(f, i * .32, 1.1, "sine", v)); },
+  slap: () => { SFX.noise(.08, .4, "bandpass", 1500, x => 1 - x); tone(300, 0, .12, "square", .05); },
+  boo: () => SFX.noise(1.1, .2, "lowpass", 420, x => Math.sin(Math.PI * x)),
+  ooh: () => { SFX.noise(.9, .16, "bandpass", 700, x => Math.sin(Math.PI * x)); tone(392, 0, .6, "sine", .05); tone(330, .2, .6, "sine", .04); },
   cheer: () => { const c = ac(); if (!c || MUTED) return; const b = c.createBuffer(1, c.sampleRate * 1.6, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / d.length) * (0.6 + 0.4 * Math.sin(i / 900)); const s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); f.type = "lowpass"; f.frequency.value = 2500; g.gain.value = .18; s.buffer = b; s.connect(f).connect(g).connect(c.destination); s.start(); [784, 988, 1175, 1568].forEach((q, i) => tone(q, .1 + i * .12, .4, "triangle", .08)); }
 };
 /* ---------------- original music (procedural WebAudio; nothing sampled, nothing copied) ---------------- */
@@ -150,15 +169,22 @@ const SPR = { stand: [174, 484, .5, .58], run1: [330, 483, .45, .6], run2: [385,
   tuck: [205, 325, .5, .6], pike: [269, 310, .25, .18], stretch: [153, 610, .5, .6], stick: [147, 579, .5, .65], split: [450, 294, .5, .82],
   passe: [324, 475, .5, .57], tbal: [550, 468, .5, .57], straddle: [463, 407, .5, .62], wobble: [320, 477, .5, .58], salute: [209, 493, .5, .59], celebrate: [264, 399, .5, .7],
   /* wrestling ring gear (same character) */
-  rentr: [302, 471, .45, .6], rbelt: [248, 486, .5, .62], rflex: [240, 483, .5, .6], rpoint: [253, 486, .42, .6], rrun: [417, 489, .45, .62], rkick: [596, 335, .45, .55], rtuck: [400, 367, .5, .55], rland: [349, 417, .45, .62] };
-const RING = new Set(["rentr", "rbelt", "rflex", "rpoint", "rrun", "rkick", "rtuck", "rland"]);
+  // Pink Cheetah set (cut sizes; the 1280x720 pairs are scaled .7–.75 to match the 1024 sheets' body height)
+  rentr: [247, 453, .45, .6], rbelt: [232, 469, .5, .62], rflex: [246, 464, .5, .6], rpoint: [229, 466, .45, .6], rrun: [347, 454, .45, .62], rkick: [537, 293, .45, .55], rtuck: [406, 296, .5, .5], rland: [342, 394, .45, .62], rgrab: [423, 418, .4, .525], rpin: [409, 314, .4, .41],
+  rperch: [286, 413, .5, .5], rpounce: [462, 358, .5, .5], rlay: [196, 494, .5, .5], rcover: [548, 179, .5, .5] };
+// match opponents + referee: [w, h, .5, foot-on-mat anchor]; names o_<belt>_<pose>, ref_<pose>
+{ const add = (n, w, h, f) => { w *= f; h *= f; SPR[n] = [Math.round(w), Math.round(h), .5, Math.max(.05, 1 - 66 / (h * K))]; };
+  const O = {"opp/vault-idle": [300, 446], "opp/vault-attack": [413, 426], "opp/vault-hit": [325, 435], "opp/vault-taunt": [243, 472], "opp/bars-idle": [290, 447], "opp/bars-attack": [401, 437], "opp/bars-hit": [295, 452], "opp/bars-taunt": [235, 473], "opp/beam-idle": [275, 441], "opp/beam-attack": [395, 433], "opp/beam-hit": [298, 448], "opp/beam-taunt": [222, 485], "opp/floor-idle": [290, 444], "opp/floor-attack": [382, 431], "opp/floor-hit": [280, 459], "opp/floor-taunt": [269, 471], "ref/watch": [214, 430], "ref/point": [242, 453], "ref/count": [286, 426], "ref/raise": [193, 486], "opp/vault-pin": [1112, 473], "opp/bars-pin": [1163, 517], "opp/beam-pin": [1180, 482], "opp/floor-pin": [1089, 499]};
+  for (const k in O) { const [w, h] = O[k], [dir, nm] = k.split("/"); dir === "ref" ? add("ref_" + nm, w, h, 1.1) : add("o_" + nm.replace("-", "_"), w, h, nm.endsWith("pin") ? .5 : 1); } }
+const RING = new Set(["rentr", "rbelt", "rflex", "rpoint", "rrun", "rkick", "rtuck", "rland", "rgrab", "rpin", "rperch", "rpounce", "rlay", "rcover"]);
+const ACTOR = n => /^(o|ref)_/.test(n);
 const RMAP = { stand: "rpoint", run1: "rrun", run2: "rrun", hurdle: "rrun", crouch: "rland", tuck: "rtuck", pike: "rtuck", stretch: "rkick", stick: "rflex", split: "rkick", passe: "rentr", tbal: "rentr", straddle: "rkick", wobble: "rpoint", salute: "rentr", celebrate: "rbelt" };
 const LEOS = [["starlight", "Starlight (pink & teal)"], ["galaxy", "Galaxy (purple & gold)"], ["ocean", "Ocean (blue & silver)"], ["ruby", "Ruby (red & gold)"], ["mint", "Mint (green & violet)"], ["sunset", "Sunset (orange & blue)"]];
-const sprURL = (n, L = LOOK) => RING.has(n) ? `assets/ring/${n}.webp` : `assets/gym/${L.leo || "starlight"}-${n}.webp`;
-const pickT = p => { const n = pick(p); return WRESTLE() && !RING.has(n) ? RMAP[n] : n; };
+const sprURL = (n, L = LOOK) => n.startsWith("o_") ? `assets/opp/${n.slice(2).replace("_", "-")}.webp` : n.startsWith("ref_") ? `assets/ref/${n.slice(4)}.webp` : RING.has(n) ? `assets/ring/${n}.webp` : `assets/gym/${L.leo || "starlight"}-${n}.webp`;
+const pickT = p => { const n = pick(p); return WRESTLE() && !RING.has(n) && !ACTOR(n) ? RMAP[n] || n : n; };
 const heroURL = (L = LOOK) => WRESTLE() ? "assets/ring/rbelt.webp" : sprURL("hero", L);
 // preload so pose swaps never flash
-function preload() { Object.keys(SPR).filter(n => WRESTLE() || !RING.has(n)).forEach(n => { const i = new Image(); i.src = sprURL(n); }); }
+function preload() { Object.keys(SPR).filter(n => WRESTLE() || !(RING.has(n) || ACTOR(n))).forEach(n => { const i = new Image(); i.src = sprURL(n); }); }
 function rigSVG(L = LOOK) {
   const spark = L.sparkles ? `<g class="spk">${[[-14, -40], [16, -22], [-8, -5], [12, -52], [0, 20], [-18, 10]].map(([x, y], k) => `<path d="M${x} ${y - 4}l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8-2.8-1.2 2.8-1.2z" fill="#fff"><animate attributeName="opacity" values="0;1;0" dur="${1.1 + k * .27}s" repeatCount="indefinite"/></path>`).join("")}</g>` : "";
   return `<g data-j="root"><image class="spA" href="${sprURL("stand", L)}"/><image class="spB" href="" opacity="0"/>${spark}</g>`;
@@ -181,7 +207,7 @@ function pick(p) {
 }
 const BASE = { x: 0, y: -66, r: 0, sx: 1, sp: 0, lsh: 10, lel: -12, rsh: -10, rel: -12, lhip: 2, lkn: 2, rhip: -2, rkn: 2, tail: 0 };
 class Rig {
-  constructor(g) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0; this.show(WRESTLE() ? "rpoint" : "stand", true); this.apply(); }
+  constructor(g, first) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0; this.show(first || (WRESTLE() ? "rpoint" : "stand"), true); this.apply(); }
   show(n, now) {
     if (n === this.cur) return; this.cur = n;
     const [w, h, ax, ay] = SPR[n], W2 = w * K, H2 = h * K;
@@ -199,7 +225,7 @@ class Rig {
       this.show(pickT(to));
       await new Promise(res => {
         const t0 = performance.now(), E = ease === "lin" ? (t => t) : ease === "out" ? (t => 1 - Math.pow(1 - t, 3)) : (t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-        const step = now => { if (tok !== this.tok) return res(); const t = Math.min(1, (now - t0) / ms), e = E(t);
+        const step = now => { if (tok !== this.tok) return res(); const t = Math.min(1, (now - t0) / (ms * SLOW)), e = E(t);
           for (const k in to) if (typeof to[k] === "number") this.p[k] = from[k] + (to[k] - from[k]) * e; this.apply(); t < 1 ? requestAnimationFrame(step) : res(); };
         requestAnimationFrame(step);
       });
@@ -231,7 +257,7 @@ function flip(x0, dx, dir, shape, height = 120, twist = 0, land = 0) {
 }
 const norm = rig => { rig.p.r = ((rig.p.r % 360) + 360) % 360; if (rig.p.r > 180) rig.p.r -= 360; };
 function run(x0, x1, y = -66) { const n = 6, fr = []; for (let i = 1; i <= n; i++) { const a = i % 2 ? 1 : -1; fr.push([{ x: x0 + (x1 - x0) * i / n, y: y - 4, sp: 12, lhip: -40 * a, rhip: 40 * a, lkn: a > 0 ? 70 : 20, rkn: a > 0 ? 20 : 70, lsh: 50 * a, rsh: -50 * a, rel: -40, lel: -40 }, 120, "lin"]); } return fr; }
-const HOME = { vault: { x: -300 }, bars: { x: -150 }, beam: { x: -40 }, floor: { x: -200 }, ring: { x: -200 } };
+const HOME = { vault: { x: -300 }, bars: { x: -150 }, beam: { x: -40 }, floor: { x: -200 }, ring: { x: -150 } };
 // stage geometry (viewBox 800x400)
 const GEO = { ring: { gx: 400, gy: 330 }, vault: { gx: 400, gy: 360 }, bars: { gx: 400, gy: 360 }, beam: { gx: 400, gy: 250 }, floor: { gx: 400, gy: 350 } };
 const HB = { x: 70, y: -230 }, LB = { x: -100, y: -150 };
@@ -296,10 +322,113 @@ const RINGLIB = {
 const LIB = { vault: SK, floor: FL, bars: BARS, beam: BEAM };
 const wobble = (h) => { const b = h.x || 0, y = h.y; const f = []; [12, -14, 10, -8, 5, 0].forEach((r, i) => f.push([M(P.arms, h, { r: (h.r || 0) + r, x: b + (y < -150 ? r * .8 : 0), sp: r * .4, rhip: i % 2 ? -25 : 0, rkn: i % 2 ? 40 : 0, spr: i % 2 ? "tbal" : "wobble" }), 170])); f.push([M(h, { spr: h.spr || pick(M(BASE, h)) }), 250]); return f; };
 
+/* ---------------- wrestling MATCH: opponent + referee actors, moves, counters, pin ---------------- */
+// Everything here only runs in the Wrestling theme. Cartoon, non-violent: bonks, boings and big flops onto a soft mat.
+const AH = -150, OH = 150, RH = 262;                      // home x: Aniston, opponent, referee
+const actorSVG = n => `<g data-j="root"><image class="spA" href="${sprURL(n)}"/><image class="spB" href="" opacity="0"/></g>`;
+const dur = fr => fr.reduce((a, f) => a + f[1], 0);
+const rrun = (x0, x1, sx = 1) => run(x0, x1).map(f => (f[0].spr = "rrun", f[0].sx = sx, f));
+const retA = x => [[{ x, sx: -1, spr: "rpoint" }, 150], ...rrun(x, AH, -1), [{ x: AH, spr: "rpoint" }, 150]];
+const climbL = (faceRing = true) => [[{ x: AH, sx: -1, spr: "rrun" }, 100], ...rrun(AH, -240, -1), [{ x: -262, y: -120, spr: "rentr", sx: 1 }, 260], [{ x: -272, y: -215, spr: "rpoint", sx: faceRing ? 1 : -1 }, 320, "out"], [{ x: -272, y: -215, spr: "rflex", sx: faceRing ? 1 : -1 }, 600]];
+function MOVES(k, kind) {
+  const os = p => `o_${k}_${p}`, I = { x: OH, spr: os("idle") };
+  const hold = (t, pose = I, pre = []) => [...pre, [pose, Math.max(1, t - dur(pre))]];
+  const getUp = xl => [[{ x: xl, spr: os("pin") }, 800], [{ x: xl - 10, r: -8, spr: os("hit") }, 300], [{ x: xl - 20, r: 4, spr: os("hit") }, 250], [I, 500]];
+  const down = (x0, xl, stay) => [[{ x: x0 + 40, y: -112, r: 20, spr: os("hit") }, 170, "out"], [{ x: xl, y: -66, r: 0, spr: os("pin") }, 170], ...(stay ? [] : getUp(xl))];
+  const stag = x0 => [[{ x: x0 + 60, r: 14, spr: os("hit") }, 170, "out"], [{ x: x0 + 45, r: 6, spr: os("hit") }, 380], [{ x: x0 + 30, r: 0, spr: os("hit") }, 250], [I, 450]];
+  const M = {
+    lockup: () => { const a = [...rrun(AH, -10), [{ x: 30, spr: "rgrab" }, 180], [{ x: 40, y: -70, spr: "rgrab" }, 350], [{ x: 95, spr: "rgrab" }, 180, "out"], [{ x: 95, spr: "rflex" }, 650], ...retA(95)], t = 1430;
+      return { a, o: [...hold(720), [{ x: 110, spr: os("attack") }, 180], [{ x: 110, y: -70, spr: os("attack") }, 350], ...stag(110)], hits: [{ t: 900, small: 1 }, { t }] }; },
+    shoulder: () => { const a = [[{ x: AH, sx: -1, spr: "rrun" }, 120], ...rrun(AH, -265, -1), [{ x: -290, r: 10, sx: -1, spr: "rrun" }, 140], [{ x: -265, sx: 1, spr: "rrun" }, 140], ...rrun(-265, 70), [{ x: 95, r: -12, spr: "rrun" }, 120], [{ x: 95, spr: "rflex" }, 650], ...retA(95)], t = 1960;
+      return { a, o: [...hold(t - 60, { x: OH, spr: os("taunt") }), ...down(OH, 225)], hits: [{ t: 980, rope: -1 }, { t, big: 1 }] }; },
+    crossbody: () => { const a = [...rrun(AH, -20), [{ x: 60, y: -165, r: -8, spr: "rkick" }, 300, "out"], [{ x: 110, y: -112, r: -4, spr: "rkick" }, 140], [{ x: 115, spr: "rland" }, 250], [{ x: 115, spr: "rflex" }, 650], ...retA(115)], t = 1160;
+      return { a, o: [...hold(t - 50), ...down(OH, 232)], hits: [{ t, big: 1 }] }; },
+    suplex: () => { const a = [...rrun(AH, 0), [{ x: 40, spr: "rgrab" }, 200], [{ x: 45, y: -72, spr: "rgrab" }, 500], [{ x: 60, y: -80, r: -10, spr: "rgrab" }, 260], [{ x: 60, spr: "rflex" }, 300], [{ x: 60, spr: "rflex" }, 900], ...retA(60)], t = 2120;
+      return { a, o: [...hold(920), [{ x: 105, spr: os("attack") }, 500], [{ x: 120, y: -200, r: -70, spr: os("hit") }, 260, "out"], [{ x: 195, y: -240, r: -160, spr: os("hit") }, 230, "lin"], [{ x: 232, y: -66, r: 0, spr: os("pin") }, 200], ...getUp(232)], hits: [{ t: 920, small: 1 }, { t, big: 1 }] }; },
+    dropkick: () => { const a = [...rrun(AH, -30), [{ x: 50, y: -152, spr: "rkick" }, 280, "out"], [{ x: 85, y: -130, r: -6, spr: "rkick" }, 150], [{ x: 90, spr: "rland" }, 300], [{ x: 90, spr: "rpoint" }, 600], ...retA(90)], t = 1150;
+      return { a, o: [...hold(t - 40), [{ x: 288, r: 16, spr: os("hit") }, 260, "out"], [{ x: 252, y: -112, r: -10, spr: os("hit") }, 200], [{ x: 232, y: -66, r: 0, spr: os("pin") }, 200], ...getUp(232)], hits: [{ t, big: 1 }, { t: t + 220, rope: 1 }] }; },
+    tuckflip: () => { const c = climbL(), tc = dur(c), a = [...c, [{ x: -80, y: -330, r: 180, spr: "rtuck" }, 350, "out"], [{ x: 60, y: -165, r: 360, spr: "rtuck" }, 320, "lin"], [{ x: 95, y: -66, r: 360, spr: "rland" }, 180], [{ x: 95, r: 360, spr: "rflex" }, 600], [{ x: 95, r: 0, spr: "rflex" }, 1], ...retA(95)], t = tc + 850;
+      return { a, o: [[I, 1200], [{ x: 140, spr: os("taunt") }, 400], [{ x: 140, spr: os("taunt") }, t - 50 - 1900], [{ x: 140, r: -6, spr: os("hit") }, 300], ...down(140, 228)], hits: [{ t: tc - 600, rope: -1, quiet: 1 }, { t, big: 1 }] }; },
+    moonsault: () => { const c = climbL(false), tc = dur(c), a = [...c, [{ x: -120, y: -345, r: -180, sx: -1, spr: "rtuck" }, 360, "out"], [{ x: 50, y: -170, r: -360, sx: -1, spr: "rtuck" }, 330, "lin"], [{ x: 85, y: -66, r: -360, sx: -1, spr: "rland" }, 180], [{ x: 85, r: -360, sx: 1, spr: "rflex" }, 600], [{ x: 85, r: 0, spr: "rflex" }, 1], ...retA(85)], t = tc + 870;
+      return { a, o: [[I, 600], [{ x: 135, spr: os("taunt") }, 400], [{ x: 135, spr: os("taunt") }, t - 50 - 1300], [{ x: 135, r: -6, spr: os("hit") }, 300], ...down(135, 228)], hits: [{ t: tc - 600, rope: -1, quiet: 1 }, { t, big: 1 }] }; },
+    finisher: () => { // TOP-ROPE CHEETAH POUNCE: a gainer — forward take-off from the top rope, full backflip while travelling forward, lands across the opponent
+      const c = climbL(), tc = dur(c), P = 1500, X = 128;
+      const fl = [[{ x: -272, y: -215, spr: "rperch" }, P], [{ x: -262, y: -238, spr: "rlay" }, 120, "out"],      // spring up off the top rope, arms high
+        [{ x: -205, y: -278, r: -70, spr: "rlay" }, 210, "out"], [{ x: -130, y: -292, r: -160, spr: "rtuck" }, 210, "lin"], // backflip starts while she travels forward
+        [{ x: -45, y: -268, r: -250, spr: "rtuck" }, 210, "lin"], [{ x: 35, y: -205, r: -320, spr: "rlay" }, 190, "lin"],     // ... tuck → open to layout
+        [{ x: 95, y: -130, r: -360, spr: "rpounce" }, 160, "in"], [{ x: X - 8, y: -72, r: 0, spr: "rcover" }, 1], [{ x: X - 8, y: -72, spr: "rcover" }, 600]];
+      const a = [...c, ...fl], t = tc + P + 120 + 210 * 3 + 190 + 160;
+      return { a, o: [[{ x: OH, r: -8, spr: os("hit") }, 450], [{ x: OH - 6, r: 8, spr: os("hit") }, 450], [{ x: OH - 10, r: -6, spr: os("hit") }, 400], ...down(OH - 40, X, true), [{ x: X, y: -66, spr: os("pin") }, Math.max(1, t - 1640)], [{ x: X, y: -58, spr: os("pin") }, 70], [{ x: X, y: -66, spr: os("pin") }, 140]],
+        hits: [{ t: 200, cue: () => { bubble("Whoa… I'm seeing stars…", OH); announce("SEEING STARS!", "hot"); } }, { t: 1640, cue: () => { SFX.thud(false); shake(false); } },
+          { t: tc - 700, cue: () => { announce("SHE'S GOING UP TOP!", "hot"); A3("hype", 3, 2200); SFX.ooh(); } },
+          { t: tc, cue: () => { announce("THE PINK CHEETAH IS ON THE TOP ROPE!", "hot"); A3("perch"); A3("hype", 4.5, 2600); SFX.cheer(); const s = $(".stage"); if (s) s.classList.add("perch", "rise"); } },
+          { t: tc + P, cue: () => { ropeBounce(-1); SFX.whoosh(); announce("GAINER!!! CHEETAH POUNCE!", "hot"); A3("gainer"); const s = $(".stage"); if (s) { s.classList.remove("perch"); s.classList.add("tilt"); } } },
+          { t: t - 260, cue: () => { const s = $(".stage"); if (s) s.classList.remove("tilt"); } }, { t, big: 2 }] }; }
+  };
+  return M[kind]();
+}
+/* effects shared by 2D + 3D: HTML overlays (flash, POW word, announcer, bars) + 3D camera shake / rope wobble */
+function stageXY(x, y = -150) { return { l: (400 + x * 1.25) / 8, t: (330 + y * 1.25) / 4 }; }
+function pow(word, x, y, big) { const st = $(".stage"); if (!st) return; const d = document.createElement("div"); d.className = "pow" + (big ? " big" : ""); d.textContent = word; const p = stageXY(x, y); d.style.left = p.l + "%"; d.style.top = p.t + "%"; st.appendChild(d); setTimeout(() => d.remove(), 900); }
+function flash(big) { const f = $(".stage .flash"); if (!f) return; f.classList.remove("on", "big"); void f.offsetWidth; f.classList.add("on"); if (big) f.classList.add("big"); }
+function shake(big) { const st = $(".stage"); if (!st) return; st.classList.remove("shake", "shake2"); void st.offsetWidth; st.classList.add(big ? "shake2" : "shake"); A3("shake", big ? .16 : .07); }
+function ropeBounce(side) { SFX.boing(); A3("rope", side); const ps = app.querySelectorAll(".stage .rope"); if (!ps.length) return; const t0 = performance.now();
+  const step = now => { const u = (now - t0) / 700; ps.forEach((p, i) => { const y = +p.dataset.y, a = u >= 1 ? 0 : Math.sin(u * 22 + i) * 14 * (1 - u); p.setAttribute("d", `M-300 ${y} Q${side * 190} ${y + a} 300 ${y}`); }); if (u < 1 && document.body.contains(ps[0])) requestAnimationFrame(step); };
+  requestAnimationFrame(step); }
+let annT = 0;
+function announce(txt, cls = "") { const an = $("#mann"); if (!an) return; an.innerHTML = `<span class="${cls}">${esc(txt)}</span>`; clearTimeout(annT); annT = setTimeout(() => { if (an.isConnected) an.innerHTML = ""; }, 2200); }
+function bubble(txt, x) { const st = $(".stage"); if (!st) return; st.querySelectorAll(".bubble").forEach(b => b.remove()); const d = document.createElement("div"); d.className = "bubble"; d.textContent = txt; const p = stageXY(x, -185); d.style.left = p.l + "%"; d.style.top = p.t + "%"; st.appendChild(d); setTimeout(() => d.remove(), 2400); }
+function meters() { if (!EV || !EV.opp) return; const { st } = EV; const a = $("#hpA"), o = $("#hpO"); if (a) a.style.width = (st.energy ?? 100) + "%"; if (o) o.style.width = Math.max(0, 100 - 12.5 * (EV.mom ?? st.i)) + "%"; }
+function hit(h, x) { // one impact moment
+  if (h.rope) ropeBounce(h.rope);
+  if (h.quiet) return;
+  const big = !!h.big; SFX.thud(big); flash(big); shake(big); pow(WR.pows[(Math.random() * WR.pows.length) | 0], x, -150, big); A3("impact", x, big ? 2 : 1);
+  if (h.big) { A3("hype", 3.2, 1600); setTimeout(SFX.ooh, 120); } }
+function refLook(pose = "ref_point", ms = 700) { const r = EV && EV.ref; if (!r) return; r.play([[{ x: RH, spr: pose }, 150], [{ x: RH, spr: pose }, ms], [{ x: RH, spr: "ref_watch" }, 200]]); }
+async function matchMove() {
+  const { e, st, rig, opp, ref } = EV, kind = WR.kinds[st.i], mv = MOVES(e.key, kind), my = ++EV.tok;
+  A3("perform", kind); if (kind === "finisher") announce(WR.calls[7], "hot");
+  mv.hits.forEach((h, i) => setTimeout(() => { if (EV && EV.tok === my) { if (h.cue) return h.cue(); hit(h, h.rope ? h.rope * 280 : (rig.p.x + opp.p.x) / 2);
+    if (i === mv.hits.length - 1) { EV.mom = st.i + 1; meters(); refLook(); if (kind !== "finisher") announce(WR.calls[st.i % 7], "hot"); } } }, h.t * SLOW));
+  await Promise.all([rig.play(mv.a), opp.play(mv.o)]);
+  if (kind === "finisher" && EV && EV.tok === my) await pinCount(my);
+}
+async function pinCount(my) {
+  const { e, rig, opp, ref } = EV, O = WR.opp[e.key], ok = () => EV && EV.tok === my && document.body.contains(rig.g);
+  const sleep = ms => new Promise(r => setTimeout(r, ms * SLOW));
+  A3("pin"); announce("THE COVER!", "hot");
+  const cx = rig.p.x; rig.play(rig.cur === "rcover" ? [[{ x: cx, y: -72, spr: "rcover" }, 300], [{ x: cx, y: -70, spr: "rcover" }, 3400]] : [[{ x: 80, spr: "rflex" }, 250], [{ x: 70, spr: "rpin" }, 300], [{ x: 70, y: -64, spr: "rpin" }, 3400]]);
+  await ref.play([[{ x: 120, sx: -1, spr: "ref_watch" }, 1], [{ x: -60, sx: -1, spr: "ref_watch" }, 500], [{ x: -80, sx: -1, spr: "ref_count" }, 300]]);
+  for (const n of [1, 2, 3]) { if (!ok()) return;
+    await ref.play([[{ x: -80, y: -80, sx: -1, spr: "ref_count" }, 260], [{ x: -80, y: -66, sx: -1, spr: "ref_count" }, 140]]);
+    SFX.slap(); A3("hype", 2 + n, 900); announce(n === 3 ? "THREE!!!" : n === 1 ? "ONE!" : "TWO!", "count"); shake(n === 3); await sleep(n < 3 ? 520 : 650); }
+  if (!ok()) return;
+  SFX.bell(3); setTimeout(SFX.cheer, 250); A3("hype", 4, 3500); A3("celebrate"); confetti(120);
+  announce(`YOUR WINNER… AND NEW CHAMPION… ${WR.ringName(W.athleteName)}!`, "hot");
+  { const s = $(".stage"); if (s) s.classList.remove("rise"); } rig.play([[{ x: 60, y: -66, spr: "rflex" }, 300], [{ x: -20, spr: "rbelt" }, 500], [{ x: -20, y: -72, spr: "rbelt" }, 1400]]);
+  await ref.play([[{ x: -110, sx: -1, spr: "ref_watch" }, 400], [{ x: -110, sx: -1, spr: "ref_raise" }, 1900]]);
+  bubble("No fair… I needed more practice!", opp.p.x);
+  await sleep(900);
+}
+async function counter() { // wrong answer: the heel gets a reversal + taunt (hints still show, nothing is graded)
+  const { e, st, rig, opp } = EV, O = WR.opp[e.key], os = p => `o_${e.key}_${p}`, my = ++EV.tok;
+  announce(O.boo, "boo"); SFX.boo();
+  st.energy = Math.max(20, (st.energy ?? 100) - 8); save();
+  setTimeout(() => { if (EV && EV.tok === my) { hit({ small: 1 }, -110); meters(); } }, 620);
+  setTimeout(() => { if (EV && EV.tok === my) ropeBounce(-1); }, 880);
+  setTimeout(() => { if (EV && EV.tok === my) bubble(O.taunts[(Math.random() * O.taunts.length) | 0], OH - 40); }, 1500);
+  rig.play([[{ x: AH, spr: "rpoint" }, 560], [{ x: -218, r: -14, spr: "rland" }, 180, "out"], [{ x: -240, r: -8, spr: "rland" }, 250], [{ x: -200, spr: "rland" }, 300], [{ x: AH, spr: "rpoint" }, 450]]);
+  await opp.play([[{ x: OH, spr: os("attack") }, 180], [{ x: -28, spr: os("attack") }, 440], [{ x: -10, spr: os("taunt") }, 300], [{ x: 60, y: -74, spr: os("taunt") }, 300], [{ x: OH, spr: os("taunt") }, 500], [{ x: OH, y: -76, spr: os("taunt") }, 250], [{ x: OH, spr: os("taunt") }, 250], [{ x: OH, y: -76, spr: os("taunt") }, 250], [{ x: OH, spr: os("idle") }, 300]]);
+}
+function matchHUD(e) { const O = WR.opp[e.key];
+  return `<div class="mbar"><div class="side me"><b>${esc(W.athleteName)}</b><div class="meter"><i id="hpA"></i></div><small>Energy</small></div><div class="vs">VS</div>
+    <div class="side them" style="--o:${O.color}"><b>${esc(O.name)}</b><div class="meter"><i id="hpO"></i></div><small>${esc(O.tag)} · Momentum</small></div></div>
+    <div class="flash"></div><div class="announce match" id="mann"></div>`; }
+
 /* ---------------- equipment art per stage ---------------- */
 function equipment(key) {
   const G = GEO[key];
-  if (key === "ring") { const rope = (y, c) => `<line x1="-300" y1="${y}" x2="300" y2="${y}" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
+  if (key === "ring") { const rope = (y, c) => `<path class="rope" data-y="${y}" d="M-300 ${y} Q0 ${y} 300 ${y}" fill="none" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
     return `<g transform="translate(${G.gx},${G.gy})"><ellipse cx="0" cy="66" rx="390" ry="14" fill="#000" opacity=".4"/>
     <path d="M-330 0 H330 L345 62 H-345z" fill="#2a0f5e" stroke="#ff5fd2" stroke-width="3"/><text x="0" y="42" text-anchor="middle" font-family="Georgia" font-weight="700" font-size="30" fill="#fff">★ SSW ★</text>
     <rect x="-330" y="-6" width="660" height="8" rx="3" fill="#f1ecff"/>
@@ -311,18 +440,21 @@ function equipment(key) {
   if (key === "beam") return `<g transform="translate(${G.gx},${G.gy})"><rect x="-270" y="0" width="540" height="14" rx="5" fill="#f4dcb4" stroke="#c99f6b"/><path d="M-220 14 l-20 96 h24 l14 -96z M220 14 l20 96 h-24 l-14 -96z" fill="#3a3a9e"/><ellipse cx="0" cy="114" rx="380" ry="10" fill="#000" opacity=".3"/><rect x="-380" y="106" width="760" height="10" rx="5" fill="#3d63ff"/></g>`;
   return `<g transform="translate(${G.gx},${G.gy})"><path d="M-390 0 L390 0 L360 -40 L-360 -40z" fill="#2c48d6" opacity=".9"/><path d="M-370 -4 L370 -4 L346 -34 L-346 -34z" fill="none" stroke="#fff" stroke-width="2" opacity=".8"/><path d="M0 -24 l3 7 7 .5 -5.5 4.5 2 7 -6.5 -4 -6.5 4 2 -7 -5.5 -4.5 7 -.5z" fill="#ffd34d"/></g>`;
 }
+let EVK = null; // event key whose opponent is in the ring (wrestle match stage only)
 function stageSVG(key, scale = 1.25) {
+  EVK = WRESTLE() && key !== "ring" ? key : null;
   if (WRESTLE()) key = "ring";
   const G = GEO[key];
   return `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="spot"><stop offset="0" stop-color="#fff" stop-opacity=".25"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
   <ellipse cx="400" cy="${G.gy}" rx="320" ry="60" fill="url(#spot)"/><g transform="translate(400,${G.gy}) scale(${scale}) translate(-400,${-G.gy})">${equipment(key)}
+  ${key === "ring" && EVK ? `<g transform="translate(${G.gx},${G.gy - 14}) scale(.9)" class="refwrap">${actorSVG("ref_watch")}</g><g transform="translate(${G.gx},${G.gy})" class="oppwrap">${actorSVG(`o_${EVK}_idle`)}</g>` : ""}
   <g transform="translate(${G.gx},${key === "floor" ? G.gy - 20 : G.gy})" class="rigwrap">${rigSVG()}</g></g></svg>`;
 }
 
 /* ---------------- 3D glue (arena3d.js is an ES module; if it fails we stay in Simple mode) ---------------- */
-function mount3D(stage, key, rig, label) {
+function mount3D(stage, key, rig, label, actors) {
   if (!use3D()) return false;
-  const ok = window.Arena3D.mount(stage, { key: WRESTLE() ? "ring" : key, rig, label, K, spr: n => SPR[n] || SPR.stand, url: n => sprURL(n),
+  const ok = window.Arena3D.mount(stage, { key: WRESTLE() ? "ring" : key, rig, label, K, actors, spr: n => SPR[n] || SPR.stand, url: n => sprURL(n),
     onFail: () => { MODE3D = "simple"; }, onSlow: f => { if (/[?&]mode=3d/.test(location.search)) return; window.Arena3D.unmount(); MODE3D = "simple"; store.set("starlight:view", "simple"); toast(`Switched to Simple mode for smoother play (${f | 0} fps).`); } });
   return ok;
 }
@@ -387,19 +519,28 @@ function startEvent(e, skipEntrance) {
   const st = S.ev[e.key]; if (st.i >= 8) { st.i = 0; st.scores = []; save(); }
   if (WRESTLE() && !skipEntrance && st.i === 0) return entrance(e);
   if (!WRESTLE() && st.i === 0) playMusic("fanfare", .55); else if (!WRESTLE()) stopMusic();
+  if (WRESTLE() && st.i === 0) { st.energy = 100; save(); }
   document.documentElement.style.setProperty("--c", e.color);
   app.innerHTML = `<div class="hud" style="--c:${e.color}">${portraitImg()}<span class="pill">${esc(evName(e))} · ${esc(e.subject)}</span><span class="pill" id="sk"></span><span class="pill" id="sc"></span>
     <span style="flex:1"></span>${viewBtn()}<button class="btn ghost" id="nt">📝 Notes</button><button class="btn ghost" id="bk">🗺 Map</button></div>
     <div class="skills" style="--c:${e.color}">${evSkills(e).map((s, i) => `<span data-i="${i}">${esc(s)}</span>`).join("")}</div>
-    <div class="stage" style="background-image:url(${bgURL()})">${stageSVG(e.key)}<div class="callout" id="co"></div></div>
+    <div class="stage${WRESTLE() ? " match" : ""}" style="background-image:url(${bgURL()})">${stageSVG(e.key)}<div class="callout" id="co"></div>${WRESTLE() ? matchHUD(e) : ""}</div>
     <div class="panel qcard" id="qc" style="--c:${e.color}"></div>`;
   const rig = new Rig($(".rigwrap [data-j=root]").parentNode);
   const home = WRESTLE() ? HOME.ring : st.i > 0 && e.key === "bars" ? hang : (HOME[e.key] || {});
   rig.set(home);
-  EV = { e, st, rig, home };
-  mount3D($(".stage"), e.key, rig, WRESTLE() ? WR.ev[e.key].name.replace(" Championship", "") : e.name);
-  bindView(() => { rig.tok++; stopMusic(.1); startEvent(e, true); });
-  $("#bk").onclick = () => { rig.tok++; stopMusic(); map(); }; $("#nt").onclick = () => notes(e);
+  EV = { e, st, rig, home, tok: 0 };
+  let actors;
+  if (WRESTLE()) { // opponent + referee share the Rig tweener; 3D draws them as extra billboards
+    const opp = new Rig($(".oppwrap"), `o_${e.key}_idle`), ref = new Rig($(".refwrap"), "ref_watch");
+    opp.base = { spr: `o_${e.key}_idle` }; ref.base = { spr: "ref_watch" }; opp.set({ x: OH }); ref.set({ x: RH });
+    Object.assign(EV, { opp, ref, mom: st.i }); meters();
+    actors = [{ rig: opp, z: 0 }, { rig: ref, z: -1.7, k: .9 }];
+  }
+  const stop = () => { rig.tok++; EV.tok++; if (EV.opp) { EV.opp.tok++; EV.ref.tok++; } };
+  mount3D($(".stage"), e.key, rig, WRESTLE() ? WR.ev[e.key].name.replace(" Championship", "") : e.name, actors);
+  bindView(() => { stop(); stopMusic(.1); startEvent(e, true); });
+  $("#bk").onclick = () => { stop(); stopMusic(); map(); }; $("#nt").onclick = () => notes(e);
   if (st.i === 0 && !st.seenNotes) { st.seenNotes = true; save(); notes(e, () => question()); } else question();
 }
 function hud() { const { e, st } = EV; $("#sk").textContent = `Skill ${Math.min(st.i + 1, 8)} / 8`; const avg = st.scores.length ? st.scores.reduce((a, b) => a + b, 0) / st.scores.length : 0; $("#sc").textContent = `Score ${fmt(avg)}`;
@@ -426,9 +567,9 @@ function question() {
   qc.querySelectorAll(".choice").forEach(b => b.onclick = () => {
     const i = +b.dataset.i;
     if (i === Q.a) { b.classList.add("right"); finish(false); return; }
-    tries++; b.classList.add("wrong"); b.disabled = true; SFX.wrong(); EV.rig.play(wobble(EV.home));
+    tries++; b.classList.add("wrong"); b.disabled = true; SFX.wrong(); WRESTLE() && EV.opp ? counter() : EV.rig.play(wobble(EV.home));
     ded = Math.max(ded, .3);
-    if (tries === 1) { fb.textContent = "Wobble! Check the hint and try again."; showHint(); }
+    if (tries === 1) { fb.textContent = WRESTLE() ? `Reversal by ${WR.opp[e.key].name}! Check the hint and try again.` : "Wobble! Check the hint and try again."; showHint(); }
     else { fb.textContent = "Let's slow down — your coach will walk through it."; showCoach(); }
   });
   function finish(shown) {
@@ -446,10 +587,10 @@ async function perform(score) {
   const frames = WRESTLE() ? RINGLIB[WR.anims[st.i]]() : (LIB[e.key][e.anims[st.i]] || SK.salute)();
   if (!WRESTLE() && e.key === "beam" && window.Arena3D && window.Arena3D.isOn()) { // 3D: first-person walk down the beam first
     A3("firstPerson", 1500); await rig.play([[{ x: -200, spr: "stand" }, 10], [{ x: -40, spr: "stand" }, 1400, "lin"]]); }
-  A3("perform", e.anims[st.i]);
-  await rig.play(frames); norm(rig); A3("celebrate"); A3("idle");
+  if (WRESTLE() && EV.opp) { await matchMove(); } else { A3("perform", e.anims[st.i]);
+  await rig.play(frames); } norm(rig); A3("celebrate"); A3("idle");
   if (!document.body.contains(co)) return;
-  co.classList.remove("show"); SFX.cheer(); confetti(40);
+  co.classList.remove("show"); if (!(WRESTLE() && st.i === 7)) { SFX.cheer(); confetti(40); }
   st.scores.push(score); st.i++;
   EV.home = WRESTLE() ? HOME.ring : e.key === "bars" && st.i < 8 ? hang : (HOME[e.key] || {});
   if (st.i < 8) { save(); rig.base = {}; await rig.play([[EV.home, 450]]); norm(rig); question(); }
@@ -484,20 +625,25 @@ function podium() {
 
 /* ---------------- wrestling: ring entrance + belt ceremony ---------------- */
 function entrance(e) {
-  const name = WR.ringName(W.athleteName), lines = ["Ladies and gentlemen… boys and girls…", `This is the ${WR.ev[e.key].name}!`, "Making her way to the ring…", "from the Starlight Gym…", `${name}!!!`];
+  const name = WR.ringName(W.athleteName), O = WR.opp[e.key], oi = `o_${e.key}_`;
+  const lines = ["Ladies and gentlemen… boys and girls…", `This is the ${WR.ev[e.key].name}!`, "Introducing first… the challenger…", `${O.name}, ${O.tag}!`, "And her opponent… making her way to the ring…", "from the Starlight Gym…", `${name}!!!`];
   app.innerHTML = `<div class="hud"><span class="pill">🎤 ${esc(WR.league)}</span><span style="flex:1"></span>${viewBtn()}<button class="btn" id="sk">Skip ▶ To the ring</button></div>
     <div class="stage entrance" style="background-image:url(${bgURL()})">
-      <div class="ent2d"><div class="beams"><i></i><i></i><i></i><i></i></div><div class="pyro l"></div><div class="pyro r"></div><img class="walker" src="assets/ring/rentr.webp" alt="${esc(W.athleteName)} walking out"></div>
+      <div class="ent2d"><div class="beams"><i></i><i></i><i></i><i></i></div><div class="pyro l"></div><div class="pyro r"></div><img class="walker opp" src="assets/opp/${e.key}-idle.webp" alt="${esc(O.name)} walking out"></div>
       <div class="announce" id="an"></div></div>
-    <p class="tip" style="text-align:center">🎵 Original walkout song made with code for ${esc(W.athleteName)} · tap 🔊 to mute</p>`;
-  const fake = { p: { x: 0, y: -66, r: 0, sx: 1 }, cur: "rentr" }, MS = 13000;
+    <p class="tip" style="text-align:center">🎵 Original walkout song made with code for ${esc(W.athleteName)} · tap 🔊 to mute · ${esc(O.name)} is a made-up cartoon character</p>`;
+  const fake = { p: { x: 0, y: -66, r: 0, sx: 1 }, cur: oi + "idle" }, MS = 16000, OPP_MS = 8400;
   const is3d = mount3D($(".stage"), "ring", fake, WR.ev[e.key].name.replace(" Championship", ""));
-  if (is3d) A3("entrance", MS);
+  if (is3d) A3("entrance", OPP_MS);
   playMusic("walkout", .75);
-  let k = 0, done = false; const an = $("#an");
+  let k = 0, done = false, me = false; const an = $("#an");
   const go = () => { if (done) return; done = true; clearInterval(iv); clearTimeout(to); stopMusic(1.2); startEvent(e, true); };
-  const iv = setInterval(() => { if (!document.body.contains(an)) return clearInterval(iv); if (k < lines.length) { an.innerHTML = `<span>${esc(lines[k++])}</span>`; if (k === lines.length) { SFX.cheer(); confetti(80); } }
-    fake.cur = ["rentr", "rpoint", "rentr", "rflex", "rbelt"][k % 5]; }, 2200);
+  const iv = setInterval(() => { if (!document.body.contains(an)) return clearInterval(iv);
+    if (k < lines.length) { an.innerHTML = `<span class="${k === 3 ? "boo" : ""}">${esc(lines[k++])}</span>`;
+      if (k === 4) { SFX.boo(); }
+      if (k === 5 && !me) { me = true; const w = $(".ent2d .walker"); if (w) { const n = w.cloneNode(); n.className = "walker me"; n.src = "assets/ring/rentr.webp"; n.alt = `${W.athleteName} walking out`; w.replaceWith(n); } fake.cur = "rentr"; if (is3d) A3("entrance", MS - 11000); }
+      if (k === lines.length) { SFX.cheer(); confetti(80); } }
+    fake.cur = me ? ["rentr", "rpoint", "rentr", "rflex", "rbelt"][k % 5] : [oi + "idle", oi + "taunt"][k % 2]; }, 2200);
   an.innerHTML = `<span>🎤</span>`;
   const to = setTimeout(go, MS + 1500);
   $("#sk").onclick = () => { SFX.click(); go(); };
