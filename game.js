@@ -368,7 +368,10 @@ function MOVES(k, kind) {
   return M[kind]();
 }
 /* effects shared by 2D + 3D: HTML overlays (flash, POW word, announcer, bars) + 3D camera shake / rope wobble */
-function stageXY(x, y = -150) { return { l: (400 + x * 1.25) / 8, t: (330 + y * 1.25) / 4 }; }
+function stageXY(x, y = -150) {
+  let q = window.Arena3D && window.Arena3D.isOn() && window.Arena3D.project ? window.Arena3D.project(x, y) : null;
+  if (!q) { const X = 400 + x * 1.25, Y = 330 + y * 1.25; q = CAM2.on ? { l: (X / 800 * CAM2.z + CAM2.tx) * 100, t: (Y / 400 * CAM2.z + CAM2.ty) * 100 } : { l: X / 8, t: Y / 4 }; }
+  return { l: Math.max(8, Math.min(92, q.l)), t: Math.max(16, Math.min(90, q.t)) }; }
 function pow(word, x, y, big) { const st = $(".stage"); if (!st) return; const d = document.createElement("div"); d.className = "pow" + (big ? " big" : ""); d.textContent = word; const p = stageXY(x, y); d.style.left = p.l + "%"; d.style.top = p.t + "%"; st.appendChild(d); setTimeout(() => d.remove(), 900); }
 function flash(big) { const f = $(".stage .flash"); if (!f) return; f.classList.remove("on", "big"); void f.offsetWidth; f.classList.add("on"); if (big) f.classList.add("big"); }
 function shake(big) { const st = $(".stage"); if (!st) return; st.classList.remove("shake", "shake2"); void st.offsetWidth; st.classList.add(big ? "shake2" : "shake"); A3("shake", big ? .16 : .07); }
@@ -403,7 +406,7 @@ async function pinCount(my) {
     await ref.play([[{ x: -80, y: -80, sx: -1, spr: "ref_count" }, 260], [{ x: -80, y: -66, sx: -1, spr: "ref_count" }, 140]]);
     SFX.slap(); A3("hype", 2 + n, 900); announce(n === 3 ? "THREE!!!" : n === 1 ? "ONE!" : "TWO!", "count"); shake(n === 3); await sleep(n < 3 ? 520 : 650); }
   if (!ok()) return;
-  SFX.bell(3); setTimeout(SFX.cheer, 250); A3("hype", 4, 3500); A3("celebrate"); confetti(120);
+  SFX.bell(3); setTimeout(SFX.cheer, 250); A3("win"); A3("hype", 4, 3500); A3("celebrate"); confetti(120);
   announce(`YOUR WINNER… AND NEW CHAMPION… ${WR.ringName(W.athleteName)}!`, "hot");
   { const s = $(".stage"); if (s) s.classList.remove("rise"); } rig.play([[{ x: 60, y: -66, spr: "rflex" }, 300], [{ x: -20, spr: "rbelt" }, 500], [{ x: -20, y: -72, spr: "rbelt" }, 1400]]);
   await ref.play([[{ x: -110, sx: -1, spr: "ref_watch" }, 400], [{ x: -110, sx: -1, spr: "ref_raise" }, 1900]]);
@@ -412,13 +415,14 @@ async function pinCount(my) {
 }
 async function counter() { // wrong answer: the heel gets a reversal + taunt (hints still show, nothing is graded)
   const { e, st, rig, opp } = EV, O = WR.opp[e.key], os = p => `o_${e.key}_${p}`, my = ++EV.tok;
-  announce(O.boo, "boo"); SFX.boo();
+  announce(O.boo, "boo"); SFX.boo(); A3("perform", "reversal");
   st.energy = Math.max(20, (st.energy ?? 100) - 8); save();
   setTimeout(() => { if (EV && EV.tok === my) { hit({ small: 1 }, -110); meters(); } }, 620);
   setTimeout(() => { if (EV && EV.tok === my) ropeBounce(-1); }, 880);
   setTimeout(() => { if (EV && EV.tok === my) bubble(O.taunts[(Math.random() * O.taunts.length) | 0], OH - 40); }, 1500);
   rig.play([[{ x: AH, spr: "rpoint" }, 560], [{ x: -218, r: -14, spr: "rland" }, 180, "out"], [{ x: -240, r: -8, spr: "rland" }, 250], [{ x: -200, spr: "rland" }, 300], [{ x: AH, spr: "rpoint" }, 450]]);
   await opp.play([[{ x: OH, spr: os("attack") }, 180], [{ x: -28, spr: os("attack") }, 440], [{ x: -10, spr: os("taunt") }, 300], [{ x: 60, y: -74, spr: os("taunt") }, 300], [{ x: OH, spr: os("taunt") }, 500], [{ x: OH, y: -76, spr: os("taunt") }, 250], [{ x: OH, spr: os("taunt") }, 250], [{ x: OH, y: -76, spr: os("taunt") }, 250], [{ x: OH, spr: os("idle") }, 300]]);
+  if (EV && EV.tok === my) A3("idle");
 }
 function matchHUD(e) { const O = WR.opp[e.key];
   return `<div class="mbar"><div class="side me"><b>${esc(W.athleteName)}</b><div class="meter"><i id="hpA"></i></div><small>Energy</small></div><div class="vs">VS</div>
@@ -458,7 +462,39 @@ function mount3D(stage, key, rig, label, actors) {
     onFail: () => { MODE3D = "simple"; }, onSlow: f => { if (/[?&]mode=3d/.test(location.search)) return; window.Arena3D.unmount(); MODE3D = "simple"; store.set("starlight:view", "simple"); toast(`Switched to Simple mode for smoother play (${f | 0} fps).`); } });
   return ok;
 }
-const A3 = (fn, ...a) => window.Arena3D && window.Arena3D.isOn() && window.Arena3D[fn](...a);
+const A3 = (fn, ...a) => { if (CAM2MODES.includes(fn)) cam2(fn); return window.Arena3D && window.Arena3D.isOn() && window.Arena3D[fn](...a); };
+/* ---------- ring cam for Simple 2D: closer, lower broadcast framing that pans/zooms with the action ---------- */
+const CAM2MODES = ["entrance", "idle", "perform", "perch", "gainer", "pin", "win"];
+const CAM2 = { mode: "idle", t0: 0, z: 1, tx: 0, ty: 0, fy: 0, on: false, last: 0 };
+function cam2(mode) { CAM2.snap = CAM2.mode !== mode && mode !== "gainer" && mode !== "idle"; CAM2.mode = mode; CAM2.t0 = performance.now(); } // hard cuts like a broadcast, except the flip follow
+function cam2Loop(now) {
+  requestAnimationFrame(cam2Loop);
+  const st = $(".stage.match"), sv = st && st.querySelector(":scope>svg"), fg = st && st.querySelector(".fgropes");
+  const live = sv && EV && EV.opp && !st.classList.contains("is3d") && document.body.contains(EV.rig.g);
+  const dt = Math.min(.05, (now - (CAM2.last || now)) / 1000) / SLOW; CAM2.last = now;
+  if (!live) { if (CAM2.on) { CAM2.on = false; Object.assign(CAM2, { z: 1, tx: 0, ty: 0 }); } return; }
+  const R = sv.getBoundingClientRect(), P = r => { const im = [r.B, r.A].find(e => e && e.getAttribute("href") && e.getAttribute("opacity") !== "0") || r.A || r.g, b = im.getBoundingClientRect(); if (!b.width || !R.width) return { x: 400, y: 250 }; return { x: (b.x + b.width / 2 - R.x) / R.width * 800, y: (b.y + b.height / 2 - R.y) / R.height * 400 }; }, a = P(EV.rig), o = P(EV.opp), rf = P(EV.ref);
+  const u = (now - CAM2.t0) / 1000 / SLOW, t = now / 1000; let z, fx, fy, ax = .5, ay = .56, fgy = 0, sp = .03;
+  switch (CAM2.mode) {
+    case "perform": z = Math.max(1.15, Math.min(1.6, 720 / (Math.abs(a.x - o.x) + 300))) + Math.min(.12, u * .08); fx = (a.x + o.x) / 2 + Math.sin(u * 1.3) * 26; fy = (a.y + o.y) / 2 - 10; break;
+    case "perch": z = 1.4 + Math.min(1, u / 1.6) * .2; fx = a.x; fy = a.y; ax = .34; ay = .44; fgy = 45; sp = .002; break;
+    case "gainer": z = 1.35; fx = a.x; fy = a.y; ax = .45; ay = .47; fgy = 45; sp = .0008; break;
+    case "pin": z = 1.6; fx = (rf.x + a.x) / 2 + 20; fy = (rf.y + a.y) / 2; ay = .55; break;
+    case "win": z = 1.45; fx = a.x + 30; fy = a.y - 10; ay = .5; break;
+    case "entrance": z = 1; fx = 400; fy = 200; fgy = 100; break;
+    default: z = Math.max(1.15, Math.min(1.5, 760 / (Math.abs(a.x - o.x) + 260))); fx = a.x * .42 + o.x * .58 + Math.sin(t * .4) * 10; ax = .5; fy = (a.y + o.y) / 2 - 10 + Math.sin(t * .5) * 3; // over-the-shoulder faceoff
+  }
+  const k = CAM2.on && !CAM2.snap ? 1 - Math.pow(sp, dt) : 1; CAM2.on = true; CAM2.snap = false;
+  CAM2.z += (z - CAM2.z) * k; CAM2.tx += ((ax - fx / 800 * z) - CAM2.tx) * k; CAM2.ty += ((ay - fy / 400 * z) - CAM2.ty) * k; CAM2.fy += (fgy - CAM2.fy) * k;
+  sv.style.transform = `translate(${(CAM2.tx * 100).toFixed(2)}%,${(CAM2.ty * 100).toFixed(2)}%) scale(${CAM2.z.toFixed(3)})`;
+  const cx = (.5 - CAM2.tx) / CAM2.z * 800, cy = (.5 - CAM2.ty) / CAM2.z * 400; // scene point at the centre of the frame
+  st.style.backgroundSize = `${(100 * (1 + (CAM2.z - 1) * .45)).toFixed(1)}% auto`;
+  st.style.backgroundPosition = `${Math.max(0, Math.min(100, 50 + (cx - 400) / 4)).toFixed(1)}% ${Math.max(0, Math.min(100, 50 + (cy - 200) / 3)).toFixed(1)}%`;
+  if (fg) fg.style.transform = `translate(${Math.max(-9, Math.min(9, -(cx - 400) * CAM2.z * .5 / 8)).toFixed(2)}%,${CAM2.fy.toFixed(1)}%)`;
+}
+requestAnimationFrame(cam2Loop);
+const FGROPES = `<svg class="fgropes" viewBox="0 0 800 400" preserveAspectRatio="none" aria-hidden="true">${[-10, 810].map(x => `<rect x="${x - 22}" y="230" width="44" height="190" rx="8" fill="#6b5a8e"/><rect x="${x - 30}" y="240" width="60" height="64" rx="16" fill="#ff5fd2"/>`).join("")}
+  <path d="M-1200 312 Q400 330 2000 312" stroke="#ff5fd2" stroke-width="15" fill="none" stroke-linecap="round"/><path d="M-1200 372 Q400 392 2000 372" stroke="#f4f0ff" stroke-width="15" fill="none" stroke-linecap="round"/></svg>`;
 function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 3500); }
 function viewBtn() { return `<button class="btn ghost" id="vw" title="Switch between 3D arena and Simple 2D view">${use3D() ? "🖼 Simple mode" : "🎥 3D arena"}</button>`; }
 function bindView(redraw) { const b = $("#vw"); if (!b) return; if (!has3D()) { b.disabled = true; b.title = "3D isn't available on this device — using Simple mode"; }
@@ -524,7 +560,7 @@ function startEvent(e, skipEntrance) {
   app.innerHTML = `<div class="hud" style="--c:${e.color}">${portraitImg()}<span class="pill">${esc(evName(e))} · ${esc(e.subject)}</span><span class="pill" id="sk"></span><span class="pill" id="sc"></span>
     <span style="flex:1"></span>${viewBtn()}<button class="btn ghost" id="nt">📝 Notes</button><button class="btn ghost" id="bk">🗺 Map</button></div>
     <div class="skills" style="--c:${e.color}">${evSkills(e).map((s, i) => `<span data-i="${i}">${esc(s)}</span>`).join("")}</div>
-    <div class="stage${WRESTLE() ? " match" : ""}" style="background-image:url(${bgURL()})">${stageSVG(e.key)}<div class="callout" id="co"></div>${WRESTLE() ? matchHUD(e) : ""}</div>
+    <div class="stage${WRESTLE() ? " match" : ""}" style="background-image:url(${bgURL()})">${stageSVG(e.key)}${WRESTLE() ? FGROPES : ""}<div class="callout" id="co"></div>${WRESTLE() ? matchHUD(e) : ""}</div>
     <div class="panel qcard" id="qc" style="--c:${e.color}"></div>`;
   const rig = new Rig($(".rigwrap [data-j=root]").parentNode);
   const home = WRESTLE() ? HOME.ring : st.i > 0 && e.key === "bars" ? hang : (HOME[e.key] || {});
@@ -534,7 +570,7 @@ function startEvent(e, skipEntrance) {
   if (WRESTLE()) { // opponent + referee share the Rig tweener; 3D draws them as extra billboards
     const opp = new Rig($(".oppwrap"), `o_${e.key}_idle`), ref = new Rig($(".refwrap"), "ref_watch");
     opp.base = { spr: `o_${e.key}_idle` }; ref.base = { spr: "ref_watch" }; opp.set({ x: OH }); ref.set({ x: RH });
-    Object.assign(EV, { opp, ref, mom: st.i }); meters();
+    Object.assign(EV, { opp, ref, mom: st.i }); meters(); cam2("idle");
     actors = [{ rig: opp, z: 0 }, { rig: ref, z: -1.7, k: .9 }];
   }
   const stop = () => { rig.tok++; EV.tok++; if (EV.opp) { EV.opp.tok++; EV.ref.tok++; } };

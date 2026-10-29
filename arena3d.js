@@ -147,7 +147,7 @@ export function mount(stage, opts) {
 }
 export function unmount() { cancelAnimationFrame(raf); raf = 0; if (R && R.domElement.parentNode) { R.domElement.parentNode.classList.remove("is3d"); R.domElement.remove(); } if (scene) scene.traverse(o => { o.geometry && o.geometry.dispose(); }); scene = null; ctx = null; }
 export const isOn = () => !!ctx;
-export function perform(name) { if (!ctx) return; ctx.mode = "perform"; ctx.t0 = performance.now(); ctx.move = name; ctx.fx.burst(ctx.key === "ring" ? -3 : 0, 2.2, -2.5, 60, 4); }
+export function perform(name) { if (!ctx) return; ctx.orb = -(ctx.orb || -1); ctx.mode = "perform"; ctx.t0 = performance.now(); ctx.move = name; ctx.fx.burst(ctx.key === "ring" ? -3 : 0, 2.2, -2.5, 60, 4); }
 export function idle() { if (!ctx) return; ctx.mode = "idle"; ctx.t0 = performance.now(); }
 export function firstPerson(ms) { if (ctx) ctx.fpUntil = performance.now() + ms; }
 export function entrance(ms) { if (!ctx) return; ctx.mode = "entrance"; ctx.t0 = performance.now(); ctx.entMs = ms; ctx.fx.burst(-3.5, 1, -17.5, 250, 9); ctx.fx.burst(3.5, 1, -17.5, 250, 9); }
@@ -158,6 +158,9 @@ export function hype(level = 2.4, ms = 1500) { if (ctx) ctx.hypeTo = { level, un
 export function pin() { if (!ctx) return; ctx.mode = "pin"; ctx.t0 = performance.now(); }
 export function perch() { if (!ctx) return; ctx.mode = "perch"; ctx.t0 = performance.now(); ctx.fx.burst(-3, 2.6, 3, 90, 5); } // top-rope push-in
 export function gainer() { if (!ctx) return; ctx.mode = "gainer"; ctx.t0 = performance.now(); } // side tracking shot for the flip
+// screen position (% of the stage) of a 2D-rig point, so pops/bubbles sit on the 3D action
+export function project(px, py = -150) { if (!ctx || !cam) return null; const v = new THREE.Vector3(px * S, BASEY[ctx.key] - py * S, 0).project(cam); if (v.z > 1 || Math.abs(v.x) > 1.3) return null; return { l: (v.x * .5 + .5) * 100, t: (-v.y * .5 + .5) * 100 }; }
+export function win() { if (!ctx) return; ctx.mode = "win"; ctx.t0 = performance.now(); }
 export function celebrate() { if (!ctx) return; const x = ctx.key === "ring" ? 3 : 2; ctx.fx.burst(-x, 1, 0, 150, 7); ctx.fx.burst(x, 1, 0, 150, 7); }
 
 const tmp = new THREE.Vector3();
@@ -171,7 +174,7 @@ function frame(now) {
   A.beams.forEach(b => { const tx = Math.sin(t * .5 + b.ph) * 3, tz = Math.cos(t * .4 + b.ph) * 2; b.s.target.position.set(tx, 0, tz); b.cone.lookAt(tx, 0, tz); b.cone.rotateX(-Math.PI / 2); });
   // crowd bounce: update a slice each frame (cheap on tablets)
   const m4 = new THREE.Matrix4(), N = A.seats.length, hype = ctx.hypeTo && ctx.hypeTo.until > now ? ctx.hypeTo.level : ctx.mode === "idle" ? 1 : 2.4;
-  ctx.rise = (ctx.rise || 0) + (((ctx.mode === "perch" || ctx.mode === "gainer" || ctx.mode === "pin") ? .16 : 0) - (ctx.rise || 0)) * Math.min(1, dt * 3); // crowd rises to its feet
+  ctx.rise = (ctx.rise || 0) + (((ctx.mode === "perch" || ctx.mode === "gainer" || ctx.mode === "pin" || ctx.mode === "win") ? .16 : 0) - (ctx.rise || 0)) * Math.min(1, dt * 3); // crowd rises to its feet
   for (let i = (ctx.slice = ((ctx.slice || 0) + 1) % 3); i < N; i += 3) { const s = A.seats[i]; m4.makeTranslation(s.x, s.y + ctx.rise + Math.max(0, Math.sin(t * s.sp + s.ph)) * .09 * hype, s.z); A.crowd.setMatrixAt(i, m4); }
   A.crowd.instanceMatrix.needsUpdate = true; A.stickPts.material.size = .18 + Math.sin(t * 6) * .05;
   if (ctx.wall && (ctx.wallT = (ctx.wallT || 0) + dt) > .15) { ctx.wallT = 0; const w = ctx.wall.userData; w.draw(w.g, w.c.width, w.c.height); ctx.wall.needsUpdate = true; }
@@ -184,8 +187,11 @@ function frame(now) {
   const [sw, sh, ax, ay] = spr, w = sw * ctx.K * S, hh = sh * ctx.K * S;
   let hx = p.x * S, hy = by - p.y * S, hz = 0;
   if (ctx.mode === "entrance") { const u = Math.min(1, (now - ctx.t0) / ctx.entMs); hx = 0; hz = -16 + u * 13.2; hy = 1 + .66 + Math.abs(Math.sin(u * 40)) * .03; }
+  const RC = key === "ring";
+  if (RC && ctx.extra && (ctx.mode === "perch" || ctx.mode === "gainer")) { // 3D: the perch is on the back-left turnbuckle; the gainer travels out from that corner
+    const pf = Math.max(0, Math.min(1, (hx + 2.62) / 3.8)); if (ctx.mode === "perch" || name === "rperch") { hx = -2.9; hz = -2.72; } else hz = -2.72 * (1 - pf) * (1 - pf * .3); }
   h.pivot.position.set(hx, hy, hz);
-  const yaw = Math.max(-1.1, Math.min(1.1, Math.atan2(cam.position.x - hx, cam.position.z - hz)));
+  const YC = key === "ring" ? 1.45 : 1.1, yaw = Math.max(-YC, Math.min(YC, Math.atan2(cam.position.x - hx, cam.position.z - hz)));
   h.pivot.rotation.set(0, ctx.mode === "entrance" ? Math.atan2(cam.position.x - hx, cam.position.z - hz) : yaw, 0); h.pivot.rotateZ(-(p.r || 0) * Math.PI / 180);
   h.plane.scale.set(w * (p.sx || 1), hh, 1); h.plane.position.set((.5 - ax) * w * (p.sx || 1), (ay - .5) * hh, 0);
   const groundY = key === "beam" && Math.abs(hx) < 2.7 && hy > 1.4 ? 1.255 : key === "ring" && Math.abs(hx) < 3.1 && Math.abs(hz) < 3.1 ? 1.03 : key === "ring" && hz < -3 ? 1.04 : key === "floor" ? .11 : key === "vault" && hx > 1.1 && hx < 3.5 ? .205 : .02;
@@ -194,8 +200,8 @@ function frame(now) {
   const ent = ctx.mode === "entrance";
   (ctx.extra || []).forEach(b => { const q = b.rig.p, nm = b.rig.cur, sp = ctx.spr(nm), kk = b.k || 1; b.pivot.visible = b.blob.visible = !ent;
     if (ent) return; if (b.cur !== nm) { b.cur = nm; b.mat.map = tex(ctx.url(nm)); b.mat.needsUpdate = true; }
-    const bw = sp[0] * ctx.K * S * kk, bh = sp[1] * ctx.K * S * kk, bx = q.x * S * kk, bz = b.z || 0, byy = by - q.y * kk * S;
-    b.pivot.position.set(bx, byy, bz); b.pivot.rotation.set(0, Math.max(-1.1, Math.min(1.1, Math.atan2(cam.position.x - bx, cam.position.z - bz))), 0); b.pivot.rotateZ(-(q.r || 0) * Math.PI / 180);
+    const bw = sp[0] * ctx.K * S * kk, bh = sp[1] * ctx.K * S * kk, bx = q.x * S * kk, bz = b.k ? (b.zz = (b.zz ?? b.z) + ((ctx.mode === "pin" && b.rig.cur === "ref_count" ? .55 : b.z) - (b.zz ?? b.z)) * Math.min(1, dt * 4)) : (b.z || 0), byy = by - q.y * kk * S;
+    b.pivot.position.set(bx, byy, bz); b.pivot.rotation.set(0, Math.max(-YC, Math.min(YC, Math.atan2(cam.position.x - bx, cam.position.z - bz))), 0); b.pivot.rotateZ(-(q.r || 0) * Math.PI / 180);
     b.plane.scale.set(bw * (q.sx || 1), bh, 1); b.plane.position.set((.5 - sp[2]) * bw * (q.sx || 1), (sp[3] - .5) * bh, 0);
     b.blob.position.set(bx, 1.035, bz); b.blob.scale.setScalar(Math.max(.3, 1 - Math.max(0, byy - 1.66) * .4)); });
   // rope wobble after a rope run / bounce
@@ -206,7 +212,25 @@ function frame(now) {
 
   // --- cameras ---
   let fov = 50, roll = 0; const look = tmp; let fp = false;
-  if (ctx.mode === "entrance") {
+  const OX = ctx.extra && ctx.extra[0] ? ctx.extra[0].rig.p.x * S : hx + 3, inR = v => { v.x = Math.max(-2.75, Math.min(2.75, v.x)); v.z = Math.max(-2.75, Math.min(2.75, v.z)); return v; };
+  const cut = m => { if (ctx.shot !== m) { ctx.shot = m; ctx.snap = true; } };
+  if (RC && ctx.mode === "entrance" && (now - ctx.t0) / ctx.entMs >= .6) { // cut inside the ring: mat-level cam looking out through the far ropes as she arrives
+    cut("entIn"); fov = 56; ctx.camPos.set(1.3 + Math.sin(t * .3) * .2, by + .55, 2.5); look.set(hx * .3, hy + .15, hz);
+  } else if (RC && ctx.extra && ctx.extra.length && ctx.mode === "idle") { // faceoff / question time: over her shoulder at the opponent, front rope in the right foreground
+    cut("ots"); fov = 52; ctx.camPos.set(Math.max(-2.75, hx - 1 + Math.sin(t * .25) * .12), by + 1.1 + Math.sin(t * .4) * .03, 2.55); look.set(OX * .85 + hx * .15, by + .78, -.2);
+  } else if (RC && ctx.extra && ctx.extra.length && ctx.mode === "perform") { // moves: low mat cam orbiting the action inside the ropes
+    cut("orbit"); const u = (now - ctx.t0) / 1000, d = ctx.orb || 1, ang = d * (-.8 + Math.min(1.6, u * .55)), rad = 2.45 - Math.min(.5, u * .2);
+    fov = 58; inR(ctx.camPos.set(mid + Math.sin(ang) * rad, by + .42 + Math.sin(u * 1.7) * .1, Math.max(.5, Math.cos(ang) * rad))); look.set(mid, Math.max(by + .8, hy * .55 + (by + .8) * .45), 0);
+  } else if (RC && ctx.mode === "perch") { // looking UP at her on the turnbuckle from the mat, slow push-in
+    cut("perch"); const u = Math.min(1, (now - ctx.t0) / 1600); fov = 62 - u * 10;
+    ctx.camPos.set(hx + 1.55 - u * .35, by + .3, hz + 1.9 - u * .35); look.set(hx + .05, hy + .2, hz);
+  } else if (RC && ctx.mode === "gainer") { // follow the flip from the mat, looking up
+    fov = 60; ctx.camPos.set(Math.max(-2.2, Math.min(1.6, hx + .2)) * .75, by + .35, 1.95); look.set(hx, Math.max(by + .9, hy + .1), hz);
+  } else if (RC && ctx.mode === "pin") { // drop to the mat: ref's hand slaps right by the lens, the cover behind
+    cut("pin"); const u = (now - ctx.t0) / 1000; fov = 56; ctx.camPos.set(-1.7 + Math.sin(u * .35) * .1, by + .3, 2.05); look.set(1.0, by + .32, -.1);
+  } else if (RC && ctx.mode === "win") { // champion's raise from the mat, looking up at her and the belt
+    cut("win"); fov = 56; ctx.camPos.set(hx + .45, by + .45, 2.3); look.set(hx, hy + .35, 0);
+  } else if (ctx.mode === "entrance") {
     const u = Math.min(1, (now - ctx.t0) / ctx.entMs);
     if (u < .22) { ctx.camPos.set(Math.sin(t * .3) * 2, 5 - u * 6, 4); look.set(0, 3, -17); }                                   // wide on the video wall + pyro
     else { const k = (u - .22) / .78; ctx.camPos.set(2.4 - k * 1.2, 1.9 + (1 - k) * .8, hz + 4.2 - k * 1.2); look.set(hx, hy + .25, hz); } // tracking in front of her
@@ -233,12 +257,12 @@ function frame(now) {
     const c0 = ctx.extra && ctx.extra.length ? mid : hx * .5 + cx * .5; ctx.camPos.set(cx + Math.sin(a) * rad, by + 2.3, Math.cos(a) * rad); look.set(c0, by + .9, 0);
   }
   h.plane.visible = !fp;
-  const k = ctx.snap ? 1 : 1 - Math.pow(.02, dt); ctx.snap = fp;
+  const k = ctx.snap ? 1 : 1 - Math.pow(ctx.mode === "gainer" ? .002 : .02, dt); ctx.snap = fp; if (!RC) ctx.shot = null;
   cam.position.lerp(ctx.camPos, k); ctx.look.lerp(look, k); cam.lookAt(ctx.look); cam.rotateZ(roll);
   let jit = null; if (ctx.shakeT) { const u = (now - ctx.shakeT) / 380; if (u < 1) { const a = ctx.shakeA * (1 - u); jit = new THREE.Vector3((Math.random() - .5) * a, (Math.random() - .5) * a, 0); cam.position.add(jit); } else ctx.shakeT = 0; }
   if (Math.abs(cam.fov - fov) > .1) { cam.fov += (fov - cam.fov) * Math.min(1, dt * 8); cam.updateProjectionMatrix(); }
   R.render(scene, cam);
   if (jit) cam.position.sub(jit);
 }
-window.Arena3D = { supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate, impact, shake, rope, hype, pin, perch, gainer };
+window.Arena3D = { supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate, impact, shake, rope, hype, pin, perch, gainer, project, win };
 window.dispatchEvent(new Event("arena3d-ready"));

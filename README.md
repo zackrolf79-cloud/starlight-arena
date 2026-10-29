@@ -63,3 +63,8 @@ Each correct answer unlocks one of 8 skills in the event.
 - **Finisher, the Top-Rope Cheetah Pounce:** she climbs the turnbuckle and poses on the top rope while the crowd rises and the camera pushes in. Then she does a **gainer**: she takes off forward, does a full backflip while travelling toward the opponent, and lands in the cover. After that come the ref's 1-2-3, the bell and the belt.
 - `?slowmo=N` (1–8) slows every animation. It is only for testing and screenshots.
 - Gymnastics is unchanged.
+
+## Ring cam (wrestling view)
+- **3D:** a low, mat-level broadcast camera inside the ropes. Over-the-shoulder during the faceoff and questions, orbit/swing during moves, look-up at the top-rope perch, a follow through the Cheetah Pounce gainer, then a low pin shot with the ref's count close to the lens. Entrances start on the ramp and cut inside the ring.
+- **Simple 2D:** a pan/zoom camera that frames the real on-screen sprite positions, with blurred foreground ropes/turnbuckles and crowd parallax.
+- Gymnastics views are unchanged.
