@@ -162,3 +162,25 @@ body.wrestle .glow{text-shadow:0 0 12px #8ff7f0,0 0 30px #ff5fd2}
 .stage.match>svg{transform-origin:0 0;will-change:transform}
 .stage .fgropes{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;filter:blur(1.6px) drop-shadow(0 4px 6px rgba(0,0,0,.5));opacity:.92;will-change:transform}
 .stage.is3d .fgropes{display:none}
+/* --- v7 motion + effects --- */
+.stage>svg{overflow:visible}
+.stage .dust circle{opacity:.85;animation:dustp .7s ease-out forwards}
+.stage .dust .spk2{animation:spk2 .7s ease-out forwards}
+@keyframes dustp{from{transform:translate(0,0) scale(.5);opacity:.9}to{transform:translate(var(--dx),var(--dy)) scale(2.1);opacity:0}}
+@keyframes spk2{from{transform:translate(0,0) scale(.3) rotate(0);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(90deg);opacity:0}}
+.stage .dust *{transform-box:fill-box;transform-origin:center}
+.stage .rays{position:absolute;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:.55;transition:opacity .6s}
+.stage.perf .rays{opacity:.9}.stage.is3d .rays,.stage.is3d .pyro2{display:none}
+.stage .rays i{position:absolute;top:-12%;width:16%;height:125%;transform-origin:50% 0;background:linear-gradient(rgba(255,255,255,.22),rgba(255,255,255,.06) 55%,transparent 85%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);animation:sweep 7s ease-in-out infinite alternate}
+.stage .rays i:nth-child(1){left:4%;background:linear-gradient(rgba(255,95,210,.32),transparent 85%);animation-delay:-2s}
+.stage .rays i:nth-child(2){left:24%;animation-duration:9s}
+.stage .rays i:nth-child(3){left:44%;background:linear-gradient(rgba(143,247,240,.28),transparent 85%);animation-delay:-4s}
+.stage .rays i:nth-child(4){left:64%;animation-duration:8s;animation-delay:-1s}
+.stage .rays i:nth-child(5){left:82%;background:linear-gradient(rgba(255,211,77,.28),transparent 85%);animation-delay:-3s}
+.stage>svg{z-index:1}
+.stage .pyro2{position:absolute;width:0;height:0;z-index:3;pointer-events:none}
+.stage .pyro2 i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;background:#fff6c0;box-shadow:0 0 8px 3px #ffd34d;animation:spark 1s cubic-bezier(.2,.7,.4,1) forwards;opacity:0}
+.stage .pyro2.pink i{background:#fff;box-shadow:0 0 8px 3px #ff5fd2}
+@keyframes spark{0%{transform:translate(0,0) scale(1.3);opacity:1}55%{transform:translate(calc(var(--dx) * .6),var(--dy));opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) * .5));opacity:0}}
+/* finisher: skill title moves off her while the camera is pushed in on the top rope */
+.stage.match.perch .callout,.stage.match.tilt .callout{left:auto;right:4%;transform:none;top:22%;font-size:clamp(16px,2.4vw,26px)}

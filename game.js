@@ -165,9 +165,9 @@ function tickC() {
 /* ---------------- character (painted sprite poses, tweened) ---------------- */
 // Each pose sprite: [origW, origH, hipX, hipY] (hip = rotation anchor, as fractions). 0.32 rig units per source px.
 const K = 0.32;
-const SPR = { stand: [174, 484, .5, .58], run1: [330, 483, .45, .6], run2: [385, 470, .45, .6], hurdle: [358, 462, .62, .7], crouch: [337, 391, .22, .6],
-  tuck: [205, 325, .5, .6], pike: [269, 310, .25, .18], stretch: [153, 610, .5, .6], stick: [147, 579, .5, .65], split: [450, 294, .5, .82],
-  passe: [324, 475, .5, .57], tbal: [550, 468, .5, .57], straddle: [463, 407, .5, .62], wobble: [320, 477, .5, .58], salute: [209, 493, .5, .59], celebrate: [264, 399, .5, .7],
+const SPR = { stand: [174, 484, .5, .58], run1: [310, 483, .45, .6], run2: [362, 470, .45, .6], hurdle: [337, 462, .62, .7], crouch: [313, 391, .22, .6],
+  tuck: [189, 325, .46, .56], pike: [250, 310, .4, .3], stretch: [153, 610, .5, .6], stick: [147, 579, .55, .65], split: [428, 294, .5, .82],
+  passe: [324, 475, .58, .57], tbal: [550, 468, .5, .57], straddle: [435, 407, .5, .62], wobble: [320, 477, .5, .58], salute: [213, 495, .56, .58], celebrate: [269, 412, .59, .7],
   /* wrestling ring gear (same character) */
   // Pink Cheetah set (cut sizes; the 1280x720 pairs are scaled .7–.75 to match the 1024 sheets' body height)
   rentr: [247, 453, .45, .6], rbelt: [232, 469, .5, .62], rflex: [246, 464, .5, .6], rpoint: [229, 466, .45, .6], rrun: [347, 454, .45, .62], rkick: [537, 293, .45, .55], rtuck: [406, 296, .5, .5], rland: [342, 394, .45, .62], rgrab: [423, 418, .4, .525], rpin: [409, 314, .4, .41],
@@ -206,16 +206,23 @@ function pick(p) {
   return "stand";
 }
 const BASE = { x: 0, y: -66, r: 0, sx: 1, sp: 0, lsh: 10, lel: -12, rsh: -10, rel: -12, lhip: 2, lkn: 2, rhip: -2, rkn: 2, tail: 0 };
+const RIGS = new Set();
 class Rig {
-  constructor(g, first) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0; this.show(first || (WRESTLE() ? "rpoint" : "stand"), true); this.apply(); }
+  constructor(g, first) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0;
+    this.trail = document.createElementNS("http://www.w3.org/2000/svg", "g"); this.trail.setAttribute("class", "trail"); g.insertBefore(this.trail, this.root);
+    this.fx = { sx: 1, sy: 1, lean: 0, lv: 0, sq: 0, sv: 0, vx: 0, vy: 0, vr: 0, air: 0, trailN: 0, tT: 0, last: 0, q: null, land: 0 };
+    this.show(first || (WRESTLE() ? "rpoint" : "stand"), true); this.apply(); RIGS.add(this); }
   show(n, now) {
     if (n === this.cur) return; this.cur = n;
     const [w, h, ax, ay] = SPR[n], W2 = w * K, H2 = h * K;
-    const [on, off] = [this.B, this.A]; this.A = on; this.B = off; // swap layers for a quick cross-fade
+    const [on, off] = [this.B, this.A]; this.A = on; this.B = off; // swap layers for a blended cross-fade
     on.setAttribute("href", sprURL(n)); on.setAttribute("x", -ax * W2); on.setAttribute("y", -ay * H2); on.setAttribute("width", W2); on.setAttribute("height", H2);
-    on.style.transition = off.style.transition = now ? "none" : "opacity .09s linear"; on.setAttribute("opacity", 1); off.setAttribute("opacity", 0);
+    on.style.transition = off.style.transition = now ? "none" : `opacity ${(.15 * SLOW).toFixed(2)}s cubic-bezier(.4,0,.2,1)`; on.setAttribute("opacity", 1); off.setAttribute("opacity", 0);
   }
-  apply() { const p = this.p; this.root.setAttribute("transform", `translate(${p.x},${p.y}) rotate(${p.r}) scale(${p.sx},1)`); }
+  // secondary motion (squash & stretch, follow-through lean, idle breathing) is layered on top of the pose by rigFX()
+  tf() { const p = this.p, f = this.fx, up = Math.abs((((p.r || 0) % 360) + 540) % 360 - 180) < 35, foot = up ? 66 * (1 - f.sy) : 0;
+    return `translate(${p.x.toFixed(2)},${(p.y + foot).toFixed(2)}) rotate(${((p.r || 0) + f.lean).toFixed(2)}) scale(${(p.sx * f.sx).toFixed(4)},${f.sy.toFixed(4)})`; }
+  apply() { this.root.setAttribute("transform", this.tf()); }
   set(p) { Object.assign(this.p, BASE, this.base, p); this.show(pickT(this.p), true); this.apply(); }
   async play(frames) { // frames: [ [pose, ms, ease?], ... ]  pose is absolute over BASE+base; sprite chosen from target pose
     const tok = ++this.tok;
@@ -231,6 +238,46 @@ class Rig {
       });
     }
   }
+}
+
+/* secondary-motion loop: one rAF for every rig (2D SVG + read by the 3D billboards) */
+function rigFX(now) {
+  requestAnimationFrame(rigFX);
+  for (const r of RIGS) {
+    if (!document.body.contains(r.g)) { RIGS.delete(r); continue; }
+    const f = r.fx, p = r.p, dt = Math.min(.05, (now - (f.last || now)) / 1000) / SLOW; f.last = now; if (!dt) continue;
+    const q = f.q || { x: p.x, y: p.y, r: p.r || 0 }; const k = 1 - Math.pow(.0005, dt);
+    f.vx += ((p.x - q.x) / dt - f.vx) * k; f.vy += ((p.y - q.y) / dt - f.vy) * k; f.vr += (((p.r || 0) - q.r) / dt - f.vr) * k; f.q = { x: p.x, y: p.y, r: p.r || 0 };
+    const sp = Math.hypot(f.vx, f.vy), ground = p.y > -72 && Math.abs(f.vy) < 120, actor = ACTOR(r.cur);
+    // landing: falling fast then stopped → squash impulse + chalk / mat dust
+    if (f.air > 260 && f.vy < 80 && p.y >= -76) { const a = Math.min(1, f.air / 700); f.sv -= 2.6 * a; if (!actor && now - f.land > 400) { f.land = now; dust(r, p.x, p.y + 66, a); } }
+    f.air = f.vy > 0 ? Math.max(f.air * .9, f.vy) : f.air * .8;
+    // squash/stretch spring: stretch with vertical speed in the air, small squash in a crouch, a breath when idle
+    const crouch = r.cur === "crouch" || r.cur === "rland", tgt = ground ? (crouch ? -.05 : sp < 20 ? Math.sin(now / 520) * .012 : 0) : Math.min(.09, Math.abs(f.vy) / 7000);
+    f.sv += ((tgt - f.sq) * 170 - f.sv * 15) * dt; f.sq += f.sv * dt; f.sq = Math.max(-.2, Math.min(.16, f.sq));
+    f.sy = 1 + f.sq; f.sx = 1 - f.sq * .55;
+    // follow-through: lean into travel and overshoot when stopping (only upright, not mid-flip)
+    const up = Math.abs((((p.r || 0) % 360) + 540) % 360 - 180) < 35 && Math.abs(f.vr) < 120, lt = up ? Math.max(-7, Math.min(7, f.vx * .011)) : 0;
+    f.lv += ((lt - f.lean) * 90 - f.lv * 11) * dt; f.lean += f.lv * dt;
+    // motion trails on fast flips / dives
+    if ((Math.abs(f.vr) > 380 || sp > 700) && now - f.tT > 42 * SLOW) { f.tT = now; f.trailN++; trail2D(r); }
+    r.apply();
+  }
+}
+requestAnimationFrame(rigFX);
+function trail2D(r) { const im = r.A; if (!im || !im.getAttribute("href")) return; const c = im.cloneNode(); c.removeAttribute("class"); c.style.transition = "none"; c.setAttribute("opacity", ".34");
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g"); g.setAttribute("transform", r.tf()); g.appendChild(c); r.trail.appendChild(g);
+  requestAnimationFrame(() => { c.style.transition = `opacity ${(.26 * SLOW).toFixed(2)}s linear`; c.setAttribute("opacity", "0"); });
+  setTimeout(() => g.remove(), 320 * SLOW); while (r.trail.childNodes.length > 6) r.trail.firstChild.remove(); }
+// chalk dust (gym) / mat dust + sparkles (ring) at a rig-space point; 3D gets the same cue
+function dust(r, x, y, a = 1) {
+  const W2 = WRESTLE(), n = 7 + Math.round(a * 6), NS = "http://www.w3.org/2000/svg", g = document.createElementNS(NS, "g"); g.setAttribute("class", "dust"); g.setAttribute("transform", `translate(${x.toFixed(1)},${y.toFixed(1)})`);
+  for (let i = 0; i < n; i++) { const c = document.createElementNS(NS, "circle"), ang = Math.PI * (i / (n - 1)), d = 26 + Math.random() * 30 * a;
+    c.setAttribute("r", (4 + Math.random() * 5).toFixed(1)); c.setAttribute("fill", W2 ? (i % 3 ? "#ffd1ef" : "#fff") : "#f4f1ff"); c.style.setProperty("--dx", `${(-Math.cos(ang) * d).toFixed(1)}px`); c.style.setProperty("--dy", `${(-Math.sin(ang) * d * .35 - 4).toFixed(1)}px`); c.style.animationDuration = `${(.55 + Math.random() * .3) * SLOW}s`; g.appendChild(c); }
+  for (let i = 0; i < 4; i++) { const s = document.createElementNS(NS, "path"); s.setAttribute("d", "M0 -7l1.8 5.2 5.2 1.8-5.2 1.8L0 7l-1.8-5.2L-7 0l5.2-1.8z"); s.setAttribute("fill", W2 ? "#ff8be0" : "#ffe9a6"); s.setAttribute("class", "spk2");
+    s.style.setProperty("--dx", `${((Math.random() - .5) * 90).toFixed(1)}px`); s.style.setProperty("--dy", `${(-30 - Math.random() * 50).toFixed(1)}px`); s.style.animationDuration = `${.7 * SLOW}s`; g.appendChild(s); }
+  r.g.appendChild(g); setTimeout(() => g.remove(), 1000 * SLOW);
+  if (r === (EV && EV.rig)) A3("dust", x, y, a, W2 ? 0xffc8ee : 0xffffff);
 }
 
 /* ---------------- poses & skills ---------------- */
@@ -260,9 +307,9 @@ function run(x0, x1, y = -66) { const n = 6, fr = []; for (let i = 1; i <= n; i+
 const HOME = { vault: { x: -300 }, bars: { x: -150 }, beam: { x: -40 }, floor: { x: -200 }, ring: { x: -150 } };
 // stage geometry (viewBox 800x400)
 const GEO = { ring: { gx: 400, gy: 330 }, vault: { gx: 400, gy: 360 }, bars: { gx: 400, gy: 360 }, beam: { gx: 400, gy: 250 }, floor: { gx: 400, gy: 350 } };
-const HB = { x: 70, y: -230 }, LB = { x: -100, y: -150 };
-function circle(cxp, cyp, a0, a1, R = 104, step = 30, extra = {}) { const fr = []; const d = a1 > a0 ? step : -step; for (let a = a0 + d; d > 0 ? a <= a1 : a >= a1; a += d) { const t = a * Math.PI / 180; fr.push([M(P.layout, extra, { x: cxp - R * Math.sin(t), y: cyp + R * Math.cos(t), r: a }), 85, "lin"]); } return fr; }
-const hang = M(P.layout, { x: HB.x, y: HB.y + 104, r: 0 });
+const HB = { x: 70, y: -230 }, LB = { x: -100, y: -150 }, GR = 114; // GR = hip-to-bar radius so her hands meet the bar
+function circle(cxp, cyp, a0, a1, R = GR, step = 30, extra = {}) { const fr = []; const d = a1 > a0 ? step : -step; for (let a = a0 + d; d > 0 ? a <= a1 : a >= a1; a += d) { const t = a * Math.PI / 180; fr.push([M(P.layout, extra, { x: cxp - R * Math.sin(t), y: cyp + R * Math.cos(t), r: a }), 85, "lin"]); } return fr; }
+const hang = M(P.layout, { x: HB.x, y: HB.y + GR, r: 0 });
 const support = { x: HB.x - 4, y: HB.y + 4, r: 0, lsh: -8, rsh: -8, lel: 0, rel: 0, sp: 0, lhip: 0, rhip: 0 };
 const SK = {
   /* vault & floor & generic */
@@ -288,14 +335,14 @@ const FL = {
   twist: () => [[M(P.lunge, { x: -200 }), 300], ...flip(-200, 230, -1, "layout", 160, 2), [{ x: -200, r: -360 }, 700]],
 };
 const BARS = {
-  kip: () => [[{ x: -150 }, 100], ...run(-150, HB.x - 10), [M(P.up, { x: HB.x, y: HB.y + 104 }), 300, "out"], [M(P.pike, { x: HB.x + 40, y: HB.y + 96, r: -25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x - 30, y: HB.y + 96, r: 25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x + 20, y: HB.y + 60, r: 0, lhip: -100, rhip: -100, lsh: -120, rsh: -120 }), 330], [support, 380, "out"], [support, 300]],
-  cast: () => [[support, 200], [{ ...support, r: 30, x: HB.x + 20, y: HB.y - 20, lhip: -40, rhip: -40 }, 250], [M(P.layout, { x: HB.x, y: HB.y - 104, r: 180 }), 600, "out"], [M(P.layout, { x: HB.x, y: HB.y - 104, r: 180 }), 400], ...circle(HB.x, HB.y, 180, 360), [hang, 200]],
-  hipcircle: () => [[hang, 100], [M(P.pike, { x: HB.x - 10, y: HB.y + 60, lsh: -120, rsh: -120 }), 350], [support, 300], ...[60, 120, 180, 240, 300, 360].map(a => [M(P.pike, { lhip: -80, rhip: -80, x: HB.x - 18 * Math.sin(a * Math.PI / 180), y: HB.y + 18 * Math.cos(a * Math.PI / 180), r: -a, lsh: -20, rsh: -20 }), 110, "lin"]), [M(support, { r: -360 }), 200], [M(P.layout, { x: HB.x, y: HB.y - 104, r: -180 }), 500, "out"], ...circle(HB.x, HB.y, -180, -360), [M(hang, { r: -360 }), 200]],
-  giant: () => [[hang, 100], [M(P.layout, { x: HB.x + 60, y: HB.y + 85, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 360), [M(hang, { r: 360 }), 200]],
-  giant2: () => [[hang, 100], [M(P.layout, { x: HB.x + 60, y: HB.y + 85, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 720, 104, 30), [M(hang, { r: 720 }), 200]],
-  pirouette: () => [[hang, 100], [M(P.layout, { x: HB.x + 60, y: HB.y + 85, r: -35 }), 300], ...circle(HB.x, HB.y, -35, 180), [M(P.layout, { x: HB.x, y: HB.y - 104, r: 180, sx: -1 }), 350], [M(P.layout, { x: HB.x, y: HB.y - 104, r: 180, sx: 1 }), 350], ...circle(HB.x, HB.y, 180, 360), [M(hang, { r: 360 }), 200]],
-  transition: () => [[hang, 100], [M(P.layout, { x: HB.x - 60, y: HB.y + 85, r: 35 }), 350], [M(P.layout, { x: HB.x + 50, y: HB.y + 90, r: -30 }), 450], [M(P.pike, { x: 0, y: -260, r: -10, lsh: -180, rsh: -180 }), 380, "out"], [M(P.layout, { x: LB.x, y: LB.y + 60, r: 30, lhip: -60, rhip: -60 }), 380], [M(P.layout, { x: LB.x + 30, y: LB.y + 80, r: -20, lhip: -70, rhip: -70 }), 380], [M(P.up, { x: LB.x + 40, y: -66 }), 400], ...run(LB.x + 40, HB.x - 10), [hang, 400, "out"]],
-  flyaway: () => [[hang, 100], [M(P.layout, { x: HB.x + 60, y: HB.y + 85, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 300), [M(P.tuck, { x: HB.x + 120, y: HB.y - 30, r: 420 }), 380, "lin"], [M(P.tuck, { x: HB.x + 190, y: -170, r: 600 }), 330, "lin"], [M(P.crouch, { x: HB.x + 220, r: 720 }), 200], [M(P.up, { x: HB.x + 220, r: 720 }), 500], [{ x: HB.x + 220, r: 720 }, 400]],
+  kip: () => [[{ x: -150 }, 100], ...run(-150, HB.x - 10), [M(P.up, { x: HB.x, y: HB.y + GR }), 300, "out"], [M(P.pike, { x: HB.x + 40, y: HB.y + 104, r: -25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x - 30, y: HB.y + 104, r: 25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x + 20, y: HB.y + 60, r: 0, lhip: -100, rhip: -100, lsh: -120, rsh: -120 }), 330], [support, 380, "out"], [support, 300]],
+  cast: () => [[support, 200], [{ ...support, r: 30, x: HB.x + 20, y: HB.y - 20, lhip: -40, rhip: -40 }, 250], [M(P.layout, { x: HB.x, y: HB.y - GR, r: 180 }), 600, "out"], [M(P.layout, { x: HB.x, y: HB.y - GR, r: 180 }), 400], ...circle(HB.x, HB.y, 180, 360), [hang, 200]],
+  hipcircle: () => [[hang, 100], [M(P.pike, { x: HB.x - 10, y: HB.y + 60, lsh: -120, rsh: -120 }), 350], [support, 300], ...[60, 120, 180, 240, 300, 360].map(a => [M(P.pike, { lhip: -80, rhip: -80, x: HB.x - 18 * Math.sin(a * Math.PI / 180), y: HB.y + 18 * Math.cos(a * Math.PI / 180), r: -a, lsh: -20, rsh: -20 }), 110, "lin"]), [M(support, { r: -360 }), 200], [M(P.layout, { x: HB.x, y: HB.y - GR, r: -180 }), 500, "out"], ...circle(HB.x, HB.y, -180, -360), [M(hang, { r: -360 }), 200]],
+  giant: () => [[hang, 100], [M(P.layout, { x: HB.x + 66, y: HB.y + 93, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 360), [M(hang, { r: 360 }), 200]],
+  giant2: () => [[hang, 100], [M(P.layout, { x: HB.x + 66, y: HB.y + 93, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 720, GR, 30), [M(hang, { r: 720 }), 200]],
+  pirouette: () => [[hang, 100], [M(P.layout, { x: HB.x + 66, y: HB.y + 93, r: -35 }), 300], ...circle(HB.x, HB.y, -35, 180), [M(P.layout, { x: HB.x, y: HB.y - GR, r: 180, sx: -1 }), 350], [M(P.layout, { x: HB.x, y: HB.y - GR, r: 180, sx: 1 }), 350], ...circle(HB.x, HB.y, 180, 360), [M(hang, { r: 360 }), 200]],
+  transition: () => [[hang, 100], [M(P.layout, { x: HB.x - 66, y: HB.y + 93, r: 35 }), 350], [M(P.layout, { x: HB.x + 50, y: HB.y + 90, r: -30 }), 450], [M(P.pike, { x: 0, y: -260, r: -10, lsh: -180, rsh: -180 }), 380, "out"], [M(P.layout, { x: LB.x, y: LB.y + 60, r: 30, lhip: -60, rhip: -60 }), 380], [M(P.layout, { x: LB.x + 30, y: LB.y + 80, r: -20, lhip: -70, rhip: -70 }), 380], [M(P.up, { x: LB.x + 40, y: -66 }), 400], ...run(LB.x + 40, HB.x - 10), [hang, 400, "out"]],
+  flyaway: () => [[hang, 100], [M(P.layout, { x: HB.x + 66, y: HB.y + 93, r: -35 }), 350], ...circle(HB.x, HB.y, -35, 300), [M(P.tuck, { x: HB.x + 120, y: HB.y - 30, r: 420 }), 380, "lin"], [M(P.tuck, { x: HB.x + 190, y: -170, r: 600 }), 330, "lin"], [M(P.crouch, { x: HB.x + 220, r: 720 }), 200], [M(P.up, { x: HB.x + 220, r: 720 }), 500], [{ x: HB.x + 220, r: 720 }, 400]],
 };
 const BEAM = {
   releve: () => [[M(P.up, { y: -70 }), 450], [M(P.passe, { y: -70 }), 450], [M(P.passe, { y: -70 }), 500], [{}, 400]],
@@ -361,7 +408,7 @@ function MOVES(k, kind) {
       return { a, o: [[{ x: OH, r: -8, spr: os("hit") }, 450], [{ x: OH - 6, r: 8, spr: os("hit") }, 450], [{ x: OH - 10, r: -6, spr: os("hit") }, 400], ...down(OH - 40, X, true), [{ x: X, y: -66, spr: os("pin") }, Math.max(1, t - 1640)], [{ x: X, y: -58, spr: os("pin") }, 70], [{ x: X, y: -66, spr: os("pin") }, 140]],
         hits: [{ t: 200, cue: () => { bubble("Whoa… I'm seeing stars…", OH); announce("SEEING STARS!", "hot"); } }, { t: 1640, cue: () => { SFX.thud(false); shake(false); } },
           { t: tc - 700, cue: () => { announce("SHE'S GOING UP TOP!", "hot"); A3("hype", 3, 2200); SFX.ooh(); } },
-          { t: tc, cue: () => { announce("THE PINK CHEETAH IS ON THE TOP ROPE!", "hot"); A3("perch"); A3("hype", 4.5, 2600); SFX.cheer(); const s = $(".stage"); if (s) s.classList.add("perch", "rise"); } },
+          { t: tc, cue: () => { announce("THE PINK CHEETAH IS ON THE TOP ROPE!", "hot"); A3("perch"); A3("hype", 4.5, 2600); SFX.cheer(); pyro2D(1); const s = $(".stage"); if (s) s.classList.add("perch", "rise"); } },
           { t: tc + P, cue: () => { ropeBounce(-1); SFX.whoosh(); announce("GAINER!!! CHEETAH POUNCE!", "hot"); A3("gainer"); const s = $(".stage"); if (s) { s.classList.remove("perch"); s.classList.add("tilt"); } } },
           { t: t - 260, cue: () => { const s = $(".stage"); if (s) s.classList.remove("tilt"); } }, { t, big: 2 }] }; }
   };
@@ -374,6 +421,11 @@ function stageXY(x, y = -150) {
   return { l: Math.max(8, Math.min(92, q.l)), t: Math.max(16, Math.min(90, q.t)) }; }
 function pow(word, x, y, big) { const st = $(".stage"); if (!st) return; const d = document.createElement("div"); d.className = "pow" + (big ? " big" : ""); d.textContent = word; const p = stageXY(x, y); d.style.left = p.l + "%"; d.style.top = p.t + "%"; st.appendChild(d); setTimeout(() => d.remove(), 900); }
 function flash(big) { const f = $(".stage .flash"); if (!f) return; f.classList.remove("on", "big"); void f.offsetWidth; f.classList.add("on"); if (big) f.classList.add("big"); }
+function pyro2D(n = 1) { const st = $(".stage"); if (!st || st.classList.contains("is3d")) return; const W2 = WRESTLE();
+  for (let k = 0; k < n; k++) setTimeout(() => { if (!st.isConnected) return; [W2 ? stageXY(-300, -175) : { l: 8, t: 72 }, W2 ? stageXY(300, -175) : { l: 92, t: 72 }].forEach(q => {
+    const d = document.createElement("div"); d.className = "pyro2" + (W2 ? " pink" : ""); d.style.left = q.l + "%"; d.style.top = q.t + "%";
+    d.innerHTML = Array.from({ length: 18 }, (_, i) => `<i style="--dx:${((Math.random() - .5) * 120).toFixed(0)}px;--dy:${(-120 - Math.random() * 160).toFixed(0)}px;animation-delay:${(Math.random() * .25 * SLOW).toFixed(2)}s;animation-duration:${((.8 + Math.random() * .5) * SLOW).toFixed(2)}s"></i>`).join("");
+    st.appendChild(d); setTimeout(() => d.remove(), 1700 * SLOW); }); }, k * 420 * SLOW); }
 function shake(big) { const st = $(".stage"); if (!st) return; st.classList.remove("shake", "shake2"); void st.offsetWidth; st.classList.add(big ? "shake2" : "shake"); A3("shake", big ? .16 : .07); }
 function ropeBounce(side) { SFX.boing(); A3("rope", side); const ps = app.querySelectorAll(".stage .rope"); if (!ps.length) return; const t0 = performance.now();
   const step = now => { const u = (now - t0) / 700; ps.forEach((p, i) => { const y = +p.dataset.y, a = u >= 1 ? 0 : Math.sin(u * 22 + i) * 14 * (1 - u); p.setAttribute("d", `M-300 ${y} Q${side * 190} ${y + a} 300 ${y}`); }); if (u < 1 && document.body.contains(ps[0])) requestAnimationFrame(step); };
@@ -386,7 +438,7 @@ function hit(h, x) { // one impact moment
   if (h.rope) ropeBounce(h.rope);
   if (h.quiet) return;
   const big = !!h.big; SFX.thud(big); flash(big); shake(big); pow(WR.pows[(Math.random() * WR.pows.length) | 0], x, -150, big); A3("impact", x, big ? 2 : 1);
-  if (h.big) { A3("hype", 3.2, 1600); setTimeout(SFX.ooh, 120); } }
+  if (h.big) { A3("hype", 3.2, 1600); setTimeout(SFX.ooh, 120); pyro2D(h.big > 1 ? 2 : 1); } }
 function refLook(pose = "ref_point", ms = 700) { const r = EV && EV.ref; if (!r) return; r.play([[{ x: RH, spr: pose }, 150], [{ x: RH, spr: pose }, ms], [{ x: RH, spr: "ref_watch" }, 200]]); }
 async function matchMove() {
   const { e, st, rig, opp, ref } = EV, kind = WR.kinds[st.i], mv = MOVES(e.key, kind), my = ++EV.tok;
@@ -406,7 +458,7 @@ async function pinCount(my) {
     await ref.play([[{ x: -80, y: -80, sx: -1, spr: "ref_count" }, 260], [{ x: -80, y: -66, sx: -1, spr: "ref_count" }, 140]]);
     SFX.slap(); A3("hype", 2 + n, 900); announce(n === 3 ? "THREE!!!" : n === 1 ? "ONE!" : "TWO!", "count"); shake(n === 3); await sleep(n < 3 ? 520 : 650); }
   if (!ok()) return;
-  SFX.bell(3); setTimeout(SFX.cheer, 250); A3("win"); A3("hype", 4, 3500); A3("celebrate"); confetti(120);
+  SFX.bell(3); setTimeout(SFX.cheer, 250); pyro2D(3); A3("win"); A3("hype", 4, 3500); A3("celebrate"); confetti(120);
   announce(`YOUR WINNER… AND NEW CHAMPION… ${WR.ringName(W.athleteName)}!`, "hot");
   { const s = $(".stage"); if (s) s.classList.remove("rise"); } rig.play([[{ x: 60, y: -66, spr: "rflex" }, 300], [{ x: -20, spr: "rbelt" }, 500], [{ x: -20, y: -72, spr: "rbelt" }, 1400]]);
   await ref.play([[{ x: -110, sx: -1, spr: "ref_watch" }, 400], [{ x: -110, sx: -1, spr: "ref_raise" }, 1900]]);
@@ -560,7 +612,7 @@ function startEvent(e, skipEntrance) {
   app.innerHTML = `<div class="hud" style="--c:${e.color}">${portraitImg()}<span class="pill">${esc(evName(e))} · ${esc(e.subject)}</span><span class="pill" id="sk"></span><span class="pill" id="sc"></span>
     <span style="flex:1"></span>${viewBtn()}<button class="btn ghost" id="nt">📝 Notes</button><button class="btn ghost" id="bk">🗺 Map</button></div>
     <div class="skills" style="--c:${e.color}">${evSkills(e).map((s, i) => `<span data-i="${i}">${esc(s)}</span>`).join("")}</div>
-    <div class="stage${WRESTLE() ? " match" : ""}" style="background-image:url(${bgURL()})">${stageSVG(e.key)}${WRESTLE() ? FGROPES : ""}<div class="callout" id="co"></div>${WRESTLE() ? matchHUD(e) : ""}</div>
+    <div class="stage${WRESTLE() ? " match" : ""}" style="background-image:url(${bgURL()})"><div class="rays" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>${stageSVG(e.key)}${WRESTLE() ? FGROPES : ""}<div class="callout" id="co"></div>${WRESTLE() ? matchHUD(e) : ""}</div>
     <div class="panel qcard" id="qc" style="--c:${e.color}"></div>`;
   const rig = new Rig($(".rigwrap [data-j=root]").parentNode);
   const home = WRESTLE() ? HOME.ring : st.i > 0 && e.key === "bars" ? hang : (HOME[e.key] || {});
@@ -624,7 +676,8 @@ async function perform(score) {
   if (!WRESTLE() && e.key === "beam" && window.Arena3D && window.Arena3D.isOn()) { // 3D: first-person walk down the beam first
     A3("firstPerson", 1500); await rig.play([[{ x: -200, spr: "stand" }, 10], [{ x: -40, spr: "stand" }, 1400, "lin"]]); }
   if (WRESTLE() && EV.opp) { await matchMove(); } else { A3("perform", e.anims[st.i]);
-  await rig.play(frames); } norm(rig); A3("celebrate"); A3("idle");
+  const stg = $(".stage"); if (stg) stg.classList.add("perf"); if (e.key === "bars" && !WRESTLE()) dust(rig, HB.x, HB.y, .5);
+  await rig.play(frames); } norm(rig); A3("celebrate"); A3("idle"); if (!WRESTLE()) pyro2D(1); { const s2 = $(".stage"); if (s2) s2.classList.remove("perf"); }
   if (!document.body.contains(co)) return;
   co.classList.remove("show"); if (!(WRESTLE() && st.i === 7)) { SFX.cheer(); confetti(40); }
   st.scores.push(score); st.i++;
