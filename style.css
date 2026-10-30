@@ -186,3 +186,8 @@ body.wrestle .glow{text-shadow:0 0 12px #8ff7f0,0 0 30px #ff5fd2}
 .stage.match.perch .callout,.stage.match.tilt .callout{left:auto;right:4%;transform:none;top:22%;font-size:clamp(16px,2.4vw,26px)}
 #homebtn{right:62px;display:grid;place-items:center;text-decoration:none}
 @media (max-width:600px){#app{padding-top:58px}}
+/* AI label: always visible, never on top of content. On phones it becomes a solid bottom bar and the page reserves room for it (incl. the iPhone home-bar safe area) */
+#ailabel{z-index:90;pointer-events:none;bottom:calc(6px + env(safe-area-inset-bottom))}
+#app{padding-bottom:calc(52px + env(safe-area-inset-bottom))}
+@media (max-width:700px){#ailabel{left:0;right:0;transform:none;bottom:0;border-radius:0;border-width:1px 0 0;text-align:center;padding:5px 8px calc(5px + env(safe-area-inset-bottom));background:#0a0523;font-size:12px}
+#app{padding-bottom:calc(46px + env(safe-area-inset-bottom))}.modal{padding-bottom:calc(40px + env(safe-area-inset-bottom))}}

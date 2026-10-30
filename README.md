@@ -67,7 +67,7 @@ Shared files are `site.css` and `site.js`, which add the header, footer and the 
 ## Limits
 - The uploaded picture is used as a portrait only (title, HUD, map, podium). The animated gymnast is the painted character in the chosen leotard.
 - Hair, skin and scrunchie are fixed to the reference design. Only the leotard colors change, and they are recolored from the original art.
-- Skills use about 16 key poses with a short cross-fade between them, so motion is smooth but not frame-by-frame animation.
+- The priority skills are frame-by-frame (8-frame sequences, see v8). Other moves still use about 16 key poses with a short cross-fade between them. These are: kip, cast, the hip circle, pirouette, handstand, cartwheel, walkover, the wrestling strikes and slams, and the entrance walk.
 - Animations are a stylized 2D side view and only approximate the real skills.
 - There are 8 questions per event, and judges' score variation is cosmetic.
 - Progress and photos stay in that one browser on that device.
@@ -104,3 +104,32 @@ Shared files are `site.css` and `site.js`, which add the header, footer and the 
   - the scrunchie keeps its colour when the leotard changes;
   - the crowd no longer covers the entrance ramp;
   - the 2D finisher title moves clear of her.
+
+## Smoother animation (v8)
+- **Frame sequences.** Seven new 8-frame sheets were painted in the same anime style, one per leotard for the gym and in the Pink Cheetah singlet for the ring:
+  - `grun`: the run cycle;
+  - `gsalto`: the salto: stretch, tuck, open, land;
+  - `gleap`: the split leap;
+  - `ggiant`: the giant swing;
+  - `gtumb`: hurdle, round-off and back handspring;
+  - `crun`: the Cheetah's run;
+  - `cgain`: the gainer.
+- **Cutting the sheets.** `anim8/cut8.py` (outside the repo) cuts each sheet into `assets/gym/{leotard}-{seq}{i}.webp` and `assets/ring/{seq}{i}.webp`. Every frame is anchored at the feet (or at the hands on bars) so nothing jumps between frames.
+- **The hybrid method:**
+  - The painted frames carry the body shape.
+  - The engine adds root motion, rotation and squash.
+  - Each segment plays a frame range (`seq` + `f:[a,b]`) with its easing.
+  - Neighbouring frames cross-blend (a two-layer smoothstep in SVG, a second billboard plane in 3D).
+  - Everything runs on 60fps delta-time `requestAnimationFrame`.
+- **Runs.** Runs are stride-locked: the frame advances with distance (`cyc`), so feet don't skate.
+- **Giant swing.** The giant swing picks its frame from the bar angle (`gf()`).
+- **Timings unchanged.** Segment timings are unchanged, so match cues (impacts, finisher, pin) still line up.
+- **Priority moves:**
+  - vault: run, hurdle, round-off entry, tuck, layout and pike saltos;
+  - the top-rope gainer finisher;
+  - floor: round-off, handspring, saltos, the leap and a stride-locked jog back;
+  - beam: the leap and split jump;
+  - bars: the giant swings;
+  - all wrestling runs (rope runs, the run-up before a dropkick or crossbody) use the Cheetah run cycle.
+- **Vault camera (3D).** A side-on tracking shot follows her for the whole flight, and the aim follows her tightly so fast skills stay in frame.
+- **AI label.** On phones the label is a solid bottom bar. The page reserves room for it, including the iPhone safe area, so it never covers text. It sits above pop-ups and lets taps pass through.

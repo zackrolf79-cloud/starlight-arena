@@ -7,7 +7,7 @@ const S = 0.01;                                   // 1 rig unit = 1 cm
 const BASEY = { vault: 0, bars: 0, beam: 1.25, floor: 0.1, ring: 1.0 };
 let R = null, scene, cam, raf = 0, ctx = null, fps = { n: 0, t: 0, bad: 0 }, sideRopes = { l: [], r: [] };
 const loader = new THREE.TextureLoader(), texCache = {};
-function tex(url) { if (!texCache[url]) { const t = loader.load(url); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; texCache[url] = t; } return texCache[url]; }
+function tex(url) { if (!texCache[url]) { const t = loader.load(url, () => { t.userData.ok = true; }, undefined, () => { t.userData.ok = true; }); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; texCache[url] = t; } return texCache[url]; }
 const std = (color, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color, roughness: .55, metalness: .1 }, o));
 const lam = (color, o = {}) => new THREE.MeshLambertMaterial(Object.assign({ color }, o));
 function box(w, h, d, m, x = 0, y = 0, z = 0) { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); return b; }
@@ -138,9 +138,10 @@ function softShadow() { if (!shadowTex) { const c = document.createElement("canv
   const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, opacity: .6, depthWrite: false })); m.rotation.x = -Math.PI / 2; return m; }
 function makeHero(rim = 0xffb8ee) {
   const pivot = new THREE.Group(), mat = rimMat(rim), plane = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
-  pivot.add(plane);
+  const matB = rimMat(rim), planeB = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), matB); matB.depthWrite = false; planeB.renderOrder = 2; planeB.visible = false; // in-between layer for frame blending
+  pivot.add(plane, planeB);
   const blob = softShadow();
-  return { pivot, plane, mat, blob, cur: "" };
+  return { pivot, plane, mat, planeB, matB, blob, cur: "", curB: "" };
 }
 // fading after-images for fast flips (copied from the hero plane's world matrix)
 function trails() { const pool = Array.from({ length: 6 }, () => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, opacity: 0, side: THREE.DoubleSide, color: 0xffc8f0 })); m.matrixAutoUpdate = false; m.visible = false; m.life = 0; return m; });
@@ -160,6 +161,7 @@ function motes() { const n = 220, pos = new Float32Array(n * 3); for (let i = 0;
 export function mount(stage, opts) {
   unmount();
   ctx = Object.assign({ key: "vault", label: "", t0: performance.now(), mode: "idle", fpUntil: 0, entrance: null }, opts);
+  (opts.pre || []).forEach(n => tex(opts.url(n))); // warm every sequence frame on the GPU side too
   try {
     if (!R) { R = new THREE.WebGLRenderer({ antialias: (devicePixelRatio || 1) < 2, powerPreference: "high-performance" }); R.outputColorSpace = THREE.SRGBColorSpace; }
   } catch (e) { opts.onFail && opts.onFail(e); return false; }
@@ -214,8 +216,13 @@ function frame(now) {
   if (ctx.mode !== "entrance" && Math.random() < dt * .5) ctx.fx.burst((Math.random() < .5 ? -1 : 1) * 4, 0, -3, 40, 6);
 
   // --- hero billboard from the Rig ---
-  const rig = ctx.rig, p = rig.p, h = ctx.hero, name = rig.cur || "stand", spr = ctx.spr(name);
-  if (h.cur !== name) { h.cur = name; h.mat.map = tex(ctx.url(name)); h.mat.needsUpdate = true; }
+  const rig = ctx.rig, p = rig.p, h = ctx.hero, seq = !!rig.sq, want = (seq ? rig.sA : rig.cur) || "stand";
+  const ready = n => { const t = tex(ctx.url(n)); return t.userData.ok || !h.cur; }; // keep showing the last frame until the next one has decoded (no blank pop)
+  if (h.cur !== want && ready(want)) { h.cur = want; h.mat.map = tex(ctx.url(want)); h.mat.needsUpdate = true; }
+  const name = h.cur || want, spr = ctx.spr(name);
+  // frame sequences: the next frame rides on a second plane, blended in by the rig's weight
+  const nB = seq && rig.sW > .01 && h.cur === name && ready(rig.sB) ? rig.sB : null; h.planeB.visible = !!nB;
+  if (nB) { if (h.curB !== nB) { h.curB = nB; h.matB.map = tex(ctx.url(nB)); h.matB.needsUpdate = true; } h.matB.opacity = rig.sW; }
   const [sw, sh, ax, ay] = spr, w = sw * ctx.K * S, hh = sh * ctx.K * S;
   const fx = rig.fx || { sx: 1, sy: 1, lean: 0 }, upr = Math.abs((((p.r || 0) % 360) + 540) % 360 - 180) < 35;
   let hx = p.x * S, hy = by - (p.y + (upr ? 66 * (1 - fx.sy) : 0)) * S, hz = 0;
@@ -227,6 +234,7 @@ function frame(now) {
   const YC = key === "ring" ? 1.45 : 1.1, yaw = Math.max(-YC, Math.min(YC, Math.atan2(cam.position.x - hx, cam.position.z - hz)));
   h.pivot.rotation.set(0, ctx.mode === "entrance" ? Math.atan2(cam.position.x - hx, cam.position.z - hz) : yaw, 0); h.pivot.rotateZ(-((p.r || 0) + fx.lean) * Math.PI / 180); h.pivot.scale.set(fx.sx, fx.sy, 1);
   h.plane.scale.set(w * (p.sx || 1), hh, 1); h.plane.position.set((.5 - ax) * w * (p.sx || 1), (ay - .5) * hh, 0);
+  if (nB) { const [bw0, bh0, bax, bay] = ctx.spr(nB), bw = bw0 * ctx.K * S, bh = bh0 * ctx.K * S; h.planeB.scale.set(bw * (p.sx || 1), bh, 1); h.planeB.position.set((.5 - bax) * bw * (p.sx || 1), (bay - .5) * bh, .004); }
   if (fx.trailN !== ctx.trN) { ctx.trN = fx.trailN; if (ctx.trN) ctx.tr.add(h.plane); }
   const groundY = key === "beam" && Math.abs(hx) < 2.7 && hy > 1.4 ? 1.255 : key === "ring" && Math.abs(hx) < 3.1 && Math.abs(hz) < 3.1 ? 1.03 : key === "ring" && hz < -3 ? 1.04 : key === "floor" ? .11 : key === "vault" && hx > 1.1 && hx < 3.5 ? .205 : .02;
   h.blob.position.set(hx, groundY + .005, hz); const air = Math.max(0, hy - .66 - groundY); { const sc = Math.max(.35, 1 - air * .35); h.blob.scale.set(Math.max(.55, w * .55) * sc, .42 * sc, 1); h.blob.material.opacity = Math.max(.12, .62 - air * .18); }
@@ -268,7 +276,7 @@ function frame(now) {
     const u = Math.min(1, (now - ctx.t0) / ctx.entMs);
     if (u < .22) { ctx.camPos.set(Math.sin(t * .3) * 2, 5 - u * 6, 4); look.set(0, 3, -17); }                                   // wide on the video wall + pyro
     else { const k = (u - .22) / .78; ctx.camPos.set(2.4 - k * 1.2, 1.9 + (1 - k) * .8, hz + 4.2 - k * 1.2); look.set(hx, hy + .25, hz); } // tracking in front of her
-  } else if (key === "vault" && (name === "run1" || name === "run2") && (p.sx || 1) > 0 && p.x < -100) {
+  } else if (key === "vault" && /^(run[12]|grun\d)$/.test(name) && (p.sx || 1) > 0 && p.x < -100) {
     fp = true; fov = 78; const bob = Math.sin(t * 22) * .035;
     ctx.camPos.set(hx + .05, hy + .78 + bob, 0); look.set(0, 1.05, 0); ctx.snap = true;
   } else if (ctx.fpUntil > now && key === "beam") {
@@ -283,20 +291,24 @@ function frame(now) {
   } else if (ctx.mode === "perform" && ctx.extra && ctx.extra.length) {
     const u = (now - ctx.t0) / 1000, ang = -.55 + Math.min(1.1, u * .35), rad = Math.max(5.5, 7.5 - u * .6), ht = Math.max(1.3, 2.6 - u * .4);
     ctx.camPos.set(mid + Math.sin(ang) * rad, by + ht, Math.cos(ang) * rad); look.set(mid, Math.max(by + .8, hy * .5 + (by + .8) * .5), 0);
+  } else if (ctx.mode === "perform" && key === "vault") { // vault: side-on tracking shot that travels with her, framed wide enough for the whole flight
+    fov = 54; ctx.fast = true; const cx = Math.max(-3.2, Math.min(3.4, hx + .55));
+    ctx.camPos.set(cx, by + 1.2 + Math.max(0, hy - by - 1.5) * .35, 4.6); look.set(Math.max(-3.4, Math.min(3.6, hx + .25)), Math.max(by + .85, hy - .05), 0);
   } else if (ctx.mode === "perform") {
-    const u = (now - ctx.t0) / 1000, ang = -.75 + Math.min(1.5, u * .45), rad = Math.max(3.6, 6 - u * .7), ht = Math.max(.9, 2.6 - u * .5);
+    ctx.fast = true; const u = (now - ctx.t0) / 1000, ang = -.75 + Math.min(1.5, u * .45), rad = Math.max(3.6, 6 - u * .7), ht = Math.max(.9, 2.6 - u * .5);
     ctx.camPos.set(hx + Math.sin(ang) * rad, by + ht, Math.cos(ang) * rad + hz); look.set(hx, hy, hz);
   } else {
     const a = Math.sin(t * .18) * .6, cx = key === "vault" ? -.5 : key === "bars" ? 0 : 0, rad = key === "floor" ? 9 : key === "ring" ? 9.5 : 7;
     const c0 = ctx.extra && ctx.extra.length ? mid : hx * .5 + cx * .5; ctx.camPos.set(cx + Math.sin(a) * rad, by + 2.3, Math.cos(a) * rad); look.set(c0, by + .9, 0);
   }
-  h.plane.visible = !fp;
-  const k = ctx.snap ? 1 : 1 - Math.pow(ctx.mode === "gainer" ? .002 : .02, dt); ctx.snap = fp; if (!RC) ctx.shot = null;
-  cam.position.lerp(ctx.camPos, k); ctx.look.lerp(look, k); cam.lookAt(ctx.look); cam.rotateZ(roll);
+  h.plane.visible = !fp; if (fp) h.planeB.visible = false;
+  const k = ctx.snap ? 1 : 1 - Math.pow(ctx.mode === "gainer" ? .002 : ctx.fast && key === "vault" ? .006 : .02, dt); ctx.snap = fp; if (!RC) ctx.shot = null;
+  const kl = k === 1 ? 1 : ctx.fast ? 1 - Math.pow(.0006, dt) : k; ctx.fast = false; // gym moves: aim tracks her tightly so fast skills never leave the frame
+  cam.position.lerp(ctx.camPos, k); ctx.look.lerp(look, kl); cam.lookAt(ctx.look); cam.rotateZ(roll);
   let jit = null; if (ctx.shakeT) { const u = (now - ctx.shakeT) / 380; if (u < 1) { const a = ctx.shakeA * (1 - u); jit = new THREE.Vector3((Math.random() - .5) * a, (Math.random() - .5) * a, 0); cam.position.add(jit); } else ctx.shakeT = 0; }
   if (Math.abs(cam.fov - fov) > .1) { cam.fov += (fov - cam.fov) * Math.min(1, dt * 8); cam.updateProjectionMatrix(); }
   R.render(scene, cam);
   if (jit) cam.position.sub(jit);
 }
-window.Arena3D = { supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate, dust, impact, shake, rope, hype, pin, perch, gainer, project, win };
+window.Arena3D = { dbg: () => ctx, supported, mount, unmount, isOn, perform, idle, firstPerson, entrance, celebrate, dust, impact, shake, rope, hype, pin, perch, gainer, project, win };
 window.dispatchEvent(new Event("arena3d-ready"));

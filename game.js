@@ -177,6 +177,18 @@ const SPR = { stand: [174, 484, .5, .58], run1: [310, 483, .45, .6], run2: [362,
   const O = {"opp/vault-idle": [300, 446], "opp/vault-attack": [413, 426], "opp/vault-hit": [325, 435], "opp/vault-taunt": [243, 472], "opp/bars-idle": [290, 447], "opp/bars-attack": [401, 437], "opp/bars-hit": [295, 452], "opp/bars-taunt": [235, 473], "opp/beam-idle": [275, 441], "opp/beam-attack": [395, 433], "opp/beam-hit": [298, 448], "opp/beam-taunt": [222, 485], "opp/floor-idle": [290, 444], "opp/floor-attack": [382, 431], "opp/floor-hit": [280, 459], "opp/floor-taunt": [269, 471], "ref/watch": [214, 430], "ref/point": [242, 453], "ref/count": [286, 426], "ref/raise": [193, 486], "opp/vault-pin": [1112, 473], "opp/bars-pin": [1163, 517], "opp/beam-pin": [1180, 482], "opp/floor-pin": [1089, 499]};
   for (const k in O) { const [w, h] = O[k], [dir, nm] = k.split("/"); dir === "ref" ? add("ref_" + nm, w, h, 1.1) : add("o_" + nm.replace("-", "_"), w, h, nm.endsWith("pin") ? .5 : 1); } }
 const RING = new Set(["rentr", "rbelt", "rflex", "rpoint", "rrun", "rkick", "rtuck", "rland", "rgrab", "rpin", "rperch", "rpounce", "rlay", "rcover"]);
+// frame-by-frame sequences: 8 painted frames per move (cut from one sheet each, same character); [w, h, anchorX, anchorY] per frame
+const SEQM = {"grun":[[307,467,0.56,0.593],[226,470,0.449,0.566],[324,464,0.546,0.584],[289,467,0.542,0.559],[302,490,0.553,0.576],[263,489,0.497,0.578],[327,489,0.557,0.573],[299,480,0.515,0.55]],"gsalto":[[160,610,0.59,0.662],[263,328,0.43,0.542],[321,325,0.417,0.534],[307,328,0.417,0.536],[266,325,0.419,0.55],[399,501,0.501,0.435],[250,504,0.3,0.404],[283,425,0.347,0.515]],"gleap":[[257,451,0.475,0.543],[301,416,0.586,0.505],[316,446,0.543,0.538],[308,416,0.54,0.434],[455,292,0.502,0.545],[301,437,0.503,0.477],[262,467,0.497,0.559],[331,484,0.514,0.574]],"ggiant":[[153,610,0.452,0.584],[163,610,0.511,0.584],[228,586,0.408,0.608],[208,592,0.61,0.602],[358,354,0.737,1.005],[312,349,0.64,1.021],[155,612,0.418,0.582],[150,612,0.427,0.582]],"gtumb":[[220,579,0.475,0.644],[432,558,0.57,0.631],[528,463,0.512,0.554],[560,532,0.5,0.535],[155,610,0.588,0.463],[340,579,0.589,0.41],[382,384,0.406,0.373],[184,641,0.613,0.678]],"crun":[[314,453,0.506,0.558],[326,448,0.52,0.552],[335,442,0.544,0.566],[320,453,0.501,0.54],[314,460,0.509,0.553],[332,455,0.52,0.545],[329,460,0.52,0.543],[316,467,0.517,0.535]],"cgain":[[232,394,0.54,0.477],[275,452,0.506,0.394],[256,405,0.531,0.442],[377,303,0.514,0.501],[364,301,0.522,0.502],[406,384,0.425,0.387],[444,355,0.435,0.391],[267,339,0.512,0.391]]};
+for (const k in SEQM) SEQM[k].forEach((d, i) => { SPR[k + i] = d; if (k[0] === "c") RING.add(k + i); });
+const FR = (k, ...ix) => ix.map(i => k + i), R8 = [0, 1, 2, 3, 4, 5, 6, 7];
+// a sequence is a list of frames; flips use the layout [crouch, take-off, ...air..., land reach, squat] so one f-range table drives every salto
+const SEQS = { run: FR("grun", ...R8), crun: FR("crun", ...R8), leap: FR("gleap", ...R8), giant: FR("ggiant", ...R8), gain: FR("cgain", ...R8),
+  tuck: FR("gsalto", 7, 0, 1, 2, 3, 4, 6, 7), layout: ["gsalto7", "gsalto0", "gtumb4", "gtumb4", "gtumb4", "gtumb4", "gsalto6", "gsalto7"],
+  pike: ["gsalto7", "gsalto0", "ggiant5", "ggiant6", "ggiant6", "ggiant5", "gsalto6", "gsalto7"], bhs: ["gsalto7", "gsalto0", "gtumb5", "gtumb5", "gtumb4", "gtumb6", "gsalto6", "gsalto7"],
+  rof: [...FR("gtumb", 0, 1, 2, 3, 4, 6), "gsalto7"], vin: FR("gtumb", 0, 1, 4, 4) };
+const LOOP = new Set(["run", "crun", "giant"]), STRIDE = 135; // rig units per run cycle (8 frames) — frames advance with distance, so feet never skate
+// in the ring the gym sequences map to the Pink Cheetah's (or fall back to her single poses)
+const seqFor = s => !s || !SEQS[s] ? null : !WRESTLE() ? (SEQS[s][0][0] === "c" ? null : s) : s === "run" ? "crun" : SEQS[s][0][0] === "c" ? s : null;
 const ACTOR = n => /^(o|ref)_/.test(n);
 const RMAP = { stand: "rpoint", run1: "rrun", run2: "rrun", hurdle: "rrun", crouch: "rland", tuck: "rtuck", pike: "rtuck", stretch: "rkick", stick: "rflex", split: "rkick", passe: "rentr", tbal: "rentr", straddle: "rkick", wobble: "rpoint", salute: "rentr", celebrate: "rbelt" };
 const LEOS = [["starlight", "Starlight (pink & teal)"], ["galaxy", "Galaxy (purple & gold)"], ["ocean", "Ocean (blue & silver)"], ["ruby", "Ruby (red & gold)"], ["mint", "Mint (green & violet)"], ["sunset", "Sunset (orange & blue)"]];
@@ -208,32 +220,48 @@ function pick(p) {
 const BASE = { x: 0, y: -66, r: 0, sx: 1, sp: 0, lsh: 10, lel: -12, rsh: -10, rel: -12, lhip: 2, lkn: 2, rhip: -2, rkn: 2, tail: 0 };
 const RIGS = new Set();
 class Rig {
-  constructor(g, first) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0;
+  constructor(g, first) { this.g = g; this.root = g.querySelector("[data-j=root]"); this.A = g.querySelector(".spA"); this.B = g.querySelector(".spB"); this.L = [this.A, this.B]; this.ph = 0; this.sq = null; this.cur = ""; this.p = Object.assign({}, BASE); this.base = {}; this.tok = 0;
     this.trail = document.createElementNS("http://www.w3.org/2000/svg", "g"); this.trail.setAttribute("class", "trail"); g.insertBefore(this.trail, this.root);
     this.fx = { sx: 1, sy: 1, lean: 0, lv: 0, sq: 0, sv: 0, vx: 0, vy: 0, vr: 0, air: 0, trailN: 0, tT: 0, last: 0, q: null, land: 0 };
     this.show(first || (WRESTLE() ? "rpoint" : "stand"), true); this.apply(); RIGS.add(this); }
+  img(el, n) { if (el._n === n) return; el._n = n; const [w, h, ax, ay] = SPR[n], W2 = w * K, H2 = h * K;
+    el.setAttribute("href", sprURL(n)); el.setAttribute("x", (-ax * W2).toFixed(2)); el.setAttribute("y", (-ay * H2).toFixed(2)); el.setAttribute("width", W2.toFixed(2)); el.setAttribute("height", H2.toFixed(2)); }
+  // frame-by-frame: fractional frame index → bottom layer = frame i, top layer = frame i+1 at a sharpened blend weight (crisp frames, no strobing)
+  seqShow(s, fr) {
+    const L = SEQS[s], N = L.length, loop = LOOP.has(s); let i = Math.floor(fr), u = fr - i;
+    if (loop) i = ((i % N) + N) % N; else if (i >= N - 1) { i = N - 1; u = 0; } else if (i < 0) { i = 0; u = 0; }
+    const j = loop ? (i + 1) % N : Math.min(N - 1, i + 1), v = Math.max(0, Math.min(1, (u - .22) / .56)), w = v * v * (3 - 2 * v), [b, t] = this.L;
+    if (!this.sq) { b.style.transition = t.style.transition = "none"; } this.sq = s;
+    this.img(b, L[i]); this.img(t, L[j]); b.setAttribute("opacity", 1); t.setAttribute("opacity", w.toFixed(3));
+    this.sA = L[i]; this.sB = L[j]; this.sW = w; this.cur = w > .5 ? L[j] : L[i];
+  }
   show(n, now) {
+    if (this.sq) { this.sq = null; this.A = this.L[0]; this.B = this.L[1]; } // leaving a sequence: cross-fade out of its last frame
     if (n === this.cur) return; this.cur = n;
-    const [w, h, ax, ay] = SPR[n], W2 = w * K, H2 = h * K;
     const [on, off] = [this.B, this.A]; this.A = on; this.B = off; // swap layers for a blended cross-fade
-    on.setAttribute("href", sprURL(n)); on.setAttribute("x", -ax * W2); on.setAttribute("y", -ay * H2); on.setAttribute("width", W2); on.setAttribute("height", H2);
+    this.img(on, n);
     on.style.transition = off.style.transition = now ? "none" : `opacity ${(.15 * SLOW).toFixed(2)}s cubic-bezier(.4,0,.2,1)`; on.setAttribute("opacity", 1); off.setAttribute("opacity", 0);
   }
   // secondary motion (squash & stretch, follow-through lean, idle breathing) is layered on top of the pose by rigFX()
   tf() { const p = this.p, f = this.fx, up = Math.abs((((p.r || 0) % 360) + 540) % 360 - 180) < 35, foot = up ? 66 * (1 - f.sy) : 0;
     return `translate(${p.x.toFixed(2)},${(p.y + foot).toFixed(2)}) rotate(${((p.r || 0) + f.lean).toFixed(2)}) scale(${(p.sx * f.sx).toFixed(4)},${f.sy.toFixed(4)})`; }
   apply() { this.root.setAttribute("transform", this.tf()); }
-  set(p) { Object.assign(this.p, BASE, this.base, p); this.show(pickT(this.p), true); this.apply(); }
+  set(p) { Object.assign(this.p, BASE, this.base, p); const sq = seqFor(p.seq); sq ? this.seqShow(sq, p.f ? p.f[1] : 0) : this.show(pickT(this.p), true); this.apply(); }
   async play(frames) { // frames: [ [pose, ms, ease?], ... ]  pose is absolute over BASE+base; sprite chosen from target pose
     const tok = ++this.tok;
     for (const [pose, ms, ease] of frames) {
       if (tok !== this.tok) return;
-      const from = Object.assign({}, this.p), to = Object.assign({}, BASE, this.base, pose);
-      this.show(pickT(to));
+      const from = Object.assign({}, this.p), to = Object.assign({}, BASE, this.base, pose), sq = seqFor(pose.seq);
+      // sequence frame range for this segment: explicit f:[a,b], a looping target frame fa, or cyc = frames to advance (stride-locked runs)
+      let f0 = this.ph, f1 = f0;
+      if (sq) { const N = SEQS[sq].length; if (pose.f) [f0, f1] = pose.f; else if (pose.fa != null) { f0 = ((f0 % N) + N) % N; f1 = pose.fa; if (f1 < f0) f1 += N; } else f1 = f0 + (pose.cyc || 0); this.seqShow(sq, f0); }
+      else this.show(pickT(to));
       await new Promise(res => {
-        const t0 = performance.now(), E = ease === "lin" ? (t => t) : ease === "out" ? (t => 1 - Math.pow(1 - t, 3)) : (t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        const t0 = performance.now(), E = ease === "lin" ? (t => t) : ease === "out" ? (t => 1 - Math.pow(1 - t, 3)) : ease === "in" ? (t => t * t * t) : (t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        // time-based (delta-time) tween on every display frame: identical motion at 30, 60 or 120 Hz
         const step = now => { if (tok !== this.tok) return res(); const t = Math.min(1, (now - t0) / (ms * SLOW)), e = E(t);
-          for (const k in to) if (typeof to[k] === "number") this.p[k] = from[k] + (to[k] - from[k]) * e; this.apply(); t < 1 ? requestAnimationFrame(step) : res(); };
+          for (const k in to) if (typeof to[k] === "number" && k !== "cyc" && k !== "fa") this.p[k] = from[k] + (to[k] - from[k]) * e;
+          if (sq) { this.ph = f0 + (f1 - f0) * e; this.seqShow(sq, this.ph); } this.apply(); t < 1 ? requestAnimationFrame(step) : res(); };
         requestAnimationFrame(step);
       });
     }
@@ -293,22 +321,31 @@ const P = {
   lunge: { y: -58, rhip: -55, rkn: 55, lhip: 22, lkn: 0, lsh: -170, rsh: -170, lel: 0, rel: 0, sp: 8 }
 };
 const M = (...a) => Object.assign({}, ...a);
-function flip(x0, dx, dir, shape, height = 120, twist = 0, land = 0) {
+const FF = [[0, 0], [0, 1], [1, 4], [4, 6], [6, 7]]; // frame ranges of the 5 flip segments in a salto sequence
+function flip(x0, dx, dir, shape, height = 120, twist = 0, land = 0, sq = shape) {
   const s = P[shape] || P.tuck;
   const fr = [[M(P.crouch, { x: x0 }), 220], [M(P.up, { x: x0 + dx * .12, y: -90 }), 160, "out"],
     [M(s, { x: x0 + dx * .5, y: -66 - height, r: dir * 180, sx: twist ? -1 : 1 }), 330, "lin"],
     [M(s, { x: x0 + dx * .85, y: -66 - height * .45 + land * .5, r: dir * 330, sx: twist > 1 ? 1 : (twist ? -1 : 1) }), 260, "lin"],
     [M(P.crouch, { x: x0 + dx, y: -50 + land, r: dir * 360 }), 160, "out"], [M(P.up, { x: x0 + dx, y: -66 + land, r: dir * 360 }), 260]];
   if (twist) fr[3][0].sx = 1;
+  if (SEQS[sq]) FF.forEach((f, i) => Object.assign(fr[i][0], { seq: sq, f }));
   return fr;
 }
+const sq = (fr, seq, f) => (Object.assign(fr[0], { seq, f }), fr); // tag one timeline step with a frame range
 const norm = rig => { rig.p.r = ((rig.p.r % 360) + 360) % 360; if (rig.p.r > 180) rig.p.r -= 360; };
-function run(x0, x1, y = -66) { const n = 6, fr = []; for (let i = 1; i <= n; i++) { const a = i % 2 ? 1 : -1; fr.push([{ x: x0 + (x1 - x0) * i / n, y: y - 4, sp: 12, lhip: -40 * a, rhip: 40 * a, lkn: a > 0 ? 70 : 20, rkn: a > 0 ? 20 : 70, lsh: 50 * a, rsh: -50 * a, rel: -40, lel: -40 }, 120, "lin"]); } return fr; }
+// run: 8-frame cycle, stride-locked (frames advance with distance travelled) — same 6×120 ms timing as before so every cue still lines up
+function run(x0, x1, y = -66) { const n = 6, fr = [], cyc = Math.abs(x1 - x0) / n / STRIDE * 8; for (let i = 1; i <= n; i++) { const a = i % 2 ? 1 : -1; fr.push([{ x: x0 + (x1 - x0) * i / n, y: y - 4 - (a > 0 ? 2 : 0), sp: 12, lhip: -40 * a, rhip: 40 * a, lkn: a > 0 ? 70 : 20, rkn: a > 0 ? 20 : 70, lsh: 50 * a, rsh: -50 * a, rel: -40, lel: -40, seq: "run", cyc }, 120, "lin"]); } return fr; }
+// jog back to a home mark (turn, stride-locked run, turn) in the same total time as the old glide
+const back = (x0, x1, ms, ex = {}) => [[M(ex, { x: x0, sx: -1 }), 110], [M(ex, { x: x1, sx: -1, y: -70, seq: "run", cyc: Math.abs(x1 - x0) / STRIDE * 8 }), Math.max(1, ms - 220), "lin"], [M(ex, { x: x1, sx: 1 }), 110]];
 const HOME = { vault: { x: -300 }, bars: { x: -150 }, beam: { x: -40 }, floor: { x: -200 }, ring: { x: -150 } };
 // stage geometry (viewBox 800x400)
 const GEO = { ring: { gx: 400, gy: 330 }, vault: { gx: 400, gy: 360 }, bars: { gx: 400, gy: 360 }, beam: { gx: 400, gy: 250 }, floor: { gx: 400, gy: 350 } };
 const HB = { x: 70, y: -230 }, LB = { x: -100, y: -150 }, GR = 114; // GR = hip-to-bar radius so her hands meet the bar
-function circle(cxp, cyp, a0, a1, R = GR, step = 30, extra = {}) { const fr = []; const d = a1 > a0 ? step : -step; for (let a = a0 + d; d > 0 ? a <= a1 : a >= a1; a += d) { const t = a * Math.PI / 180; fr.push([M(P.layout, extra, { x: cxp - R * Math.sin(t), y: cyp + R * Math.cos(t), r: a }), 85, "lin"]); } return fr; }
+// body shape through a giant: straight over the top, hollow on the way down, arch + tap before the bottom, kick/pike through it, hollow back to handstand
+const GA = [[0, 0], [60, 1], [130, 2], [170, 3], [200, 4], [235, 5], [290, 6], [330, 7], [360, 8]];
+const gf = a => { const u = (((a - 180) % 360) + 360) % 360; for (let i = 1; i < GA.length; i++) if (u <= GA[i][0]) { const [a0, f0] = GA[i - 1], [a1, f1] = GA[i]; return (f0 + (f1 - f0) * (u - a0) / (a1 - a0)) % 8; } return 0; };
+function circle(cxp, cyp, a0, a1, R = GR, step = 30, extra = {}) { const fr = []; const d = a1 > a0 ? step : -step; for (let a = a0 + d; d > 0 ? a <= a1 : a >= a1; a += d) { const t = a * Math.PI / 180; fr.push([M(P.layout, extra, { x: cxp - R * Math.sin(t), y: cyp + R * Math.cos(t), r: a }, d > 0 && R === GR ? { seq: "giant", fa: gf(a) } : {}), 85, "lin"]); } return fr; }
 const hang = M(P.layout, { x: HB.x, y: HB.y + GR, r: 0 });
 const support = { x: HB.x - 4, y: HB.y + 4, r: 0, lsh: -8, rsh: -8, lel: 0, rel: 0, sp: 0, lhip: 0, rhip: 0 };
 const SK = {
@@ -317,8 +354,8 @@ const SK = {
   finalpose: () => [[M(P.lunge), 450], [M(P.up, { y: -66, rhip: -10, lhip: 15, sp: -14 }), 450], [{ lsh: -150, rsh: 40, sp: -8, rhip: -20, rkn: 40, y: -64 }, 500], [{}, 500]],
   stick: () => [...run(-300, -140), [M(P.lunge, { x: -110 }), 160], [M(P.up, { x: -70, y: -150, r: 90 }), 200], [M(P.up, { x: -10, y: -216, r: 180 }), 220, "lin"], ...flip(-10, 220, 1, "layout", 70, 2, 0).slice(2), [M(P.up, { x: 210, r: 360 }), 700], [{ x: 210, r: 360 }, 300], [{ x: -300, r: 360 }, 1, "lin"]],
 };
-function vaultSkill(shape, twist) { return () => [...run(-300, -140), [M(P.lunge, { x: -110 }), 160], [M(P.up, { x: -70, y: -150, r: 90 }), 200], [M(P.up, { x: -10, y: -216, r: 180 }), 200, "lin"],
-  ...(shape ? flip(-10, 220, 1, shape, 90, twist).slice(2) : [[M(P.up, { x: 120, y: -150, r: 300 }), 260, "lin"], [M(P.crouch, { x: 210, r: 360 }), 200], [M(P.up, { x: 210, r: 360 }), 300]]),
+function vaultSkill(shape, twist) { return () => [...run(-300, -140), sq([M(P.lunge, { x: -110 }), 160], "vin", [0, 1]), sq([M(P.up, { x: -70, y: -150, r: 90 }), 200], "vin", [1, 2]), sq([M(P.up, { x: -10, y: -216, r: 180 }), 200, "lin"], "vin", [2, 3]),
+  ...(shape ? flip(-10, 220, 1, shape, 90, twist).slice(2) : [sq([M(P.up, { x: 120, y: -150, r: 300 }), 260, "lin"], "layout", [2, 6]), sq([M(P.crouch, { x: 210, r: 360 }), 200], "layout", [6, 7]), [M(P.up, { x: 210, r: 360 }), 300]]),
   [{ x: 210, r: 360 }, 300], [{ x: 210, r: 360, sx: -1 }, 150], ...run(210, -300).map(f => (f[0].sx = -1, f[0].r = 360, f)), [{ x: -300, r: 360, sx: 1 }, 150]]; }
 Object.assign(SK, {
   run: () => [...run(-300, -40), [M(P.crouch, { x: -20 }), 150], [M(P.up, { x: 40, y: -150 }), 300, "out"], [M(P.crouch, { x: 90 }), 250], [M(P.up, { x: 90 }), 300], [{ x: 90, sx: -1 }, 150], ...run(90, -300).map(f => (f[0].sx = -1, f)), [{ x: -300 }, 150]],
@@ -327,12 +364,12 @@ Object.assign(SK, {
 // floor passes travel across mat
 const FL = {
   salute: SK.salute, finalpose: SK.finalpose,
-  roundoff: () => [[M(P.lunge, { x: -200 }), 350], [M(P.up, { x: -140, y: -100, r: 90 }), 220], [M(P.up, { x: -90, y: -172, r: 180 }), 220, "lin"], [M(P.up, { x: -40, y: -110, r: 270, lhip: -30 }), 200, "lin"], [M(P.crouch, { x: -10, r: 360 }), 200], [M(P.up, { x: -10, r: 360 }), 350], [{ x: -200, r: 360 }, 700]],
-  handspring: () => [[M(P.lunge, { x: -200 }), 300], ...flip(-200, 150, 1, "layout", 60).slice(1), ...flip(-50, 150, 1, "layout", 60).slice(1), [{ x: -200, r: 720 }, 800]],
-  tuck: () => [[M(P.lunge, { x: -200 }), 300], ...flip(-200, 200, -1, "tuck", 130).slice(0), [{ x: -200, r: -360 }, 700]],
-  leap: () => [[{ x: -200 }, 100], ...run(-200, -60), [M(P.split, { x: 40, y: -150, sp: -5 }), 320, "out"], [M(P.split, { x: 110, y: -120 }), 200], [M(P.crouch, { x: 150 }), 200], [M(P.up, { x: 150 }), 300], [{ x: -200 }, 700]],
-  layout: () => [[M(P.lunge, { x: -200 }), 300], ...flip(-200, 220, -1, "layout", 150), [{ x: -200, r: -360 }, 700]],
-  twist: () => [[M(P.lunge, { x: -200 }), 300], ...flip(-200, 230, -1, "layout", 160, 2), [{ x: -200, r: -360 }, 700]],
+  roundoff: () => [sq([M(P.lunge, { x: -200 }), 350], "rof", [0, 1]), sq([M(P.up, { x: -140, y: -100, r: 90 }), 220], "rof", [1, 3]), sq([M(P.up, { x: -90, y: -172, r: 180 }), 220, "lin"], "rof", [3, 4]), sq([M(P.up, { x: -40, y: -110, r: 270, lhip: -30 }), 200, "lin"], "rof", [4, 5]), sq([M(P.crouch, { x: -10, r: 360 }), 200], "rof", [5, 6]), [M(P.up, { x: -10, r: 360 }), 350], ...back(-10, -200, 700, { r: 360 })],
+  handspring: () => [sq([M(P.lunge, { x: -200 }), 300], "rof", [0, 1]), ...flip(-200, 150, 1, "layout", 60, 0, 0, "bhs").slice(1), ...flip(-50, 150, 1, "layout", 60, 0, 0, "bhs").slice(1), ...back(100, -200, 800, { r: 720 })],
+  tuck: () => [sq([M(P.lunge, { x: -200 }), 300], "rof", [0, 1]), ...flip(-200, 200, -1, "tuck", 130).slice(0), ...back(0, -200, 700, { r: -360 })],
+  leap: () => [[{ x: -200 }, 100], ...run(-200, -60), sq([M(P.split, { x: 40, y: -150, sp: -5 }), 320, "out"], "leap", [1, 4]), sq([M(P.split, { x: 110, y: -120 }), 200], "leap", [4, 5]), sq([M(P.crouch, { x: 150 }), 200], "leap", [5, 6]), sq([M(P.up, { x: 150 }), 300], "leap", [6, 7]), ...back(150, -200, 700)],
+  layout: () => [sq([M(P.lunge, { x: -200 }), 300], "rof", [0, 1]), ...flip(-200, 220, -1, "layout", 150), ...back(20, -200, 700, { r: -360 })],
+  twist: () => [sq([M(P.lunge, { x: -200 }), 300], "rof", [0, 1]), ...flip(-200, 230, -1, "layout", 160, 2), ...back(30, -200, 700, { r: -360 })],
 };
 const BARS = {
   kip: () => [[{ x: -150 }, 100], ...run(-150, HB.x - 10), [M(P.up, { x: HB.x, y: HB.y + GR }), 300, "out"], [M(P.pike, { x: HB.x + 40, y: HB.y + 104, r: -25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x - 30, y: HB.y + 104, r: 25, lsh: -180, rsh: -180 }), 380], [M(P.pike, { x: HB.x + 20, y: HB.y + 60, r: 0, lhip: -100, rhip: -100, lsh: -120, rsh: -120 }), 330], [support, 380, "out"], [support, 300]],
@@ -346,11 +383,11 @@ const BARS = {
 };
 const BEAM = {
   releve: () => [[M(P.up, { y: -70 }), 450], [M(P.passe, { y: -70 }), 450], [M(P.passe, { y: -70 }), 500], [{}, 400]],
-  leap: () => [[{ x: -150 }, 400], [M(P.crouch, { x: -130 }), 200], [M(P.split, { x: -40, y: -140 }), 330, "out"], [M(P.split, { x: 30, y: -110 }), 200], [M(P.crouch, { x: 60 }), 200], [M(P.arms, { x: 60 }), 300], [{ x: -40 }, 600]],
+  leap: () => [[{ x: -150 }, 400], sq([M(P.crouch, { x: -130 }), 200], "leap", [0, 1]), sq([M(P.split, { x: -40, y: -140 }), 330, "out"], "leap", [1, 4]), sq([M(P.split, { x: 30, y: -110 }), 200], "leap", [4, 5]), sq([M(P.crouch, { x: 60 }), 200], "leap", [5, 6]), sq([M(P.arms, { x: 60 }), 300], "leap", [6, 7]), [{ x: -40 }, 600]],
   pirouette: () => [[M(P.passe, { y: -70 }), 350], [M(P.passe, { y: -70, sx: -1 }), 220, "lin"], [M(P.passe, { y: -70, sx: 1 }), 220, "lin"], [M(P.passe, { y: -70, sx: -1 }), 220, "lin"], [M(P.passe, { y: -70, sx: 1 }), 220, "lin"], [M(P.arms), 400], [{}, 300]],
   handstand: () => [[M(P.lunge), 350], [M(P.up, { x: -20, y: -110, r: 90 }), 300], [M(P.layout, { x: -40, y: -106, r: 180 }), 300, "out"], [M(P.layout, { x: -40, y: -106, r: 180, lhip: -30, rhip: 30 }), 600], [M(P.layout, { x: -40, y: -106, r: 180 }), 300], [M(P.up, { x: -60, y: -110, r: 90 }), 300], [M(P.lunge, { x: -40, r: 0, sx: -1 }), 1], [M(P.lunge, { x: -40 }), 1], [{}, 350]],
   cartwheel: () => [[M(P.lunge), 300], [M(P.up, { x: 0, y: -110, r: 90, lhip: 30, rhip: -30 }), 220], [M(P.layout, { x: 30, y: -106, r: 180, lhip: 40, rhip: -40 }), 220, "lin"], [M(P.up, { x: 60, y: -110, r: 270, lhip: 30, rhip: -30 }), 220, "lin"], [M(P.lunge, { x: 80, r: 360 }), 250], [M(P.arms, { x: 80, r: 360 }), 300], [{ x: -40, r: 360 }, 700]],
-  splitjump: () => [[M(P.crouch), 220], [M(P.split, { y: -150, sp: -8 }), 320, "out"], [M(P.split, { y: -150, lhip: 90, rhip: -90 }), 120], [M(P.crouch), 300], [M(P.arms), 300], [{}, 300]],
+  splitjump: () => [sq([M(P.crouch), 220], "leap", [1, 1]), sq([M(P.split, { y: -150, sp: -8 }), 320, "out"], "leap", [2, 4]), sq([M(P.split, { y: -150, lhip: 90, rhip: -90 }), 120], "leap", [4, 4.4]), sq([M(P.crouch), 300], "leap", [5, 6]), sq([M(P.arms), 300], "leap", [6, 7]), [{}, 300]],
   walkover: () => [[M(P.up), 300], [M(P.up, { sp: -60, y: -70 }), 350], [M(P.layout, { x: -70, y: -106, r: -180, rhip: -40 }), 450], [M(P.layout, { x: -90, y: -100, r: -260, rhip: -60, lhip: 20 }), 300], [M(P.lunge, { x: -100, r: -360 }), 350], [M(P.arms, { x: -100, r: -360 }), 300], [{ x: -40, r: -360 }, 600]],
   dismount: () => [[{ x: 60 }, 300], [{ x: 150 }, 500], [{ x: 220 }, 400], ...flip(220, 120, 1, "tuck", 110, 0, 110), [M(P.up, { x: 340, y: 44, r: 360 }), 600], [{ x: 340, y: 44, r: 360 }, 400]]
 };
@@ -394,16 +431,17 @@ function MOVES(k, kind) {
       return { a, o: [...hold(920), [{ x: 105, spr: os("attack") }, 500], [{ x: 120, y: -200, r: -70, spr: os("hit") }, 260, "out"], [{ x: 195, y: -240, r: -160, spr: os("hit") }, 230, "lin"], [{ x: 232, y: -66, r: 0, spr: os("pin") }, 200], ...getUp(232)], hits: [{ t: 920, small: 1 }, { t, big: 1 }] }; },
     dropkick: () => { const a = [...rrun(AH, -30), [{ x: 50, y: -152, spr: "rkick" }, 280, "out"], [{ x: 85, y: -130, r: -6, spr: "rkick" }, 150], [{ x: 90, spr: "rland" }, 300], [{ x: 90, spr: "rpoint" }, 600], ...retA(90)], t = 1150;
       return { a, o: [...hold(t - 40), [{ x: 288, r: 16, spr: os("hit") }, 260, "out"], [{ x: 252, y: -112, r: -10, spr: os("hit") }, 200], [{ x: 232, y: -66, r: 0, spr: os("pin") }, 200], ...getUp(232)], hits: [{ t, big: 1 }, { t: t + 220, rope: 1 }] }; },
-    tuckflip: () => { const c = climbL(), tc = dur(c), a = [...c, [{ x: -80, y: -330, r: 180, spr: "rtuck" }, 350, "out"], [{ x: 60, y: -165, r: 360, spr: "rtuck" }, 320, "lin"], [{ x: 95, y: -66, r: 360, spr: "rland" }, 180], [{ x: 95, r: 360, spr: "rflex" }, 600], [{ x: 95, r: 0, spr: "rflex" }, 1], ...retA(95)], t = tc + 850;
+    tuckflip: () => { const c = climbL(), tc = dur(c), a = [...c, [{ x: -80, y: -330, r: 180, spr: "rtuck", seq: "gain", f: [1, 3.5] }, 350, "out"], [{ x: 60, y: -165, r: 360, spr: "rtuck", seq: "gain", f: [3.5, 5] }, 320, "lin"], [{ x: 95, y: -66, r: 360, spr: "rland" }, 180], [{ x: 95, r: 360, spr: "rflex" }, 600], [{ x: 95, r: 0, spr: "rflex" }, 1], ...retA(95)], t = tc + 850;
       return { a, o: [[I, 1200], [{ x: 140, spr: os("taunt") }, 400], [{ x: 140, spr: os("taunt") }, t - 50 - 1900], [{ x: 140, r: -6, spr: os("hit") }, 300], ...down(140, 228)], hits: [{ t: tc - 600, rope: -1, quiet: 1 }, { t, big: 1 }] }; },
-    moonsault: () => { const c = climbL(false), tc = dur(c), a = [...c, [{ x: -120, y: -345, r: -180, sx: -1, spr: "rtuck" }, 360, "out"], [{ x: 50, y: -170, r: -360, sx: -1, spr: "rtuck" }, 330, "lin"], [{ x: 85, y: -66, r: -360, sx: -1, spr: "rland" }, 180], [{ x: 85, r: -360, sx: 1, spr: "rflex" }, 600], [{ x: 85, r: 0, spr: "rflex" }, 1], ...retA(85)], t = tc + 870;
+    moonsault: () => { const c = climbL(false), tc = dur(c), a = [...c, [{ x: -120, y: -345, r: -180, sx: -1, spr: "rtuck", seq: "gain", f: [1, 3.5] }, 360, "out"], [{ x: 50, y: -170, r: -360, sx: -1, spr: "rtuck", seq: "gain", f: [3.5, 5] }, 330, "lin"], [{ x: 85, y: -66, r: -360, sx: -1, spr: "rland" }, 180], [{ x: 85, r: -360, sx: 1, spr: "rflex" }, 600], [{ x: 85, r: 0, spr: "rflex" }, 1], ...retA(85)], t = tc + 870;
       return { a, o: [[I, 600], [{ x: 135, spr: os("taunt") }, 400], [{ x: 135, spr: os("taunt") }, t - 50 - 1300], [{ x: 135, r: -6, spr: os("hit") }, 300], ...down(135, 228)], hits: [{ t: tc - 600, rope: -1, quiet: 1 }, { t, big: 1 }] }; },
     finisher: () => { // TOP-ROPE CHEETAH POUNCE: a gainer — forward take-off from the top rope, full backflip while travelling forward, lands across the opponent
       const c = climbL(), tc = dur(c), P = 1500, X = 128;
-      const fl = [[{ x: -272, y: -215, spr: "rperch" }, P], [{ x: -262, y: -238, spr: "rlay" }, 120, "out"],      // spring up off the top rope, arms high
-        [{ x: -205, y: -278, r: -70, spr: "rlay" }, 210, "out"], [{ x: -130, y: -292, r: -160, spr: "rtuck" }, 210, "lin"], // backflip starts while she travels forward
-        [{ x: -45, y: -268, r: -250, spr: "rtuck" }, 210, "lin"], [{ x: 35, y: -205, r: -320, spr: "rlay" }, 190, "lin"],     // ... tuck → open to layout
-        [{ x: 95, y: -130, r: -360, spr: "rpounce" }, 160, "in"], [{ x: X - 8, y: -72, r: 0, spr: "rcover" }, 1], [{ x: X - 8, y: -72, spr: "rcover" }, 600]];
+      const g = (f, a) => Object.assign(f, { seq: "gain", f: a }); // 8-frame gainer: crouch, spring, knees up, tuck, tuck, open, pounce reach
+      const fl = [[{ x: -272, y: -215, spr: "rperch" }, P], [g({ x: -262, y: -238, spr: "rlay" }, [0, 1]), 120, "out"],      // spring up off the top rope, arms high
+        [g({ x: -205, y: -278, r: -70, spr: "rlay" }, [1, 2]), 210, "out"], [g({ x: -130, y: -292, r: -160, spr: "rtuck" }, [2, 3]), 210, "lin"], // backflip starts while she travels forward
+        [g({ x: -45, y: -268, r: -250, spr: "rtuck" }, [3, 4.2]), 210, "lin"], [g({ x: 35, y: -205, r: -320, spr: "rlay" }, [4.2, 5]), 190, "lin"],     // ... tuck → open to layout
+        [g({ x: 95, y: -130, r: -360, spr: "rpounce" }, [5, 6]), 160, "in"], [{ x: X - 8, y: -72, r: 0, spr: "rcover" }, 1], [{ x: X - 8, y: -72, spr: "rcover" }, 600]];
       const a = [...c, ...fl], t = tc + P + 120 + 210 * 3 + 190 + 160;
       return { a, o: [[{ x: OH, r: -8, spr: os("hit") }, 450], [{ x: OH - 6, r: 8, spr: os("hit") }, 450], [{ x: OH - 10, r: -6, spr: os("hit") }, 400], ...down(OH - 40, X, true), [{ x: X, y: -66, spr: os("pin") }, Math.max(1, t - 1640)], [{ x: X, y: -58, spr: os("pin") }, 70], [{ x: X, y: -66, spr: os("pin") }, 140]],
         hits: [{ t: 200, cue: () => { bubble("Whoa… I'm seeing stars…", OH); announce("SEEING STARS!", "hot"); } }, { t: 1640, cue: () => { SFX.thud(false); shake(false); } },
@@ -508,9 +546,12 @@ function stageSVG(key, scale = 1.25) {
 }
 
 /* ---------------- 3D glue (arena3d.js is an ES module; if it fails we stay in Simple mode) ---------------- */
+// every frame of every sequence this theme can play (warm the browser cache so no frame ever pops in blank)
+const seqFrames = () => [...new Set(Object.keys(SEQS).map(seqFor).filter(Boolean).flatMap(k => SEQS[k]))];
+const PRE = {}; function preSeq() { seqFrames().forEach(n => { const u = sprURL(n); if (!PRE[u]) { PRE[u] = new Image(); PRE[u].decoding = "async"; PRE[u].src = u; } }); }
 function mount3D(stage, key, rig, label, actors) {
   if (!use3D()) return false;
-  const ok = window.Arena3D.mount(stage, { key: WRESTLE() ? "ring" : key, rig, label, K, actors, spr: n => SPR[n] || SPR.stand, url: n => sprURL(n),
+  const ok = window.Arena3D.mount(stage, { key: WRESTLE() ? "ring" : key, rig, label, K, actors, spr: n => SPR[n] || SPR.stand, url: n => sprURL(n), pre: seqFrames(),
     onFail: () => { MODE3D = "simple"; }, onSlow: f => { if (/[?&]mode=3d/.test(location.search)) return; window.Arena3D.unmount(); MODE3D = "simple"; store.set("starlight:view", "simple"); toast(`Switched to Simple mode for smoother play (${f | 0} fps).`); } });
   return ok;
 }
@@ -604,6 +645,7 @@ function notes(e, after) {
 /* ---------------- event play ---------------- */
 let EV = null;
 function startEvent(e, skipEntrance) {
+  preSeq();
   const st = S.ev[e.key]; if (st.i >= 8) { st.i = 0; st.scores = []; save(); }
   if (WRESTLE() && !skipEntrance && st.i === 0) return entrance(e);
   if (!WRESTLE() && st.i === 0) playMusic("fanfare", .55); else if (!WRESTLE()) stopMusic();
