@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Play · Starlight Arena</title>
+<link rel="stylesheet" href="style.css">
+</head><body>
+<div id="bg"></div>
+<div id="ailabel" role="note">✨ AI-made practice, not for graded work</div>
+<a id="homebtn" class="iconbtn" href="./" aria-label="Back to the Starlight Arena home page" title="Home">🏠</a>
+<button id="mute" class="iconbtn" aria-label="Toggle sound">🔊</button>
+<main id="app"></main>
+<canvas id="confetti"></canvas>
+<script src="weeks/manifest.js"></script>
+<script>/* ?week=<id> replays an archived week; default = newest */(function(){var W=window.WEEKS||[],id=new URLSearchParams(location.search).get("week"),w=W.filter(function(x){return x.id===id})[0]||W[0];document.write('<script src="'+(w?w.file:"week.js")+'"><\/script>')})()</script>
+<script src="game.js"></script>
+<script type="module" src="arena3d.js"></script>
+</body></html>

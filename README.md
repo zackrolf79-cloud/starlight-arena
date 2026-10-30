@@ -1,6 +1,6 @@
 # Starlight Arena: Aniston's Weekly Gymnastics Practice Game
 
-This is a static browser game with no server, no build step and no API keys. Open `index.html` directly, or host the folder anywhere.
+This is a static website and browser game with no server, no build step and no API keys. `index.html` is the home page and `play.html` is the game. Open either one directly, or host the folder anywhere.
 
 | Event | Subject |
 |---|---|
@@ -12,9 +12,32 @@ This is a static browser game with no server, no build step and no API keys. Ope
 Each correct answer unlocks one of 8 skills in the event.
 
 ## Run / deploy
-- **Locally:** run `python3 -m http.server` in this folder, or just double-click `index.html`.
+- **Locally:** run `python3 -m http.server` in this folder, or just double-click `play.html`.
 - **GitHub Pages:** push this folder to a repo, then go to Settings → Pages and deploy from the branch root.
 - **Netlify:** drag this folder onto app.netlify.com/drop.
+
+## Website (v7)
+| Page | What it is |
+|---|---|
+| `index.html` | Landing page with a summary of this week's topics |
+| `launch.html` | Game launcher: gymnastics or wrestling, in 3D or Simple 2D (links to `play.html?theme=gym\|wrestle&mode=3d\|simple`) |
+| `lessons.html` | Weekly lessons archive: topics and coach notes for every week, with a link to replay any week (`play.html?week=<id>`) |
+| `parents.html` | How the game lines up with the GVA AI expectations, plus privacy details and a button to clear this device's saved data |
+| `play.html` | The game, with a 🏠 Home button |
+
+Shared files are `site.css` and `site.js`, which add the header, footer and the "AI-made practice" label. Pages are mobile-first and tested at phone, tablet and desktop widths. They make no external requests.
+
+### Archiving a week
+1. Move the old `week.js` to `weeks/<its id>.js`, then update its `file` in `weeks/manifest.js`.
+2. Put the new `week.js` in place and add `{ id, file: "week.js", label }` at the **top** of `weeks/manifest.js`.
+
+### Custom domain (optional, not purchased)
+1. Buy the domain at a registrar.
+2. In the repo, go to Settings → Pages → Custom domain, enter it, and save. This adds a `CNAME` file.
+3. At the DNS provider, add `A` records for `@` pointing to 185.199.108.153, 185.199.109.153, 185.199.110.153 and 185.199.111.153. Optionally add `AAAA` records for 2606:50c0:8000::153 through 2606:50c0:8003::153.
+4. Add a `CNAME` record for `www` pointing to `zackrolf79-cloud.github.io`. Don't use wildcard records.
+5. Optionally verify the domain under your GitHub profile → Settings → Pages.
+6. Tick **Enforce HTTPS** once it's offered, which can take up to 24 h.
 
 ## Swap the weekly content (edit only `week.js`)
 1. Change `id` (for example `2026-wk-nov02`). Progress is saved per id, so a new id starts a fresh week.
@@ -68,3 +91,16 @@ Each correct answer unlocks one of 8 skills in the event.
 - **3D:** a low, mat-level broadcast camera inside the ropes. Over-the-shoulder during the faceoff and questions, orbit/swing during moves, look-up at the top-rope perch, a follow through the Cheetah Pounce gainer, then a low pin shot with the ref's count close to the lens. Entrances start on the ramp and cut inside the ring.
 - **Simple 2D:** a pan/zoom camera that frames the real on-screen sprite positions, with blurred foreground ropes/turnbuckles and crowd parallax.
 - Gymnastics views are unchanged.
+
+## Motion + graphics (v7)
+- **Secondary motion:** one rAF loop (`rigFX`) layers squash and stretch on every rig. That includes stretch in the air, a damped landing squash with a follow-through bounce, and a crouch anticipation squash. It also adds a lean into travel that overshoots when she stops, idle breathing, motion trails on fast flips, and a longer blended cross-fade between poses. The 3D billboards read the same `rig.fx`.
+- **3D depth:** the billboards get a rim-light shader, soft body shading and soft radial contact shadows sized to the pose. There are also after-image trails, chalk and mat-dust puffs on landings, and floating dust motes.
+- **2D effects:** chalk and sparkle puffs on landings and at the bar, moving light rays, sparkle fountains after gym skills, and ring pyro on big hits, the finisher and the win.
+- **Fixes:**
+  - the salute and celebrate poses now have sleeves;
+  - action poses are leaner;
+  - the stick, pike, tuck and passe anchors are re-centred;
+  - her hands meet the high bar (`GR`);
+  - the scrunchie keeps its colour when the leotard changes;
+  - the crowd no longer covers the entrance ramp;
+  - the 2D finisher title moves clear of her.

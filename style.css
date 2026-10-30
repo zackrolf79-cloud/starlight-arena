@@ -184,3 +184,5 @@ body.wrestle .glow{text-shadow:0 0 12px #8ff7f0,0 0 30px #ff5fd2}
 @keyframes spark{0%{transform:translate(0,0) scale(1.3);opacity:1}55%{transform:translate(calc(var(--dx) * .6),var(--dy));opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) * .5));opacity:0}}
 /* finisher: skill title moves off her while the camera is pushed in on the top rope */
 .stage.match.perch .callout,.stage.match.tilt .callout{left:auto;right:4%;transform:none;top:22%;font-size:clamp(16px,2.4vw,26px)}
+#homebtn{right:62px;display:grid;place-items:center;text-decoration:none}
+@media (max-width:600px){#app{padding-top:58px}}

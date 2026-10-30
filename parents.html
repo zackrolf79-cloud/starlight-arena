@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0624">
+<link rel="stylesheet" href="site.css">
+<title>For parents · Starlight Arena</title>
+</head><body>
+<main class="wrap">
+  <h1>For parents</h1>
+  <p class="lead">Starlight Arena is a home practice game. It is not a school product and it does not replace any GVA assignment, quiz or test.</p>
+
+  <section class="card" style="margin-top:18px"><h2>How it lines up with GVA's AI expectations</h2>
+    <p>The game follows the usual expectation for students: AI can help with <b>practice and learning</b>, but schoolwork that is handed in or graded must be the student's own. In the game, that means:</p>
+    <ul class="check">
+      <li>✅ <b>Original questions only.</b> Every question is new AI-made practice written about the same concepts as the week's lessons. Real GVA quiz, test or activity-sheet questions and answers are never copied in.</li>
+      <li>✅ <b>Hints first.</b> Each question offers a hint and a step-by-step coach walk-through. The answer can only be revealed after the hint, so the game teaches the thinking, not just the answer.</li>
+      <li>✅ <b>Always labelled.</b> "AI-made practice, not for graded work" stays on screen on every page and in the game.</li>
+      <li>✅ <b>No help on graded work.</b> The game never sees or touches real assignments. Please don't use it during a live quiz or test.</li>
+    </ul>
+    <p class="small">Each school's AI rules can change, so check the current GVA student handbook or ask your teacher if you're unsure. If the school's guidance differs from this page, follow the school.</p></section>
+
+  <section class="card" style="margin-top:18px"><h2>Privacy</h2>
+    <ul class="check">
+      <li>🔒 <b>No personal info.</b> The game uses a first name only. There are no accounts, logins, emails, ads, analytics, cookies or trackers.</li>
+      <li>💾 <b>Saved locally.</b> Progress, scores, the chosen leotard, sound and theme settings are kept in this browser's local storage on this device. Nothing is sent to a server, and progress doesn't sync between devices.</li>
+      <li>🖼️ <b>Photos never leave the device.</b> If you use "Upload my gymnast", the picture is shrunk inside the browser and stored locally. It is never uploaded. Please use a drawing or cartoon rather than a real photo of your child.</li>
+      <li>🌐 <b>Hosting.</b> The site is a set of static files on GitHub Pages. Like any web host, GitHub may keep standard server logs (such as IP addresses) for security; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub's privacy statement</a>. The game loads nothing from other sites.</li>
+    </ul>
+    <p><button class="btn alt" id="clear" type="button">Clear this device's saved game data</button> <span id="cleared" class="small" role="status"></span></p></section>
+
+  <section class="card" style="margin-top:18px"><h2>How a week works</h2>
+    <p>Each week's lessons become a new set of 32 questions: 8 each for Math, ELA, Science and Social Studies. Past weeks stay in the <a href="lessons.html">lessons archive</a> so they can be reviewed. A new week starts with fresh progress.</p></section>
+</main>
+<script src="site.js"></script>
+<script>
+document.getElementById("clear").onclick = function () {
+  if (!confirm("Clear Starlight Arena progress, settings and any uploaded picture on this device?")) return;
+  var n = 0; Object.keys(localStorage).forEach(function (k) { if (k.indexOf("starlight") === 0) { localStorage.removeItem(k); n++; } });
+  document.getElementById("cleared").textContent = "Cleared " + n + " saved item" + (n === 1 ? "" : "s") + ".";
+};
+</script>
+</body></html>

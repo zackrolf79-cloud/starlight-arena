@@ -1,15 +1,37 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Starlight Arena · Study Gymnastics</title>
-<link rel="stylesheet" href="style.css">
+<meta name="theme-color" content="#0b0624">
+<link rel="stylesheet" href="site.css">
+<title>Starlight Arena · Weekly study practice game</title>
+<meta name="description" content="A free, private practice game: answer original weekly study questions to power gymnastics skills or wrestling moves.">
 </head><body>
-<div id="bg"></div>
-<div id="ailabel" role="note">✨ AI-made practice, not for graded work</div>
-<button id="mute" class="iconbtn" aria-label="Toggle sound">🔊</button>
-<main id="app"></main>
-<canvas id="confetti"></canvas>
-<script src="week.js"></script>
-<script src="game.js"></script>
-<script type="module" src="arena3d.js"></script>
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <span class="pill">Grade 5 · Math · ELA · Science · Social Studies</span>
+      <h1>Study like a <span style="color:var(--pink)">champion</span>.</h1>
+      <p class="lead">Starlight Arena turns this week's lessons into a sports show. Each right answer powers a gymnastics skill or a big wrestling move. Hints come first, a coach walks through the steps, and every question is original practice.</p>
+      <div class="btns"><a class="btn" href="play.html">▶ Play this week</a><a class="btn alt" href="launch.html">Choose a mode</a></div>
+      <p class="small">Works on phones, tablets and computers. Low-power devices switch to Simple 2D automatically.</p>
+    </div>
+    <div class="art" aria-hidden="true"><img class="a" src="assets/gym/starlight-celebrate.webp" alt=""><img class="b" src="assets/ring/rflex.webp" alt=""></div>
+  </section>
+
+  <section class="grid" style="margin-top:28px">
+    <div class="card"><h3>🤸 Four events, four subjects</h3><p>Vault is Math, Uneven Bars is ELA, Balance Beam is Science and Floor is Social Studies. Each event has 8 questions that unlock 8 skills.</p></div>
+    <div class="card"><h3>🤼 Or step into the ring</h3><p>As The Pink Cheetah, win a championship belt for each subject against cartoon villains like Dr. Remainder.</p></div>
+    <div class="card"><h3>💡 Hints first</h3><p>Every question has a hint and a step-by-step coach walk-through before the answer can be shown.</p></div>
+    <div class="card"><h3>🔒 Private by design</h3><p>There are no accounts and no tracking, and only a first name is used. Progress is saved in this browser only. <a href="parents.html">Details for parents</a></p></div>
+  </section>
+
+  <section class="card" style="margin-top:28px" id="thisweek"><h2>This week</h2><div id="wk" class="small">Loading…</div><div class="btns"><a class="btn teal" href="lessons.html">See all weekly lessons</a></div></section>
+</main>
+<script src="weeks/manifest.js"></script>
+<script src="site.js"></script>
+<script>
+loadWeeks(function (all) { var x = all[0]; if (!x) return; var w = x.week;
+  document.getElementById("wk").innerHTML = "<p><b>" + esc(w.title) + "</b> · " + esc(w.subtitle) + "</p><div class=events>" + w.events.map(function (e) {
+    return '<div class="ev"><img src="' + esc(e.icon) + '" alt=""><div><b>' + esc(e.subject) + '</b><small>' + esc(e.topic) + "</small></div></div>"; }).join("") + "</div>"; });
+</script>
 </body></html>

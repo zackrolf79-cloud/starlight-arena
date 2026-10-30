@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0624">
+<link rel="stylesheet" href="site.css">
+<title>Weekly lessons · Starlight Arena</title>
+</head><body>
+<main class="wrap">
+  <h1>Weekly lessons archive</h1>
+  <p class="small">Every week's topics and coach notes are kept here, so past weeks can be reviewed or replayed. Questions are original practice written about the same concepts as the lessons; none are copied from school quizzes or tests.</p>
+  <div id="list" style="margin-top:18px">Loading…</div>
+</main>
+<script src="weeks/manifest.js"></script>
+<script src="site.js"></script>
+<script>
+loadWeeks(function (all) {
+  document.getElementById("list").innerHTML = all.map(function (x, i) { var w = x.week;
+    return '<details class="card week"' + (i === 0 ? " open" : "") + '><summary><h3>' + esc(x.meta.label || w.subtitle) + (i === 0 ? ' <span class="pill">this week</span>' : "") + '</h3><div class="small">' + esc(w.title) + " · " + esc(w.subtitle) + "</div></summary>" +
+      '<div class="btns"><a class="btn" href="play.html?week=' + encodeURIComponent(x.meta.id) + '&amp;theme=gym">Play gymnastics</a><a class="btn alt" href="play.html?week=' + encodeURIComponent(x.meta.id) + '&amp;theme=wrestle">Play wrestling</a></div>' +
+      '<div class="grid">' + w.events.map(function (e) {
+        return '<section><div class="ev"><img src="' + esc(e.icon) + '" alt=""><div><b>' + esc(e.subject) + " · " + esc(e.name) + "</b><small>" + esc(e.topic) + "</small></div></div>" +
+          (e.notes || []).map(function (n) { return '<div class="note"><b>' + esc(n.t) + "</b><br>" + esc(n.b) + "</div>"; }).join("") +
+          '<p class="small">' + (e.questions || []).length + " practice questions</p></section>"; }).join("") + "</div></details>"; }).join("") || "No weeks yet.";
+});
+</script>
+</body></html>
