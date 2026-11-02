@@ -1,247 +1,935 @@
 /* =====================================================================
    WEEK CONTENT FILE — swap this file each week (see README.md).
-   Everything the game teaches + the theme lives here. Questions are
-   ORIGINAL AI-made practice written about the same concepts as the
-   lessons; none are copied from GVA quizzes, tests, or activity sheets.
+   Week of Nov 2, 2026 · meet theme: Aurora Peaks Classic (see themes.md).
+   Questions are ORIGINAL AI-made practice written about the same concepts
+   as the lessons; none are copied from GVA lessons, quizzes, tests, or
+   activity sheets. Hints + coach walk-through come before the answer.
+   athleteName is FIRST NAME ONLY (privacy).
+   Optional "wrestle" block overrides belt names, moves and opponents.
    ===================================================================== */
 window.WEEK = {
-  id: "2026-wk-oct26",                 // change each week -> fresh progress save
-  title: "Starlight Arena Invitational",
-  subtitle: "Week of Oct 26 · Grade 5",
-  athleteName: "Aniston",              // FIRST NAME ONLY (privacy)
-  theme: {
-    background: "assets/arena.webp",
-    podium: "assets/podium.webp",
-    gymnast: "assets/gym/starlight-hero.webp",
-    accent: "#ff5fd2", accent2: "#38e8e0", gold: "#ffd34d",
-    leotard: ["#7b3fe4", "#d23fc1", "#2fd3d0"], hair: "#6b3b1f", skin: "#f3c39b"
-  },
-  events: [
-  /* ---------------------------- VAULT = MATH ---------------------------- */
-  {
-    key: "vault", name: "Vault", subject: "Math", topic: "Dividing whole numbers & decimals",
-    icon: "assets/vault.webp", color: "#ff5fd2",
-    skills: ["Power Run", "Round-off Entry", "Handspring", "Tuck Salto", "Pike Salto", "Layout", "Full Twist", "Stuck Landing!"],
-    anims:  ["run", "roundoff", "handspring", "tuck", "pike", "layout", "twist", "stick"],
-    notes: [
-      { t: "Zeros trick", b: "When both numbers end in zeros, cross off the SAME number of zeros from each. 4,800 ÷ 60 → 480 ÷ 6 = 80." },
-      { t: "Decimal in the divisor?", b: "Make the divisor a whole number by multiplying by 10 (or 100). Do the SAME to the dividend. Then divide." },
-      { t: "Decimal in the dividend", b: "Put the decimal point in the quotient right above the decimal point in the dividend. Add trailing zeros if you need to keep going." },
-      { t: "Dividing by less than 1", b: "Dividing by 0.1 or 0.01 makes the answer BIGGER (how many tenths fit?)." },
-      { t: "Word problems", b: "Read the question twice. Does it ask for FULL groups? Ignore the remainder. Need room for everyone? Round up. Money per ounce? Keep the decimal." },
-      { t: "Check it", b: "Multiply quotient × divisor. You should get the dividend back." }
-    ],
-    questions: [
-      { q: "The arena sells 4,200 glow sticks in bundles of 70. How many bundles is that?",
-        choices: ["6", "60", "600", "0.6"], a: 1,
-        hint: "Both numbers end in a zero. Cross one zero off each and use a basic fact.",
-        steps: ["4,200 ÷ 70 → cross off one zero from each: 420 ÷ 7.", "Think: 42 ÷ 7 = 6.", "420 is 42 tens, so 420 ÷ 7 = 60 (6 tens).", "Check: 60 × 70 = 4,200 ✔"],
-        explain: "4,200 ÷ 70 = 60 bundles." },
-      { q: "A 38.4-meter ribbon is cut into 12 equal pieces for the floor routine. How long is each piece?",
-        choices: ["3.2 m", "32 m", "0.32 m", "3.02 m"], a: 0,
-        hint: "Divide like whole numbers, then put the decimal point straight up into the quotient.",
-        steps: ["Set up 38.4 ÷ 12.", "12 goes into 38 three times (36). Remainder 2. Write 3, then the decimal point above the dividend's decimal.", "Bring down the 4: 24 ÷ 12 = 2.", "So 3.2. Check: 3.2 × 12 = 38.4 ✔"],
-        explain: "38.4 ÷ 12 = 3.2 meters." },
-      { q: "What is 5.6 ÷ 0.7?",
-        choices: ["0.8", "80", "8", "4.9"], a: 2,
-        hint: "Make the divisor a whole number. Multiply BOTH numbers by 10.",
-        steps: ["0.7 × 10 = 7.", "5.6 × 10 = 56 (do the same to the dividend!).", "56 ÷ 7 = 8.", "Check: 8 × 0.7 = 5.6 ✔"],
-        explain: "5.6 ÷ 0.7 = 56 ÷ 7 = 8." },
-      { q: "A gymnast cuts 23 chalk blocks into tenths. How many tenth-pieces does she get? (23 ÷ 0.1)",
-        choices: ["2.3", "230", "23", "2,300"], a: 1,
-        hint: "How many tenths fit in ONE whole? Then think about 23 wholes.",
-        steps: ["There are 10 tenths in 1 whole.", "Multiply both by 10: 23 ÷ 0.1 → 230 ÷ 1.", "230 ÷ 1 = 230.", "Dividing by a number less than 1 gives a BIGGER answer ✔"],
-        explain: "23 ÷ 0.1 = 230 pieces." },
-      { q: "What is 7.65 ÷ 0.5?",
-        choices: ["1.53", "15.3", "153", "3.825"], a: 1,
-        hint: "Multiply both numbers by 10 so the divisor becomes 5.",
-        steps: ["0.5 × 10 = 5 and 7.65 × 10 = 76.5.", "Now 76.5 ÷ 5. 5 into 7 = 1 r2; 5 into 26 = 5 r1.", "Decimal point goes up. Bring down 5: 15 ÷ 5 = 3.", "Answer 15.3. Check: 15.3 × 0.5 = 7.65 ✔"],
-        explain: "7.65 ÷ 0.5 = 76.5 ÷ 5 = 15.3." },
-      { q: "The team has $1,392 to buy warm-up jackets that cost $48 each. How many jackets can they buy?",
-        choices: ["27", "29", "31", "290"], a: 1,
-        hint: "Estimate first: about $1,400 ÷ $50. Then divide exactly.",
-        steps: ["Estimate: 1,400 ÷ 50 ≈ 28, so the answer is close to 28.", "48 into 139 → 2 (96). 139 − 96 = 43.", "Bring down 2 → 432. 48 × 9 = 432. Remainder 0.", "So 29 jackets. Check: 29 × 48 = 1,392 ✔"],
-        explain: "1,392 ÷ 48 = 29 jackets." },
-      { q: "A coach has 250 hair ribbons. She puts 16 in each gift bag. How many bags can she fill COMPLETELY?",
-        choices: ["15.625", "16", "15", "14"], a: 2,
-        hint: "Divide, then read the question again: it asks for FULL bags.",
-        steps: ["250 ÷ 16 = 15 with remainder 10 (16 × 15 = 240).", "The 10 leftover ribbons are not enough for another full bag.", "The question asks for COMPLETE bags, so ignore the remainder.", "Answer: 15 bags ✔"],
-        explain: "250 ÷ 16 = 15 R10 → 15 full bags." },
-      { q: "Sports drink: a 16-oz bottle costs $1.28 and a 20-oz bottle costs $1.80. Which costs LESS per ounce?",
-        choices: ["16-oz bottle", "20-oz bottle", "They cost the same", "Can't tell"], a: 0,
-        hint: "Find the price of ONE ounce for each bottle: price ÷ ounces.",
-        steps: ["16-oz: $1.28 ÷ 16. 16 can't go into 1, so think 128 hundredths ÷ 16 = 8 hundredths = $0.08.", "20-oz: $1.80 ÷ 20 → 180 hundredths ÷ 20 = 9 hundredths = $0.09.", "Compare: $0.08 < $0.09.", "The 16-oz bottle costs less per ounce ✔"],
-        explain: "$0.08 per oz vs $0.09 per oz → the 16-oz bottle." }
+ "id": "2026-wk-nov02",
+ "title": "Aurora Peaks Classic",
+ "subtitle": "Week of Nov 2 · Grade 5",
+ "athleteName": "Aniston",
+ "theme": {
+  "background": "assets/arena.webp",
+  "podium": "assets/podium.webp",
+  "gymnast": "assets/gym/starlight-hero.webp",
+  "accent": "#4ff0b0",
+  "accent2": "#a98bff",
+  "gold": "#ffd34d",
+  "leotard": [
+   "#2fbf9a",
+   "#7b5cff",
+   "#4ff0b0"
+  ],
+  "hair": "#6b3b1f",
+  "skin": "#f3c39b"
+ },
+ "wrestle": {
+  "show": "Northern Lights Throwdown",
+  "ev": {
+   "vault": {
+    "name": "Fraction Frenzy Championship",
+    "moves": [
+     "Benchmark Lock-Up",
+     "Round-to-a-Half Shoulder Block",
+     "Common Denominator Crossbody",
+     "LCM Suplex Toss",
+     "Mixed Number Dropkick",
+     "Equivalent Fraction Tuck Flip",
+     "Missing Addend Moonsault",
+     "Top-Rope Cheetah Pounce!"
     ]
-  },
-  /* -------------------------- UNEVEN BARS = ELA -------------------------- */
-  {
-    key: "bars", name: "Uneven Bars", subject: "ELA", topic: "Roots & affixes, homophones, author's purpose",
-    icon: "assets/bars.webp", color: "#ffd34d",
-    skills: ["Glide Kip", "Cast to Handstand", "Clear Hip Circle", "Giant Swing", "Pirouette Turn", "Transition Leap", "Double Giant", "Flyaway Dismount"],
-    anims:  ["kip", "cast", "hipcircle", "giant", "pirouette", "transition", "giant2", "flyaway"],
-    notes: [
-      { t: "Prefixes = NOT", b: "in-, il-, im-, ir- often mean NOT: incomplete, illegal, impossible, irregular." },
-      { t: "Roots", b: "geo = earth · therm = heat. geothermal = heat from inside the earth." },
-      { t: "Suffixes", b: "-tion, -ation, -ion = the act or process of: celebrate → celebration." },
-      { t: "Homophones", b: "Sound the same, spelled differently: their/there/they're, hear/here, know/no, wear/where. Ask: what part of speech fits?" },
-      { t: "Author's purpose", b: "Inform = facts, no opinion. Persuade = wants you to believe or DO something. Entertain = a story for fun." },
-      { t: "Author's perspective", b: "How the author FEELS. Look for opinion words like amazing, best, terrible, should." }
-    ],
-    questions: [
-      { q: "In the word “imperfect,” what does the prefix im- mean?",
-        choices: ["again", "not", "before", "very"], a: 1,
-        hint: "Think of impossible and impatient. What does im- do to the base word?",
-        steps: ["Split the word: im + perfect.", "“Perfect” means without mistakes.", "im-, in-, il-, ir- usually mean NOT.", "So imperfect = NOT perfect ✔"],
-        explain: "im- means “not”: imperfect = not perfect." },
-      { q: "A hot spring is heated from deep underground. Which word part tells you “earth” in “geothermal”?",
-        choices: ["geo", "therm", "al", "mal"], a: 0,
-        hint: "Think of geography (studying the earth's places).",
-        steps: ["Split it: geo + therm + al.", "therm = heat (like thermometer).", "geo = earth (like geography, geology).", "geothermal = earth heat ✔"],
-        explain: "geo = earth; therm = heat." },
-      { q: "The suffix in “competition” tells you the word means…",
-        choices: ["a person who competes", "the act or process of competing", "able to compete", "not competing"], a: 1,
-        hint: "Find the ending. What do -tion / -ion / -ation usually add?",
-        steps: ["Split it: compet(e) + ition.", "-tion / -ion / -ation = the act or process of.", "So competition = the act or process of competing.", "A person would be “competitor” — different suffix ✔"],
-        explain: "-tion means the act or process of." },
-      { q: "Choose the right word: “The gymnasts packed ___ grips before the meet.”",
-        choices: ["there", "their", "they're", "the're"], a: 1,
-        hint: "The blank tells WHOSE grips. Which homophone shows ownership?",
-        steps: ["What part of speech is needed? A word that shows ownership (possessive).", "there = a place. they're = they are.", "their = belonging to them.", "“...packed their grips” ✔"],
-        explain: "their = belonging to them." },
-      { q: "Choose the right word: “Can you ___ the crowd cheering for the vault?”",
-        choices: ["here", "hear", "hair", "heir"], a: 1,
-        hint: "Is this about a place, or something you do with your ears?",
-        steps: ["The sentence needs an action (verb).", "here = a place (“over here”).", "hear = to listen with your ears — it has an EAR inside!", "“Can you hear the crowd” ✔"],
-        explain: "hear = listen (ear is inside hear)." },
-      { q: "“Every family should visit a national park this summer. Pack a bag, grab a map, and go explore!” What is the author's purpose?",
-        choices: ["to inform with facts only", "to persuade the reader", "to entertain with a story", "to describe a character"], a: 1,
-        hint: "Is the author asking YOU to do something?",
-        steps: ["Look for clue words: “should”, “go explore!”", "Those words push the reader to take action.", "A call to action = persuading.", "Purpose: to persuade ✔"],
-        explain: "“Should” + a call to action = persuade." },
-      { q: "“The canyon at sunset is the most breathtaking sight anywhere.” Which words show the author's perspective?",
-        choices: ["canyon, sunset", "the, at", "most breathtaking", "sight, anywhere"], a: 2,
-        hint: "Perspective = feelings. Which words are opinions, not facts?",
-        steps: ["Perspective is how the author feels about the topic.", "“canyon” and “sunset” just name things.", "“most breathtaking” is an opinion — strong describing words.", "The author thinks the canyon is amazing ✔"],
-        explain: "Opinion words like “most breathtaking” show perspective." },
-      { q: "In the park reading, bison “forage” for hours each day. What does forage mean?",
-        choices: ["sleep in the sun", "search widely for food", "run away from danger", "swim across rivers"], a: 1,
-        hint: "Use context: bison eat grasses in meadows for 9–11 hours. What are they doing?",
-        steps: ["Context clue: bison feed on grasses and plants in meadows.", "They do it for many hours, moving around.", "That means looking around for food.", "forage = search widely for food ✔"],
-        explain: "forage = search widely for food." }
+   },
+   "bars": {
+    "name": "Sentence Slam Championship",
+    "moves": [
+     "Homophone Lock-Up",
+     "Context Clue Shoulder Block",
+     "Signal Word Crossbody",
+     "Claim & Evidence Suplex Toss",
+     "FANBOYS Dropkick",
+     "Comma Catch Tuck Flip",
+     "Complex Clause Moonsault",
+     "Top-Rope Cheetah Pounce!"
     ]
-  },
-  /* ------------------------ BALANCE BEAM = SCIENCE ------------------------ */
-  {
-    key: "beam", name: "Balance Beam", subject: "Science", topic: "Electrical energy & transformations",
-    icon: "assets/beam.webp", color: "#38e8e0",
-    skills: ["Relevé Pose", "Split Leap", "Full Turn", "Handstand", "Cartwheel", "Split Jump", "Back Walkover", "Salto Dismount"],
-    anims:  ["releve", "leap", "pirouette", "handstand", "cartwheel", "splitjump", "walkover", "dismount"],
-    notes: [
-      { t: "Electrical energy", b: "Energy from tiny charged particles moving. Lightning is a natural example!" },
-      { t: "Conservation of energy", b: "Energy is never created or destroyed — it only CHANGES form (transforms)." },
-      { t: "Transformations", b: "Electrical energy can become light, heat, sound, or mechanical energy (motion)." },
-      { t: "More than one", b: "Many devices do several: a laptop makes light (screen), sound (speakers), and heat." },
-      { t: "Investigate", b: "Ask a question → observe → conclude. Do multiple trials so others can replicate your results." }
-    ],
-    questions: [
-      { q: "Electrical energy is caused by…",
-        choices: ["tiny charged particles moving", "water freezing", "plants growing", "magnets sleeping"], a: 0,
-        hint: "Think about what flows through a wire — very tiny particles.",
-        steps: ["Energy comes in forms: light, heat, sound, motion, electrical…", "Electrical energy is a MOVING energy.", "What moves? Tiny charged particles.", "So: tiny charged particles moving ✔"],
-        explain: "Electrical energy = moving charged particles." },
-      { q: "During a storm, a bright bolt flashes across the sky. This is a natural example of…",
-        choices: ["sound energy only", "electrical energy", "chemical energy in food", "energy being destroyed"], a: 1,
-        hint: "Lightning happens when lots of charged particles flow through the air at once.",
-        steps: ["The bolt is lightning.", "Lightning = many charged particles flowing through air at once.", "Charged particles moving = electrical energy.", "Lightning is electrical energy ✔"],
-        explain: "Lightning is natural electrical energy." },
-      { q: "When an arena scoreboard turns on, what happens to the energy?",
-        choices: ["It is used up and disappears", "It changes from one form to another", "It is created from nothing", "Nothing happens to it"], a: 1,
-        hint: "Remember the law of conservation of energy.",
-        steps: ["Law of conservation: energy can't be created or destroyed.", "So it can't disappear or appear from nothing.", "It must CHANGE form — electrical → light (and heat).", "That's an energy transformation ✔"],
-        explain: "Energy transforms; it's never used up." },
-      { q: "A toaster changes electrical energy mostly into…",
-        choices: ["sound energy", "heat energy", "mechanical energy", "electrical energy again"], a: 1,
-        hint: "What does a toaster do to the bread?",
-        steps: ["Think about what the toaster is FOR.", "It makes bread hot and crispy.", "Making things hot = heat energy (its coils also glow = a bit of light).", "Main transformation: electrical → heat ✔"],
-        explain: "Toaster: electrical → heat (and a little light)." },
-      { q: "An electric fan in the gym spins its blades. Electrical energy became…",
-        choices: ["mechanical energy (motion)", "light energy", "nothing", "chemical energy"], a: 0,
-        hint: "Spinning is a kind of movement. What energy is motion?",
-        steps: ["Observe: the blades SPIN.", "Spinning = movement.", "Energy of motion = mechanical energy.", "Fan: electrical → mechanical ✔"],
-        explain: "Motion = mechanical energy." },
-      { q: "A judge's buzzer goes BZZZ when the routine ends. Electrical energy changed into…",
-        choices: ["heat energy only", "sound energy", "light energy", "mechanical energy only"], a: 1,
-        hint: "Which of your senses notices a buzzer?",
-        steps: ["You HEAR a buzzer.", "Things you hear = sound energy.", "So the buzzer transforms electrical energy.", "Electrical → sound ✔"],
-        explain: "Buzzer: electrical → sound." },
-      { q: "A tablet plays a gymnastics video. Which TWO forms of energy does it make that you can notice?",
-        choices: ["light and sound", "sound and chemical", "mechanical and chemical", "only heat"], a: 0,
-        hint: "Use your eyes AND your ears.",
-        steps: ["You SEE the video on the screen → light energy.", "You HEAR the music → sound energy.", "(It also gets a little warm → heat.)", "Two you notice: light and sound ✔"],
-        explain: "Screen = light, speakers = sound." },
-      { q: "Why do scientists repeat an investigation several times (multiple trials)?",
-        choices: ["to make it take longer", "so results can be checked and replicated", "because the first try never counts", "to change the question each time"], a: 1,
-        hint: "Think about other scientists trying to get the same result.",
-        steps: ["One trial could have a mistake.", "Repeating shows whether results are the same each time.", "Others can replicate it and find patterns.", "So results are checked and trustworthy ✔"],
-        explain: "Multiple trials let results be replicated and validated." }
+   },
+   "beam": {
+    "name": "Circuit Breaker Championship",
+    "moves": [
+     "Power Source Lock-Up",
+     "Live Wire Shoulder Block",
+     "Closed Loop Crossbody",
+     "Battery Blast Suplex Toss",
+     "Switch Flip Dropkick",
+     "Bright Bulb Tuck Flip",
+     "Current Flow Moonsault",
+     "Top-Rope Cheetah Pounce!"
     ]
-  },
-  /* ------------------------- FLOOR = SOCIAL STUDIES ------------------------- */
-  {
-    key: "floor", name: "Floor Exercise", subject: "Social Studies", topic: "Middle & Southern Colonies",
-    icon: "assets/floor.webp", color: "#b48cff",
-    skills: ["Opening Pose", "Round-off", "Back Handspring", "Back Tuck", "Switch Leap", "Layout", "Full Twist", "Final Pose!"],
-    anims:  ["salute", "roundoff", "handspring", "tuck", "leap", "layout", "twist", "finalpose"],
-    notes: [
-      { t: "Middle Colonies (4)", b: "New York, New Jersey, Pennsylvania, Delaware. Mild climate, good soil → “Breadbasket colonies” (grains, corn). Long wide rivers for shipping. Fur trade. Many religions." },
-      { t: "Southern Colonies (5)", b: "Maryland, Virginia, North Carolina, South Carolina, Georgia. Hottest region, rich soil, plantations. Cash crops: tobacco, rice (also cotton)." },
-      { t: "Leaders", b: "William Penn (Quaker) → Pennsylvania, religious tolerance. Peter Minuit → bought Manhattan, founded Delaware colony. George Calvert → Maryland, protected Catholics. James Oglethorpe → Georgia, safe place for people in poverty." },
-      { t: "Hard history", b: "Enslaved Africans were forced to work in both regions — most of all on Southern plantations (South Carolina had the highest number)." },
-      { t: "Compare", b: "Middle: farms + trade by rivers. South: big plantations + cash crops. Both: a variety of religions." }
-    ],
-    questions: [
-      { q: "The Middle Colonies grew so much grain that people called them the…",
-        choices: ["Breadbasket colonies", "Rocky colonies", "Fishing colonies", "Ice colonies"], a: 0,
-        hint: "What food is made from grains like wheat?",
-        steps: ["Middle colonies: mild climate + good soil.", "Farmers grew lots of grains and corn.", "Grain makes bread — they fed many people.", "Nickname: Breadbasket colonies ✔"],
-        explain: "Breadbasket colonies — grain and corn." },
-      { q: "Which of these was NOT one of the Middle Colonies?",
-        choices: ["New Jersey", "Delaware", "Virginia", "Pennsylvania"], a: 2,
-        hint: "The Middle Colonies were NY, NJ, PA, and DE. Which one is farther south?",
-        steps: ["List the four Middle Colonies: New York, New Jersey, Pennsylvania, Delaware.", "Check each choice against the list.", "Virginia is not on it — it's a Southern Colony.", "Answer: Virginia ✔"],
-        explain: "Virginia was a Southern Colony." },
-      { q: "Which crops did Southern plantations grow to SELL (cash crops)?",
-        choices: ["fish and fur", "tobacco and rice", "apples and maple syrup", "ice and lumber only"], a: 1,
-        hint: "Think hot, humid climate and rich soil — and the most exported item.",
-        steps: ["Southern climate: long hot summers, rich soil.", "Plantations = large farms growing crops to sell.", "Main ones: tobacco (top export), rice, cotton.", "Answer: tobacco and rice ✔"],
-        explain: "Tobacco and rice (also cotton)." },
-      { q: "William Penn, a Quaker, led Pennsylvania. What was his key idea?",
-        choices: ["only one church allowed", "religious tolerance", "no farming", "moving to Florida"], a: 1,
-        hint: "Penn himself wanted freedom to worship his own way.",
-        steps: ["Penn rejected the Church of England and became a Quaker.", "He wanted freedom of religion.", "In Pennsylvania he accepted people of many Christian faiths.", "His key idea: religious tolerance ✔"],
-        explain: "Penn = religious tolerance." },
-      { q: "James Oglethorpe helped start Georgia as a safe place for…",
-        choices: ["people living in poverty", "fur traders only", "kings and queens", "Dutch merchants"], a: 0,
-        hint: "Oglethorpe cared about the poor and about prison conditions.",
-        steps: ["Oglethorpe was known for charity.", "He wanted to help poor people and improve prisons.", "Georgia became a fresh start for them.", "Answer: people living in poverty ✔"],
-        explain: "Georgia was a safe place for people in poverty." },
-      { q: "George Calvert (Lord Baltimore) wanted Maryland to protect which group?",
-        choices: ["Puritans", "Roman Catholics", "Quakers only", "sailors"], a: 1,
-        hint: "He wasn't allowed to stay in Virginia because of his beliefs.",
-        steps: ["After the Church of England split from the Roman Catholic Church, Catholics faced trouble.", "Calvert wanted to give them protection.", "He founded Maryland for that reason.", "Answer: Roman Catholics ✔"],
-        explain: "Maryland protected Roman Catholics." },
-      { q: "Which BEST describes the Southern Colonies' climate?",
-        choices: ["short summers, long freezing winters", "long hot, humid summers and mild winters", "snowy all year", "dry desert with no rain"], a: 1,
-        hint: "It was the hottest of the colonial regions.",
-        steps: ["Compare regions: New England = cold winters.", "Middle = warm summers, mild winters.", "Southern = the HOTTEST: long, hot, humid summers.", "Answer: long hot, humid summers and mild winters ✔"],
-        explain: "South: hot, humid summers; mild winters." },
-      { q: "How did long, wide rivers help the Middle Colonies' economy?",
-        choices: ["for shipping goods to other places", "to keep farms dry", "for ice skating only", "they did not help"], a: 0,
-        hint: "Before trucks and trains, how did people move heavy goods?",
-        steps: ["Farms grew more grain than families needed.", "Extra goods had to get to buyers.", "Boats on long, wide rivers carried them.", "Rivers = shipping goods ✔"],
-        explain: "Rivers were highways for shipping goods." }
+   },
+   "floor": {
+    "name": "Trade Route Championship",
+    "moves": [
+     "Market Lock-Up",
+     "Cod & Timber Shoulder Block",
+     "Cash Crop Crossbody",
+     "Supply & Demand Suplex Toss",
+     "Shipbuilder Dropkick",
+     "Profit Tuck Flip",
+     "Compass Rose Moonsault",
+     "Top-Rope Cheetah Pounce!"
     ]
+   }
+  },
+  "opp": {
+   "vault": {
+    "name": "The Unlike Denominator",
+    "tag": "the Mismatch Menace",
+    "color": "#a6e22e",
+    "taunts": [
+     "My pieces NEVER match!",
+     "Good luck finding a common denominator!",
+     "I'll chop you into twelfths!"
+    ],
+    "boo": "The Unlike Denominator scrambles the pieces!"
+   },
+   "bars": {
+    "name": "Run-On Ronnie",
+    "tag": "the Comma Crasher",
+    "color": "#ff4d4d",
+    "taunts": [
+     "I never stop for commas and I just keep going and going!",
+     "Their, there, whatever!",
+     "I'll fragment your sentence!"
+    ],
+    "boo": "Run-On Ronnie skips the comma!"
+   },
+   "beam": {
+    "name": "Captain Open Circuit",
+    "tag": "the Gap Maker",
+    "color": "#ffd21f",
+    "taunts": [
+     "Snip! Your circuit has a gap!",
+     "Lights out, Cheetah!",
+     "No loop, no glow!"
+    ],
+    "boo": "Captain Open Circuit flips the switch OFF!"
+   },
+   "floor": {
+    "name": "Count Copper-Coin",
+    "tag": "the Price Gouger",
+    "color": "#e0a030",
+    "taunts": [
+     "Buy only from ME!",
+     "Prices just went UP!",
+     "No competition allowed!"
+    ],
+    "boo": "Count Copper-Coin corners the market!"
+   }
   }
-  ]
+ },
+ "events": [
+  {
+   "key": "vault",
+   "name": "Vault",
+   "subject": "Math",
+   "topic": "Estimating & adding fractions with unlike denominators",
+   "icon": "assets/vault.webp",
+   "color": "#4ff0b0",
+   "skills": [
+    "Power Run",
+    "Round-off Entry",
+    "Handspring",
+    "Tuck Salto",
+    "Pike Salto",
+    "Layout",
+    "Full Twist",
+    "Stuck Landing!"
+   ],
+   "anims": [
+    "run",
+    "roundoff",
+    "handspring",
+    "tuck",
+    "pike",
+    "layout",
+    "twist",
+    "stick"
+   ],
+   "notes": [
+    {
+     "t": "Benchmark buddies",
+     "b": "To estimate, round each fraction to 0, 1/2 or 1. Compare the top to the bottom: tiny top → about 0; top about half the bottom → about 1/2; top almost the bottom → about 1."
+    },
+    {
+     "t": "Mixed numbers",
+     "b": "Keep the whole number, then round the fraction part. 4 7/8 is about 5, and 2 1/10 is about 2."
+    },
+    {
+     "t": "Same-size pieces",
+     "b": "You can only add or subtract fractions when the pieces are the same size, so first find a common denominator."
+    },
+    {
+     "t": "LCM shortcut",
+     "b": "The least common multiple of the denominators is the smallest common denominator. Multiply top AND bottom by the same number."
+    },
+    {
+     "t": "Tidy the answer",
+     "b": "Simplify if you can. If the top is bigger than the bottom, change it to a mixed number (13/10 = 1 3/10)."
+    },
+    {
+     "t": "Missing addend",
+     "b": "? + 1/4 = 3/4 → subtract: 3/4 − 1/4. Then check by adding back."
+    }
+   ],
+   "questions": [
+    {
+     "q": "Estimate: 7/8 + 5/12. About how much is the sum?",
+     "choices": [
+      "about 1/2",
+      "about 1",
+      "about 1 1/2",
+      "about 2"
+     ],
+     "a": 2,
+     "hint": "Round each fraction to 0, 1/2 or 1 first. Is 7 close to 8? Is 5 close to half of 12?",
+     "steps": [
+      "7/8: the top is almost the bottom → about 1.",
+      "5/12: half of 12 is 6, and 5 is close to 6 → about 1/2.",
+      "1 + 1/2 = 1 1/2.",
+      "Estimate: about 1 1/2 ✔"
+     ],
+     "explain": "7/8 ≈ 1 and 5/12 ≈ 1/2, so the sum is about 1 1/2."
+    },
+    {
+     "q": "Estimate: 9/10 − 4/9. About how much is left?",
+     "choices": [
+      "about 0",
+      "about 1/2",
+      "about 1",
+      "about 1 1/2"
+     ],
+     "a": 1,
+     "hint": "Round 9/10 and 4/9 to benchmarks, then subtract.",
+     "steps": [
+      "9/10 is almost a whole → about 1.",
+      "Half of 9 is 4.5, and 4 is close → 4/9 is about 1/2.",
+      "1 − 1/2 = 1/2.",
+      "Estimate: about 1/2 ✔"
+     ],
+     "explain": "9/10 ≈ 1 and 4/9 ≈ 1/2, so about 1/2."
+    },
+    {
+     "q": "A gymnast stretches for 3 1/8 minutes, then warms up for 2 5/6 minutes. About how many minutes is that?",
+     "choices": [
+      "about 5",
+      "about 5 1/2",
+      "about 6",
+      "about 7"
+     ],
+     "a": 2,
+     "hint": "Keep the whole numbers. Round each fraction part to 0, 1/2 or 1.",
+     "steps": [
+      "3 1/8: 1/8 is tiny → about 3.",
+      "2 5/6: 5/6 is almost 1 → about 3.",
+      "3 + 3 = 6.",
+      "Estimate: about 6 minutes ✔"
+     ],
+     "explain": "3 1/8 ≈ 3 and 2 5/6 ≈ 3, so about 6 minutes."
+    },
+    {
+     "q": "What is 1/4 + 3/8?",
+     "choices": [
+      "4/12",
+      "1/2",
+      "5/8",
+      "4/8"
+     ],
+     "a": 2,
+     "hint": "Fourths and eighths are different sizes. How many eighths make 1/4?",
+     "steps": [
+      "8 is a multiple of 4, so use 8 as the common denominator.",
+      "1/4 = 2/8 (multiply top and bottom by 2).",
+      "2/8 + 3/8 = 5/8. Add only the tops!",
+      "Check: 5/8 is a little more than 1/2, which matches 1/4 + 3/8 ✔"
+     ],
+     "explain": "1/4 + 3/8 = 2/8 + 3/8 = 5/8."
+    },
+    {
+     "q": "What is 2/3 + 1/4?",
+     "choices": [
+      "3/7",
+      "11/12",
+      "9/12",
+      "3/12"
+     ],
+     "a": 1,
+     "hint": "Find the LCM of 3 and 4. Never add the bottoms!",
+     "steps": [
+      "Multiples of 3: 3, 6, 9, 12. Multiples of 4: 4, 8, 12. LCM = 12.",
+      "2/3 = 8/12 (×4 top and bottom).",
+      "1/4 = 3/12 (×3 top and bottom).",
+      "8/12 + 3/12 = 11/12 ✔"
+     ],
+     "explain": "2/3 + 1/4 = 8/12 + 3/12 = 11/12."
+    },
+    {
+     "q": "The beam team runs 3/4 of a lap, then 5/6 of a lap. How far is that in all?",
+     "choices": [
+      "8/10 lap",
+      "19/24 lap",
+      "1 1/12 laps",
+      "1 7/12 laps"
+     ],
+     "a": 3,
+     "hint": "Use the LCM of 4 and 6 as the denominator. Is the answer more than 1 lap?",
+     "steps": [
+      "LCM of 4 and 6 is 12.",
+      "3/4 = 9/12 and 5/6 = 10/12.",
+      "9/12 + 10/12 = 19/12.",
+      "19/12 = 12/12 + 7/12 = 1 7/12 laps ✔"
+     ],
+     "explain": "3/4 + 5/6 = 19/12 = 1 7/12 laps."
+    },
+    {
+     "q": "What is 7/10 − 1/4?",
+     "choices": [
+      "6/6",
+      "3/10",
+      "9/20",
+      "11/20"
+     ],
+     "a": 2,
+     "hint": "Find a common denominator for 10 and 4, then subtract the tops.",
+     "steps": [
+      "Multiples of 10: 10, 20. Multiples of 4: 4, 8, 12, 16, 20. LCM = 20.",
+      "7/10 = 14/20 and 1/4 = 5/20.",
+      "14/20 − 5/20 = 9/20.",
+      "Check: 9/20 + 5/20 = 14/20 = 7/10 ✔"
+     ],
+     "explain": "7/10 − 1/4 = 14/20 − 5/20 = 9/20."
+    },
+    {
+     "q": "A ribbon routine is 5/6 of a minute long. The first part took 1/3 of a minute. How long is the rest? (1/3 + ? = 5/6)",
+     "choices": [
+      "4/3 min",
+      "1/6 min",
+      "2/3 min",
+      "1/2 min"
+     ],
+     "a": 3,
+     "hint": "A missing addend means subtract: 5/6 − 1/3. Make sixths first.",
+     "steps": [
+      "1/3 = 2/6.",
+      "5/6 − 2/6 = 3/6.",
+      "3/6 simplifies to 1/2.",
+      "Check: 1/3 + 1/2 = 2/6 + 3/6 = 5/6 ✔"
+     ],
+     "explain": "The rest is 3/6 = 1/2 minute."
+    }
+   ]
+  },
+  {
+   "key": "bars",
+   "name": "Uneven Bars",
+   "subject": "ELA",
+   "topic": "Homophones, context clues, claims & clauses",
+   "icon": "assets/bars.webp",
+   "color": "#ffd34d",
+   "skills": [
+    "Glide Kip",
+    "Cast to Handstand",
+    "Clear Hip Circle",
+    "Giant Swing",
+    "Pirouette Turn",
+    "Transition Leap",
+    "Double Giant",
+    "Flyaway Dismount"
+   ],
+   "anims": [
+    "kip",
+    "cast",
+    "hipcircle",
+    "giant",
+    "pirouette",
+    "transition",
+    "giant2",
+    "flyaway"
+   ],
+   "notes": [
+    {
+     "t": "Homophones",
+     "b": "Same sound, different spelling and meaning: one/won, sun/son, pair/pear, to/too/two, their/there. Read the whole sentence to pick the right one."
+    },
+    {
+     "t": "Context clues",
+     "b": "Look around a new word for a definition, a synonym, an antonym or an example."
+    },
+    {
+     "t": "Signal words",
+     "b": "'and', 'also', 'or' often point to a SIMILAR meaning. 'unlike', 'however', 'although' often point to an OPPOSITE meaning."
+    },
+    {
+     "t": "Claim + evidence",
+     "b": "A claim is what the author wants you to believe. Reasons explain why, and evidence (facts, numbers, examples) proves it. Opinions are not evidence."
+    },
+    {
+     "t": "Clauses",
+     "b": "A main clause can stand alone. A subordinate clause starts with a word like because, although, if, until or once, and can't stand alone."
+    },
+    {
+     "t": "Commas",
+     "b": "Compound: main clause, + FANBOYS + main clause. Complex: put a comma after the subordinate clause when it comes FIRST."
+    }
+   ],
+   "questions": [
+    {
+     "q": "Choose the word that fits: “Aniston ___ first place on the bars.”",
+     "choices": [
+      "one",
+      "won",
+      "own",
+      "wan"
+     ],
+     "a": 1,
+     "hint": "Is this word a number, or does it mean 'came out the winner'?",
+     "steps": [
+      "'one' is the number 1.",
+      "'won' is the past tense of win.",
+      "She came out the winner, so we need the 'win' word.",
+      "Answer: won ✔"
+     ],
+     "explain": "'Won' means she was the winner; 'one' is a number."
+    },
+    {
+     "q": "“Unlike her jittery teammate, Mia felt serene before the meet.” What does serene mean?",
+     "choices": [
+      "nervous",
+      "calm",
+      "angry",
+      "sleepy"
+     ],
+     "a": 1,
+     "hint": "Find the signal word. Does it point to a similar or an opposite meaning?",
+     "steps": [
+      "The signal word is 'Unlike', so it is an antonym clue.",
+      "Mia is the OPPOSITE of her jittery (shaky, nervous) teammate.",
+      "The opposite of nervous is calm.",
+      "serene = calm ✔"
+     ],
+     "explain": "'Unlike' signals an opposite: serene means calm."
+    },
+    {
+     "q": "“The gymnast bounced off a springboard, a bouncy board that launches you into the air.” Which kind of context clue is this?",
+     "choices": [
+      "antonym",
+      "example",
+      "definition",
+      "synonym"
+     ],
+     "a": 2,
+     "hint": "Look at the words right after the comma. What do they tell you?",
+     "steps": [
+      "After the comma, the sentence explains exactly what a springboard IS.",
+      "Telling the meaning of a word is a definition.",
+      "There is no opposite or list of examples.",
+      "Answer: definition clue ✔"
+     ],
+     "explain": "The sentence tells what a springboard is, so it's a definition clue."
+    },
+    {
+     "q": "Which signal word usually tells you that an OPPOSITE meaning is coming?",
+     "choices": [
+      "also",
+      "and",
+      "however",
+      "or"
+     ],
+     "a": 2,
+     "hint": "Three of these words connect similar ideas. Which one turns the idea around?",
+     "steps": [
+      "'also' and 'and' add something similar.",
+      "'or' often gives another word with the same meaning.",
+      "'however' shows a contrast, or a change in direction.",
+      "Answer: however ✔"
+     ],
+     "explain": "'However' signals contrast, so an opposite meaning is coming."
+    },
+    {
+     "q": "An author claims, “Every gymnast should warm up before practice.” Which sentence is the best EVIDENCE for this claim?",
+     "choices": [
+      "Warming up is my favorite part of the day.",
+      "In one study of young athletes, those who warmed up had fewer pulled muscles.",
+      "Leotards come in many bright colors.",
+      "Some gyms have blue floor mats."
+     ],
+     "a": 1,
+     "hint": "Evidence is a fact or result that PROVES the claim. It is not just someone's feelings.",
+     "steps": [
+      "Choice A is an opinion: it tells a feeling.",
+      "Choices C and D are facts, but they are not about warming up.",
+      "Choice B is a fact about warm-ups and injuries.",
+      "It supports the claim, so the answer is B ✔"
+     ],
+     "explain": "A study result about warm-ups and fewer injuries is evidence for the claim."
+    },
+    {
+     "q": "“Although the beam was narrow, Zoe stayed balanced.” Which part is the SUBORDINATE clause?",
+     "choices": [
+      "Zoe stayed balanced",
+      "Although the beam was narrow",
+      "the beam",
+      "stayed balanced"
+     ],
+     "a": 1,
+     "hint": "Find the part that starts with a subordinating conjunction and can't stand alone.",
+     "steps": [
+      "'Zoe stayed balanced' makes sense alone, so it is the main clause.",
+      "'Although the beam was narrow…' leaves you waiting for more.",
+      "It starts with 'Although', a subordinating conjunction.",
+      "Answer: Although the beam was narrow ✔"
+     ],
+     "explain": "The clause that starts with 'Although' is subordinate."
+    },
+    {
+     "q": "Which compound sentence is punctuated correctly?",
+     "choices": [
+      "The crowd cheered and, the judges smiled.",
+      "The crowd, cheered and the judges smiled.",
+      "The crowd cheered, and the judges smiled.",
+      "The crowd cheered the judges, smiled."
+     ],
+     "a": 2,
+     "hint": "Two main clauses joined by a FANBOYS word need a comma placed BEFORE the conjunction.",
+     "steps": [
+      "Main clause 1: The crowd cheered. Main clause 2: the judges smiled.",
+      "They are joined by 'and', which is a FANBOYS word.",
+      "The comma goes right before 'and'.",
+      "Answer: The crowd cheered, and the judges smiled. ✔"
+     ],
+     "explain": "Use a comma before the FANBOYS conjunction: “cheered, and”."
+    },
+    {
+     "q": "Which complex sentence is punctuated correctly?",
+     "choices": [
+      "Once the music starts she, begins her routine.",
+      "Once the music starts, she begins her routine.",
+      "Once, the music starts she begins her routine.",
+      "Once the music, starts she begins her routine."
+     ],
+     "a": 1,
+     "hint": "When the subordinate clause comes first, put the comma at the END of that clause.",
+     "steps": [
+      "The subordinate clause is 'Once the music starts'.",
+      "It comes first in the sentence.",
+      "So the comma goes right after 'starts'.",
+      "Answer: Once the music starts, she begins her routine. ✔"
+     ],
+     "explain": "Put a comma after a subordinate clause that comes first."
+    }
+   ]
+  },
+  {
+   "key": "beam",
+   "name": "Balance Beam",
+   "subject": "Science",
+   "topic": "Circuits: closed, open & switches",
+   "icon": "assets/beam.webp",
+   "color": "#a98bff",
+   "skills": [
+    "Relevé Pose",
+    "Split Leap",
+    "Full Turn",
+    "Handstand",
+    "Cartwheel",
+    "Split Jump",
+    "Back Walkover",
+    "Salto Dismount"
+   ],
+   "anims": [
+    "releve",
+    "leap",
+    "pirouette",
+    "handstand",
+    "cartwheel",
+    "splitjump",
+    "walkover",
+    "dismount"
+   ],
+   "notes": [
+    {
+     "t": "Circuit recipe",
+     "b": "Every circuit needs a power source (like a battery), wires (a path) and a device that uses the energy (like a bulb)."
+    },
+    {
+     "t": "Closed circuit",
+     "b": "A closed circuit is a complete loop with no gaps. Electric current flows, and the bulb lights."
+    },
+    {
+     "t": "Open circuit",
+     "b": "An open circuit has a gap or break, such as a loose wire or an open switch. The current stops, and the bulb goes out."
+    },
+    {
+     "t": "Switches",
+     "b": "A switch is a gate in the path. ON closes the circuit and OFF opens it."
+    },
+    {
+     "t": "Battery energy",
+     "b": "A battery changes stored chemical energy into electrical energy. The bulb then changes electrical energy into light and heat."
+    },
+    {
+     "t": "Evidence",
+     "b": "Use what you observe: bulb ON → closed circuit; bulb OFF → open circuit (or a dead battery)."
+    }
+   ],
+   "questions": [
+    {
+     "q": "Which set has the three parts every circuit needs?",
+     "choices": [
+      "a magnet, water and a bulb",
+      "a power source, wires and a device",
+      "only a light bulb",
+      "a switch and nothing else"
+     ],
+     "a": 1,
+     "hint": "Think: where does the energy come from, how does it travel, and what uses it?",
+     "steps": [
+      "The energy comes from a power source, like a battery.",
+      "Wires make the path it travels along.",
+      "A device, such as a bulb, uses the energy.",
+      "Answer: power source, wires and a device ✔"
+     ],
+     "explain": "A circuit needs a power source, wires and a device."
+    },
+    {
+     "q": "The scoreboard bulb is glowing. What does that tell you about its circuit?",
+     "choices": [
+      "It is open, with a gap in the path.",
+      "It has no battery.",
+      "It is closed: a complete loop.",
+      "The wires are cut."
+     ],
+     "a": 2,
+     "hint": "Current can only flow through a path with no gaps.",
+     "steps": [
+      "The bulb is ON, so current must be flowing.",
+      "Current flows only in a complete path.",
+      "A complete path is a closed circuit.",
+      "Answer: closed ✔"
+     ],
+     "explain": "A glowing bulb is evidence of a closed circuit."
+    },
+    {
+     "q": "During a test, one wire pops off the battery. What happens to the bulb?",
+     "choices": [
+      "It gets brighter.",
+      "It turns off because the circuit is now open.",
+      "It changes color.",
+      "Nothing changes."
+     ],
+     "a": 1,
+     "hint": "Did the loose wire make a gap in the loop?",
+     "steps": [
+      "The wire came off, so now there is a gap.",
+      "A gap makes the circuit open.",
+      "With no complete path, the current stops.",
+      "The bulb turns off ✔"
+     ],
+     "explain": "A loose wire opens the circuit, so the bulb goes out."
+    },
+    {
+     "q": "What is the job of a switch in a circuit?",
+     "choices": [
+      "It makes brand-new electricity.",
+      "It opens or closes the path to control the current.",
+      "It stores water.",
+      "It turns light into sound."
+     ],
+     "a": 1,
+     "hint": "Think of a switch as a gate on the path.",
+     "steps": [
+      "A switch does not create energy. The battery supplies it.",
+      "Switch ON connects the path, so the circuit is closed.",
+      "Switch OFF breaks the path, so the circuit is open.",
+      "So it controls the flow ✔"
+     ],
+     "explain": "A switch opens or closes the circuit."
+    },
+    {
+     "q": "Inside a battery, what energy change happens?",
+     "choices": [
+      "electrical → chemical",
+      "chemical → electrical",
+      "light → chemical",
+      "sound → electrical"
+     ],
+     "a": 1,
+     "hint": "What kind of energy is STORED in a battery, and what comes out into the wires?",
+     "steps": [
+      "A battery stores energy in chemicals.",
+      "When the circuit closes, the battery sends electrical energy into the wires.",
+      "So stored chemical energy becomes electrical energy.",
+      "Answer: chemical → electrical ✔"
+     ],
+     "explain": "A battery changes chemical energy into electrical energy."
+    },
+    {
+     "q": "In a flashlight bulb, electrical energy is changed mostly into…",
+     "choices": [
+      "chemical energy",
+      "sound only",
+      "light and heat",
+      "nothing at all"
+     ],
+     "a": 2,
+     "hint": "What do you see, and feel, when a bulb is on?",
+     "steps": [
+      "The bulb glows, so there is light.",
+      "A bulb also gets warm, so there is heat.",
+      "Electrical energy becomes light and heat.",
+      "Answer: light and heat ✔"
+     ],
+     "explain": "A bulb changes electrical energy into light and heat."
+    },
+    {
+     "q": "Kai says, “My circuit is closed.” Which observation is the BEST evidence?",
+     "choices": [
+      "The wires are red.",
+      "The bulb is glowing.",
+      "The battery is brand new.",
+      "He built it fast."
+     ],
+     "a": 1,
+     "hint": "Evidence should show whether current is flowing.",
+     "steps": [
+      "The wire color and build speed don't tell you whether current flows.",
+      "A new battery could still be in an open circuit.",
+      "A glowing bulb shows that current is flowing.",
+      "Best evidence: the bulb is glowing ✔"
+     ],
+     "explain": "A glowing bulb shows that the circuit is closed."
+    },
+    {
+     "q": "The arena light switch is flipped to OFF. What kind of circuit is it now?",
+     "choices": [
+      "closed, so the light is on",
+      "open, so the light is off",
+      "brighter",
+      "a battery"
+     ],
+     "a": 1,
+     "hint": "Flipping a switch OFF makes a gap in the path.",
+     "steps": [
+      "OFF lifts the switch's metal piece, which makes a gap.",
+      "A gap makes the circuit open.",
+      "With no current, the light is off.",
+      "Answer: open, so the light is off ✔"
+     ],
+     "explain": "Switch OFF opens the circuit, so the light goes off."
+    }
+   ]
+  },
+  {
+   "key": "floor",
+   "name": "Floor Exercise",
+   "subject": "Social Studies",
+   "topic": "Colonial trade & economic growth",
+   "icon": "assets/floor.webp",
+   "color": "#ff7ad9",
+   "skills": [
+    "Opening Pose",
+    "Round-off",
+    "Back Handspring",
+    "Back Tuck",
+    "Switch Leap",
+    "Layout",
+    "Full Twist",
+    "Final Pose!"
+   ],
+   "anims": [
+    "salute",
+    "roundoff",
+    "handspring",
+    "tuck",
+    "leap",
+    "layout",
+    "twist",
+    "finalpose"
+   ],
+   "notes": [
+    {
+     "t": "New England",
+     "b": "Rocky soil and cold winters → fishing, shipbuilding and logging (forests for lumber)."
+    },
+    {
+     "t": "Middle Colonies",
+     "b": "Furs, iron and lots of grain. Busy ports shipped these goods out."
+    },
+    {
+     "t": "Southern Colonies",
+     "b": "Cash crops grown to SELL: tobacco, rice, cotton and indigo (a blue dye)."
+    },
+    {
+     "t": "Jamestown tobacco",
+     "b": "John Rolfe grew a milder tobacco at Jamestown. It sold well in England and became Virginia's money crop."
+    },
+    {
+     "t": "Triangular Trade & mercantilism",
+     "b": "Mercantilism: colonies sent raw materials to Britain and bought its goods, making Britain rich. Trade routes linked the colonies, Britain and Europe, West Africa and the West Indies. Enslaved Africans were forced across the Atlantic against their will. This was cruel and wrong. Bringing enslaved people into the U.S. was banned in 1808."
+    },
+    {
+     "t": "Market economy",
+     "b": "Supply (how much there is) and demand (how much people want) set prices. Sellers try to make a profit, and competition between sellers keeps prices fair. Trade → profit → more jobs, ships and towns = economic growth."
+    }
+   ],
+   "questions": [
+    {
+     "q": "Which list matches the New England colonies' economy?",
+     "choices": [
+      "tobacco and rice",
+      "furs and iron only",
+      "fishing, shipbuilding and logging",
+      "cotton and indigo"
+     ],
+     "a": 2,
+     "hint": "Think about rocky soil, cold winters, thick forests and the ocean.",
+     "steps": [
+      "Rocky soil made big farms hard.",
+      "The ocean gave fish, and forests gave lumber.",
+      "Lumber was used to build ships.",
+      "Answer: fishing, shipbuilding and logging ✔"
+     ],
+     "explain": "New England: fishing, shipbuilding and logging."
+    },
+    {
+     "q": "Which was NOT a Southern cash crop?",
+     "choices": [
+      "tobacco",
+      "rice",
+      "indigo",
+      "codfish"
+     ],
+     "a": 3,
+     "hint": "Cash crops are PLANTS grown to sell. Which one isn't a plant?",
+     "steps": [
+      "Tobacco, rice and indigo are all plants grown on Southern farms.",
+      "Codfish is a fish, not a crop.",
+      "Fishing belonged to New England.",
+      "Answer: codfish ✔"
+     ],
+     "explain": "Codfish came from New England fishing, not Southern farms."
+    },
+    {
+     "q": "The Middle Colonies traded which group of goods?",
+     "choices": [
+      "furs, iron and grain",
+      "only sugar",
+      "gold and silver mines",
+      "cotton and indigo"
+     ],
+     "a": 0,
+     "hint": "This region was known for its farms, its forests' animals and its metal.",
+     "steps": [
+      "Their farms grew lots of grain.",
+      "Furs came from trading for animal pelts.",
+      "Iron was mined and made into tools.",
+      "Answer: furs, iron and grain ✔"
+     ],
+     "explain": "Middle Colonies: furs, iron and grain."
+    },
+    {
+     "q": "Who grew a tobacco at Jamestown that became a money-making crop?",
+     "choices": [
+      "John Rolfe",
+      "William Penn",
+      "George Washington",
+      "Ben Franklin"
+     ],
+     "a": 0,
+     "hint": "He was a Jamestown settler, and the crop sold well in England.",
+     "steps": [
+      "Jamestown, Virginia, needed a way to earn money.",
+      "John Rolfe planted a milder kind of tobacco there.",
+      "English buyers wanted it.",
+      "Answer: John Rolfe ✔"
+     ],
+     "explain": "John Rolfe's tobacco became Jamestown's cash crop."
+    },
+    {
+     "q": "What was the main idea of mercantilism?",
+     "choices": [
+      "Colonies could trade with any country they wanted.",
+      "Colonies existed to make the home country rich: they sent it raw materials and bought its goods.",
+      "No one used money.",
+      "The colonies ruled Britain."
+     ],
+     "a": 1,
+     "hint": "Who was supposed to get richer from the colonies?",
+     "steps": [
+      "Britain controlled colonial trade.",
+      "Colonies sent raw materials, like lumber and tobacco, to Britain.",
+      "Britain made finished goods and sold them back to the colonies.",
+      "That made Britain rich, which was the goal of mercantilism ✔"
+     ],
+     "explain": "Under mercantilism, colonies helped make the home country wealthy."
+    },
+    {
+     "q": "Which statement about the Triangular Trade is TRUE?",
+     "choices": [
+      "It only moved goods between two colonies.",
+      "Enslaved Africans were forced across the Atlantic against their will, which was cruel and wrong.",
+      "It happened in Asia.",
+      "Everyone in it was paid fairly."
+     ],
+     "a": 1,
+     "hint": "The routes made a 'triangle' across the Atlantic Ocean. Think about who was forced to travel.",
+     "steps": [
+      "The routes linked the colonies, Britain and Europe, West Africa and the West Indies.",
+      "Ships carried goods, and they also carried enslaved African people who were taken by force.",
+      "Enslaved people were not paid and were treated cruelly.",
+      "Bringing enslaved people into the U.S. was banned in 1808 ✔"
+     ],
+     "explain": "Enslaved Africans were taken by force, which was cruel and wrong. Importing enslaved people was banned in 1808."
+    },
+    {
+     "q": "Many colonists want sugar, but only a little sugar arrives at the port. What usually happens to the price?",
+     "choices": [
+      "It goes up.",
+      "It goes down.",
+      "It becomes free.",
+      "It never changes."
+     ],
+     "a": 0,
+     "hint": "High demand plus low supply means buyers compete for a small amount.",
+     "steps": [
+      "Demand is high, because lots of people want sugar.",
+      "Supply is low, because there is only a little.",
+      "Buyers will pay more to get some.",
+      "So the price goes up ✔"
+     ],
+     "explain": "Low supply and high demand make the price go up."
+    },
+    {
+     "q": "How did trade help the colonies' economies grow?",
+     "choices": [
+      "Trade stopped people from working.",
+      "Selling goods earned profit, which paid for more ships, farms, shops and jobs.",
+      "Trade made all prices zero.",
+      "Only kings could trade."
+     ],
+     "a": 1,
+     "hint": "Follow the money: what happens after a seller makes a profit?",
+     "steps": [
+      "Colonists sold fish, lumber, grain and crops.",
+      "Selling for more than it cost to make or grow earns a profit.",
+      "Profit was spent on more ships, land and workers.",
+      "More jobs and bigger towns mean economic growth ✔"
+     ],
+     "explain": "Trade brought profit, and the profit was spent on more ships, farms and jobs, so the economy grew."
+    }
+   ]
+  }
+ ]
 };

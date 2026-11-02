@@ -46,6 +46,8 @@ Shared files are `site.css` and `site.js`, which add the header, footer and the 
    - `q`, `choices` (4 options) and `a` (index of the correct choice)
    - `hint`, `steps` (the coach walk-through) and `explain`
 4. `skills` and `anims` are the 8 skill names and their animation ids. Keep the existing ids per event; you can rename the skills freely.
+5. Optional `wrestle` block: `show` (the wrestling show name), `ev.<key>.name/moves` (belt names and 8 moves) and `opp.<key>` (`name`, `tag`, `color`, `taunts`, `boo`). These override the defaults in `game.js` for that week only.
+6. Pick a NEW meet theme each week (`title` + accent colors) and log it in `themes.md` (outside the repo).
 
 ## Swap the theme
 - `theme.background`, `theme.podium` and `theme.gymnast` are image paths in `assets/`.

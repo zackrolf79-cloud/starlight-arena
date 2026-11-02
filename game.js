@@ -49,6 +49,8 @@ const WR = {
   calls: ["WHAT A MOVE!", "THE CROWD GOES WILD!", "OH MY! WHAT A COMEBACK!", "UNBELIEVABLE!", "SHE'S ON FIRE!", "LISTEN TO THIS CROWD!", "TEXTBOOK! LITERALLY!", "IT'S TIME… FOR THE CHEETAH POUNCE!"],
   pows: ["BAM!", "BOING!", "WHOOSH!", "KA-POW!", "SPARKLE!", "ZOOM!", "WHAM!", "STAR POWER!"]
 };
+/* per-week overrides (week.js "wrestle" block): belt names, moves, opponents; older weeks fall back to the defaults above */
+if (W.wrestle) { for (const k of ["ev", "opp"]) for (const e in W.wrestle[k] || {}) if (WR[k][e]) Object.assign(WR[k][e], W.wrestle[k][e]); }
 const WRESTLE = () => THEME === "wrestle";
 const evName = e => WRESTLE() ? WR.ev[e.key].name : e.name;
 const evSkills = e => WRESTLE() ? WR.ev[e.key].moves : e.skills;
@@ -607,7 +609,7 @@ function done() { return W.events.every(e => S.ev[e.key].best != null); }
 function title() {
   const started = W.events.some(e => S.ev[e.key].i > 0 || S.ev[e.key].best != null);
   stopMusic();
-  app.innerHTML = `<section class="title"><div><div class="sub">${esc(W.subtitle)}</div>
+  app.innerHTML = `<section class="title"><div><div class="sub">${esc(WRESTLE() && W.wrestle && W.wrestle.show ? W.wrestle.show + " · " + W.subtitle : W.subtitle)}</div>
     <h1 class="glow">${esc(WRESTLE() ? WR.league : W.title)}</h1><p class="sub">${WRESTLE() ? `Welcome to the ring, <b>${esc(WR.ringName(W.athleteName))}</b>! Answer questions to unlock signature moves in four title matches — Math, ELA, Science and Social Studies — then claim every championship belt.` : `Welcome to the arena, <b>${esc(W.athleteName)}</b>! Answer questions to perform skills on Vault, Bars, Beam and Floor — then take the podium.`}</p>
     ${themeChips()}
     <div class="row"><button class="btn" id="go">${started ? "▶ Continue" : "✨ Start"}</button><button class="btn teal" id="studio">🎨 Design Your ${WRESTLE() ? "Superstar" : "Gymnast"}</button>${viewBtn()}</div>
