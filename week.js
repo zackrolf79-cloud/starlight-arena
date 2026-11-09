@@ -1,6 +1,6 @@
 /* =====================================================================
    WEEK CONTENT FILE — swap this file each week (see README.md).
-   Week of Nov 2, 2026 · meet theme: Aurora Peaks Classic (see themes.md).
+   Week of Nov 9, 2026 · meet theme: Comet Trail Classic (see themes.md).
    Questions are ORIGINAL AI-made practice written about the same concepts
    as the lessons; none are copied from GVA lessons, quizzes, tests, or
    activity sheets. Hints + coach walk-through come before the answer.
@@ -8,125 +8,125 @@
    Optional "wrestle" block overrides belt names, moves and opponents.
    ===================================================================== */
 window.WEEK = {
- "id": "2026-wk-nov02",
- "title": "Aurora Peaks Classic",
- "subtitle": "Week of Nov 2 · Grade 5",
+ "id": "2026-wk-nov09",
+ "title": "Comet Trail Classic",
+ "subtitle": "Week of Nov 9 · Grade 5",
  "athleteName": "Aniston",
  "theme": {
   "background": "assets/arena.webp",
   "podium": "assets/podium.webp",
   "gymnast": "assets/gym/starlight-hero.webp",
-  "accent": "#4ff0b0",
-  "accent2": "#a98bff",
+  "accent": "#ff8c42",
+  "accent2": "#5ce1ff",
   "gold": "#ffd34d",
   "leotard": [
-   "#2fbf9a",
-   "#7b5cff",
-   "#4ff0b0"
+   "#ff8c42",
+   "#2a6fff",
+   "#5ce1ff"
   ],
   "hair": "#6b3b1f",
   "skin": "#f3c39b"
  },
  "wrestle": {
-  "show": "Northern Lights Throwdown",
+  "show": "Comet Crash Throwdown",
   "ev": {
    "vault": {
-    "name": "Fraction Frenzy Championship",
+    "name": "Mixed Number Mayhem Championship",
     "moves": [
-     "Benchmark Lock-Up",
-     "Round-to-a-Half Shoulder Block",
-     "Common Denominator Crossbody",
-     "LCM Suplex Toss",
+     "Unlike Denominator Lock-Up",
+     "LCM Shoulder Block",
+     "Equivalent Fraction Crossbody",
+     "Regroup Suplex Toss",
      "Mixed Number Dropkick",
-     "Equivalent Fraction Tuck Flip",
-     "Missing Addend Moonsault",
+     "Common Denominator Tuck Flip",
+     "Borrow-a-Whole Moonsault",
      "Top-Rope Cheetah Pounce!"
     ]
    },
    "bars": {
-    "name": "Sentence Slam Championship",
+    "name": "Author's Arena Championship",
     "moves": [
-     "Homophone Lock-Up",
-     "Context Clue Shoulder Block",
-     "Signal Word Crossbody",
+     "Purpose Lock-Up",
+     "Homophone Shoulder Block",
+     "Series Comma Crossbody",
      "Claim & Evidence Suplex Toss",
-     "FANBOYS Dropkick",
-     "Comma Catch Tuck Flip",
-     "Complex Clause Moonsault",
+     "Direct Address Dropkick",
+     "Root & Affix Tuck Flip",
+     "Expository Moonsault",
      "Top-Rope Cheetah Pounce!"
     ]
    },
    "beam": {
-    "name": "Circuit Breaker Championship",
+    "name": "Static Shock Championship",
     "moves": [
-     "Power Source Lock-Up",
-     "Live Wire Shoulder Block",
-     "Closed Loop Crossbody",
-     "Battery Blast Suplex Toss",
-     "Switch Flip Dropkick",
-     "Bright Bulb Tuck Flip",
-     "Current Flow Moonsault",
+     "Charge Lock-Up",
+     "Attract Shoulder Block",
+     "Repel Crossbody",
+     "Static Spark Suplex Toss",
+     "Neutral Pull Dropkick",
+     "Lightning Tuck Flip",
+     "Repeated Trials Moonsault",
      "Top-Rope Cheetah Pounce!"
     ]
    },
    "floor": {
-    "name": "Trade Route Championship",
+    "name": "Charter Clash Championship",
     "moves": [
-     "Market Lock-Up",
-     "Cod & Timber Shoulder Block",
-     "Cash Crop Crossbody",
-     "Supply & Demand Suplex Toss",
-     "Shipbuilder Dropkick",
-     "Profit Tuck Flip",
-     "Compass Rose Moonsault",
+     "Compact Lock-Up",
+     "Burgess Shoulder Block",
+     "Indirect Rule Crossbody",
+     "Democracy Suplex Toss",
+     "Town Meeting Dropkick",
+     "Petition Tuck Flip",
+     "Self-Government Moonsault",
      "Top-Rope Cheetah Pounce!"
     ]
    }
   },
   "opp": {
    "vault": {
-    "name": "The Unlike Denominator",
-    "tag": "the Mismatch Menace",
-    "color": "#a6e22e",
+    "name": "Regroup Rex",
+    "tag": "the Borrow Bandit",
+    "color": "#ff8c42",
     "taunts": [
-     "My pieces NEVER match!",
-     "Good luck finding a common denominator!",
-     "I'll chop you into twelfths!"
+     "Your fraction is too small — better borrow!",
+     "I scramble every mixed number!",
+     "No common denominator for YOU!"
     ],
-    "boo": "The Unlike Denominator scrambles the pieces!"
+    "boo": "Regroup Rex steals a whole number!"
    },
    "bars": {
-    "name": "Run-On Ronnie",
-    "tag": "the Comma Crasher",
-    "color": "#ff4d4d",
+    "name": "The Purpose Pirate",
+    "tag": "the Claim Crasher",
+    "color": "#5ce1ff",
     "taunts": [
-     "I never stop for commas and I just keep going and going!",
-     "Their, there, whatever!",
-     "I'll fragment your sentence!"
+     "Inform? Persuade? Entertain? I'll confuse them all!",
+     "My claims need NO evidence!",
+     "I'll skip every comma in the series!"
     ],
-    "boo": "Run-On Ronnie skips the comma!"
+    "boo": "The Purpose Pirate buries the author's claim!"
    },
    "beam": {
-    "name": "Captain Open Circuit",
-    "tag": "the Gap Maker",
-    "color": "#ffd21f",
+    "name": "Static Stinger",
+    "tag": "the Charge Charger",
+    "color": "#ffd34d",
     "taunts": [
-     "Snip! Your circuit has a gap!",
-     "Lights out, Cheetah!",
-     "No loop, no glow!"
+     "Like charges — REPEL!",
+     "I'll shock your whole routine!",
+     "One trial is enough… trust me!"
     ],
-    "boo": "Captain Open Circuit flips the switch OFF!"
+    "boo": "Static Stinger builds a huge charge!"
    },
    "floor": {
-    "name": "Count Copper-Coin",
-    "tag": "the Price Gouger",
-    "color": "#e0a030",
+    "name": "King Absolute",
+    "tag": "the Autocrat",
+    "color": "#ff7ad9",
     "taunts": [
-     "Buy only from ME!",
-     "Prices just went UP!",
-     "No competition allowed!"
+     "No elections in MY colony!",
+     "Burn the Compact — I make the laws!",
+     "Burgesses? Banished!"
     ],
-    "boo": "Count Copper-Coin corners the market!"
+    "boo": "King Absolute cancels the vote!"
    }
   }
  },
@@ -135,9 +135,9 @@ window.WEEK = {
    "key": "vault",
    "name": "Vault",
    "subject": "Math",
-   "topic": "Estimating & adding fractions with unlike denominators",
+   "topic": "Adding & subtracting mixed numbers with unlike denominators",
    "icon": "assets/vault.webp",
-   "color": "#4ff0b0",
+   "color": "#ff8c42",
    "skills": [
     "Power Run",
     "Round-off Entry",
@@ -160,174 +160,174 @@ window.WEEK = {
    ],
    "notes": [
     {
-     "t": "Benchmark buddies",
-     "b": "To estimate, round each fraction to 0, 1/2 or 1. Compare the top to the bottom: tiny top → about 0; top about half the bottom → about 1/2; top almost the bottom → about 1."
-    },
-    {
      "t": "Mixed numbers",
-     "b": "Keep the whole number, then round the fraction part. 4 7/8 is about 5, and 2 1/10 is about 2."
+     "b": "A mixed number has a whole-number part plus a fraction part, like 2 3/5. Add (or subtract) the wholes and the fractions separately after the fractions share a denominator."
     },
     {
-     "t": "Same-size pieces",
-     "b": "You can only add or subtract fractions when the pieces are the same size, so first find a common denominator."
+     "t": "Unlike denominators",
+     "b": "You can only add or subtract fraction pieces that are the same size. Rewrite each fraction as an equivalent fraction with a common denominator first."
     },
     {
      "t": "LCM shortcut",
-     "b": "The least common multiple of the denominators is the smallest common denominator. Multiply top AND bottom by the same number."
+     "b": "The least common multiple of the denominators is the smallest common denominator. List multiples, or multiply the denominators (that works, but may make bigger numbers)."
     },
     {
-     "t": "Tidy the answer",
-     "b": "Simplify if you can. If the top is bigger than the bottom, change it to a mixed number (13/10 = 1 3/10)."
+     "t": "Equivalent fractions",
+     "b": "Multiply top AND bottom by the same number: 1/2 = 3/6, 2/3 = 8/12."
     },
     {
-     "t": "Missing addend",
-     "b": "? + 1/4 = 3/4 → subtract: 3/4 − 1/4. Then check by adding back."
+     "t": "Regroup when adding",
+     "b": "If the fraction parts add up to 1 or more, regroup: 5/6 + 5/6 = 10/6 = 1 4/6, then add that extra 1 to the wholes."
+    },
+    {
+     "t": "Regroup when subtracting",
+     "b": "If the top fraction is too small to subtract, borrow 1 whole from the whole-number part and rewrite it as an improper fraction with the common denominator."
     }
    ],
    "questions": [
     {
-     "q": "Estimate: 7/8 + 5/12. About how much is the sum?",
+     "q": "What is 2 1/3 + 1 1/4?",
      "choices": [
-      "about 1/2",
-      "about 1",
-      "about 1 1/2",
-      "about 2"
-     ],
-     "a": 2,
-     "hint": "Round each fraction to 0, 1/2 or 1 first. Is 7 close to 8? Is 5 close to half of 12?",
-     "steps": [
-      "7/8: the top is almost the bottom → about 1.",
-      "5/12: half of 12 is 6, and 5 is close to 6 → about 1/2.",
-      "1 + 1/2 = 1 1/2.",
-      "Estimate: about 1 1/2 ✔"
-     ],
-     "explain": "7/8 ≈ 1 and 5/12 ≈ 1/2, so the sum is about 1 1/2."
-    },
-    {
-     "q": "Estimate: 9/10 − 4/9. About how much is left?",
-     "choices": [
-      "about 0",
-      "about 1/2",
-      "about 1",
-      "about 1 1/2"
+      "3 2/7",
+      "3 7/12",
+      "3 1/12",
+      "4 1/12"
      ],
      "a": 1,
-     "hint": "Round 9/10 and 4/9 to benchmarks, then subtract.",
+     "hint": "Find a common denominator for 3 and 4, rewrite both fractions, then add wholes and fractions.",
      "steps": [
-      "9/10 is almost a whole → about 1.",
-      "Half of 9 is 4.5, and 4 is close → 4/9 is about 1/2.",
-      "1 − 1/2 = 1/2.",
-      "Estimate: about 1/2 ✔"
+      "LCM of 3 and 4 is 12.",
+      "1/3 = 4/12 and 1/4 = 3/12.",
+      "Wholes: 2 + 1 = 3. Fractions: 4/12 + 3/12 = 7/12.",
+      "Answer: 3 7/12 ✔"
      ],
-     "explain": "9/10 ≈ 1 and 4/9 ≈ 1/2, so about 1/2."
+     "explain": "2 1/3 + 1 1/4 = 3 7/12."
     },
     {
-     "q": "A gymnast stretches for 3 1/8 minutes, then warms up for 2 5/6 minutes. About how many minutes is that?",
+     "q": "Aniston vaults for 1 5/6 minutes, then rests for 2 1/2 minutes. How long is that altogether?",
      "choices": [
-      "about 5",
-      "about 5 1/2",
-      "about 6",
-      "about 7"
+      "3 2/3 min",
+      "3 7/8 min",
+      "4 1/3 min",
+      "3 5/8 min"
      ],
      "a": 2,
-     "hint": "Keep the whole numbers. Round each fraction part to 0, 1/2 or 1.",
+     "hint": "Add the mixed numbers. First make sixths and halves into the same size pieces.",
      "steps": [
-      "3 1/8: 1/8 is tiny → about 3.",
-      "2 5/6: 5/6 is almost 1 → about 3.",
-      "3 + 3 = 6.",
-      "Estimate: about 6 minutes ✔"
+      "LCM of 6 and 2 is 6.",
+      "1/2 = 3/6, so 2 1/2 = 2 3/6.",
+      "Wholes: 1 + 2 = 3. Fractions: 5/6 + 3/6 = 8/6.",
+      "8/6 = 1 2/6, so regroup: 3 + 1 2/6 = 4 2/6 = 4 1/3 ✔"
      ],
-     "explain": "3 1/8 ≈ 3 and 2 5/6 ≈ 3, so about 6 minutes."
+     "explain": "1 5/6 + 2 1/2 = 4 1/3 minutes after regrouping."
     },
     {
-     "q": "What is 1/4 + 3/8?",
+     "q": "What is the least common multiple (LCM) of 8 and 6?",
      "choices": [
-      "4/12",
+      "14",
+      "48",
+      "24",
+      "16"
+     ],
+     "a": 2,
+     "hint": "List multiples of each number and find the smallest one they share.",
+     "steps": [
+      "Multiples of 8: 8, 16, 24, 32…",
+      "Multiples of 6: 6, 12, 18, 24…",
+      "The smallest number in both lists is 24.",
+      "LCM = 24 ✔"
+     ],
+     "explain": "The LCM of 8 and 6 is 24."
+    },
+    {
+     "q": "What is 5/6 − 1/4?",
+     "choices": [
+      "4/2",
       "1/2",
-      "5/8",
-      "4/8"
+      "7/12",
+      "3/8"
      ],
      "a": 2,
-     "hint": "Fourths and eighths are different sizes. How many eighths make 1/4?",
+     "hint": "Rewrite both fractions with a common denominator, then subtract the tops.",
      "steps": [
-      "8 is a multiple of 4, so use 8 as the common denominator.",
-      "1/4 = 2/8 (multiply top and bottom by 2).",
-      "2/8 + 3/8 = 5/8. Add only the tops!",
-      "Check: 5/8 is a little more than 1/2, which matches 1/4 + 3/8 ✔"
+      "LCM of 6 and 4 is 12.",
+      "5/6 = 10/12 and 1/4 = 3/12.",
+      "10/12 − 3/12 = 7/12.",
+      "Check: 7/12 + 3/12 = 10/12 = 5/6 ✔"
      ],
-     "explain": "1/4 + 3/8 = 2/8 + 3/8 = 5/8."
+     "explain": "5/6 − 1/4 = 7/12."
     },
     {
-     "q": "What is 2/3 + 1/4?",
+     "q": "What is 4 2/5 − 1 1/2?",
      "choices": [
-      "3/7",
-      "11/12",
-      "9/12",
-      "3/12"
+      "3 1/10",
+      "2 9/10",
+      "3 9/10",
+      "2 1/10"
      ],
      "a": 1,
-     "hint": "Find the LCM of 3 and 4. Never add the bottoms!",
+     "hint": "Use a common denominator for fifths and halves. Will you need to regroup?",
      "steps": [
-      "Multiples of 3: 3, 6, 9, 12. Multiples of 4: 4, 8, 12. LCM = 12.",
-      "2/3 = 8/12 (×4 top and bottom).",
-      "1/4 = 3/12 (×3 top and bottom).",
-      "8/12 + 3/12 = 11/12 ✔"
+      "LCM of 5 and 2 is 10.",
+      "4 2/5 = 4 4/10 and 1 1/2 = 1 5/10.",
+      "4/10 is smaller than 5/10, so borrow 1 whole: 4 4/10 → 3 14/10.",
+      "3 14/10 − 1 5/10 = 2 9/10 ✔"
      ],
-     "explain": "2/3 + 1/4 = 8/12 + 3/12 = 11/12."
+     "explain": "After regrouping, 4 2/5 − 1 1/2 = 2 9/10."
     },
     {
-     "q": "The beam team runs 3/4 of a lap, then 5/6 of a lap. How far is that in all?",
+     "q": "Which step comes FIRST when you add 3/5 + 1/4?",
      "choices": [
-      "8/10 lap",
-      "19/24 lap",
-      "1 1/12 laps",
-      "1 7/12 laps"
+      "Add the tops: 3 + 1 = 4",
+      "Find a common denominator for 5 and 4",
+      "Subtract the bottoms",
+      "Multiply the tops only"
      ],
-     "a": 3,
-     "hint": "Use the LCM of 4 and 6 as the denominator. Is the answer more than 1 lap?",
+     "a": 1,
+     "hint": "You can only add fraction pieces that are the same size.",
      "steps": [
-      "LCM of 4 and 6 is 12.",
-      "3/4 = 9/12 and 5/6 = 10/12.",
-      "9/12 + 10/12 = 19/12.",
-      "19/12 = 12/12 + 7/12 = 1 7/12 laps ✔"
+      "Fifths and fourths are different sizes.",
+      "So rewrite both with a common denominator first.",
+      "LCM of 5 and 4 is 20.",
+      "First step: find a common denominator ✔"
      ],
-     "explain": "3/4 + 5/6 = 19/12 = 1 7/12 laps."
+     "explain": "First find a common denominator, then rewrite and add."
     },
     {
-     "q": "What is 7/10 − 1/4?",
+     "q": "What is 3/8 + 1/3?",
      "choices": [
-      "6/6",
-      "3/10",
-      "9/20",
-      "11/20"
+      "4/11",
+      "17/24",
+      "4/24",
+      "1/2"
      ],
-     "a": 2,
-     "hint": "Find a common denominator for 10 and 4, then subtract the tops.",
+     "a": 1,
+     "hint": "Find the LCM of 8 and 3, rewrite, then add the numerators.",
      "steps": [
-      "Multiples of 10: 10, 20. Multiples of 4: 4, 8, 12, 16, 20. LCM = 20.",
-      "7/10 = 14/20 and 1/4 = 5/20.",
-      "14/20 − 5/20 = 9/20.",
-      "Check: 9/20 + 5/20 = 14/20 = 7/10 ✔"
+      "LCM of 8 and 3 is 24.",
+      "3/8 = 9/24 and 1/3 = 8/24.",
+      "9/24 + 8/24 = 17/24.",
+      "17/24 is already simplified ✔"
      ],
-     "explain": "7/10 − 1/4 = 14/20 − 5/20 = 9/20."
+     "explain": "3/8 + 1/3 = 17/24."
     },
     {
-     "q": "A ribbon routine is 5/6 of a minute long. The first part took 1/3 of a minute. How long is the rest? (1/3 + ? = 5/6)",
+     "q": "A beam warm-up lasts 5 1/4 minutes. Aniston has already practiced for 2 2/3 minutes. How much time is left?",
      "choices": [
-      "4/3 min",
-      "1/6 min",
-      "2/3 min",
-      "1/2 min"
+      "3 5/12 min",
+      "2 7/12 min",
+      "3 1/12 min",
+      "2 5/12 min"
      ],
-     "a": 3,
-     "hint": "A missing addend means subtract: 5/6 − 1/3. Make sixths first.",
+     "a": 1,
+     "hint": "Subtract the mixed numbers. Use twelfths, and regroup if the fraction is too small.",
      "steps": [
-      "1/3 = 2/6.",
-      "5/6 − 2/6 = 3/6.",
-      "3/6 simplifies to 1/2.",
-      "Check: 1/3 + 1/2 = 2/6 + 3/6 = 5/6 ✔"
+      "LCM of 4 and 3 is 12.",
+      "5 1/4 = 5 3/12 and 2 2/3 = 2 8/12.",
+      "3/12 < 8/12, so borrow: 5 3/12 → 4 15/12.",
+      "4 15/12 − 2 8/12 = 2 7/12 ✔"
      ],
-     "explain": "The rest is 3/6 = 1/2 minute."
+     "explain": "5 1/4 − 2 2/3 = 2 7/12 minutes left."
     }
    ]
   },
@@ -335,9 +335,9 @@ window.WEEK = {
    "key": "bars",
    "name": "Uneven Bars",
    "subject": "ELA",
-   "topic": "Homophones, context clues, claims & clauses",
+   "topic": "Author's purpose, commas, word study & roots",
    "icon": "assets/bars.webp",
-   "color": "#ffd34d",
+   "color": "#5ce1ff",
    "skills": [
     "Glide Kip",
     "Cast to Handstand",
@@ -360,174 +360,178 @@ window.WEEK = {
    ],
    "notes": [
     {
+     "t": "Author's purpose",
+     "b": "Why did the author write it? To inform (teach facts), to persuade (change your mind), or to entertain (tell a fun story)."
+    },
+    {
+     "t": "Perspective & claim",
+     "b": "Perspective is the author's attitude or way of thinking. A claim is the point the author wants to prove, backed by facts and reasons."
+    },
+    {
      "t": "Homophones",
-     "b": "Same sound, different spelling and meaning: one/won, sun/son, pair/pear, to/too/two, their/there. Read the whole sentence to pick the right one."
+     "b": "Words that sound alike but are spelled differently: their/there/they're, to/too/two. Use context clues to pick the right spelling."
     },
     {
-     "t": "Context clues",
-     "b": "Look around a new word for a definition, a synonym, an antonym or an example."
+     "t": "Comma jobs",
+     "b": "Use commas to separate items in a series; after an introductory element; and to set off yes/no, tag questions, and direct address (calling someone by name)."
     },
     {
-     "t": "Signal words",
-     "b": "'and', 'also', 'or' often point to a SIMILAR meaning. 'unlike', 'however', 'although' often point to an OPPOSITE meaning."
+     "t": "Conjunctions",
+     "b": "Coordinating conjunctions (FANBOYS) join two main clauses. Subordinating conjunctions (because, although, if…) join a main clause to a dependent clause."
     },
     {
-     "t": "Claim + evidence",
-     "b": "A claim is what the author wants you to believe. Reasons explain why, and evidence (facts, numbers, examples) proves it. Opinions are not evidence."
+     "t": "Roots & affixes",
+     "b": "pro- means moving forward; spec/spect means to look; multi- means many; -ic and -ous mean 'having the qualities of.' Use them to unlock unfamiliar words."
     },
     {
-     "t": "Clauses",
-     "b": "A main clause can stand alone. A subordinate clause starts with a word like because, although, if, until or once, and can't stand alone."
-    },
-    {
-     "t": "Commas",
-     "b": "Compound: main clause, + FANBOYS + main clause. Complex: put a comma after the subordinate clause when it comes FIRST."
+     "t": "Expository writing",
+     "b": "Introduction states the controlling idea, body paragraphs support it with evidence, and the conclusion wraps it up."
     }
    ],
    "questions": [
     {
-     "q": "Choose the word that fits: “Aniston ___ first place on the bars.”",
+     "q": "A short article lists facts about New York City's subway and how many riders it carries each day. What is the author's MAIN purpose?",
      "choices": [
-      "one",
-      "won",
-      "own",
-      "wan"
-     ],
-     "a": 1,
-     "hint": "Is this word a number, or does it mean 'came out the winner'?",
-     "steps": [
-      "'one' is the number 1.",
-      "'won' is the past tense of win.",
-      "She came out the winner, so we need the 'win' word.",
-      "Answer: won ✔"
-     ],
-     "explain": "'Won' means she was the winner; 'one' is a number."
-    },
-    {
-     "q": "“Unlike her jittery teammate, Mia felt serene before the meet.” What does serene mean?",
-     "choices": [
-      "nervous",
-      "calm",
-      "angry",
-      "sleepy"
-     ],
-     "a": 1,
-     "hint": "Find the signal word. Does it point to a similar or an opposite meaning?",
-     "steps": [
-      "The signal word is 'Unlike', so it is an antonym clue.",
-      "Mia is the OPPOSITE of her jittery (shaky, nervous) teammate.",
-      "The opposite of nervous is calm.",
-      "serene = calm ✔"
-     ],
-     "explain": "'Unlike' signals an opposite: serene means calm."
-    },
-    {
-     "q": "“The gymnast bounced off a springboard, a bouncy board that launches you into the air.” Which kind of context clue is this?",
-     "choices": [
-      "antonym",
-      "example",
-      "definition",
-      "synonym"
+      "to persuade readers to move to New York",
+      "to entertain with a silly subway story",
+      "to inform readers with facts about the subway",
+      "to sell subway tickets"
      ],
      "a": 2,
-     "hint": "Look at the words right after the comma. What do they tell you?",
+     "hint": "Ask: is the writer mostly teaching facts, changing minds, or telling a fun story?",
      "steps": [
-      "After the comma, the sentence explains exactly what a springboard IS.",
-      "Telling the meaning of a word is a definition.",
-      "There is no opposite or list of examples.",
-      "Answer: definition clue ✔"
+      "The article lists facts and numbers about the subway.",
+      "That matches informing, not persuading or entertaining.",
+      "There is no sales pitch or silly plot.",
+      "Author's purpose: to inform ✔"
      ],
-     "explain": "The sentence tells what a springboard is, so it's a definition clue."
+     "explain": "Listing facts about the subway shows the purpose is to inform."
     },
     {
-     "q": "Which signal word usually tells you that an OPPOSITE meaning is coming?",
+     "q": "Choose the correct homophone: \"Aniston left _____ gym bag by the bars.\"",
      "choices": [
-      "also",
-      "and",
-      "however",
-      "or"
-     ],
-     "a": 2,
-     "hint": "Three of these words connect similar ideas. Which one turns the idea around?",
-     "steps": [
-      "'also' and 'and' add something similar.",
-      "'or' often gives another word with the same meaning.",
-      "'however' shows a contrast, or a change in direction.",
-      "Answer: however ✔"
-     ],
-     "explain": "'However' signals contrast, so an opposite meaning is coming."
-    },
-    {
-     "q": "An author claims, “Every gymnast should warm up before practice.” Which sentence is the best EVIDENCE for this claim?",
-     "choices": [
-      "Warming up is my favorite part of the day.",
-      "In one study of young athletes, those who warmed up had fewer pulled muscles.",
-      "Leotards come in many bright colors.",
-      "Some gyms have blue floor mats."
+      "there",
+      "their",
+      "they're",
+      "thair"
      ],
      "a": 1,
-     "hint": "Evidence is a fact or result that PROVES the claim. It is not just someone's feelings.",
+     "hint": "Which spelling means 'belonging to them'?",
      "steps": [
-      "Choice A is an opinion: it tells a feeling.",
-      "Choices C and D are facts, but they are not about warming up.",
-      "Choice B is a fact about warm-ups and injuries.",
-      "It supports the claim, so the answer is B ✔"
+      "'there' points to a place.",
+      "'they're' means 'they are'.",
+      "'their' shows ownership.",
+      "The bag belongs to them → their ✔"
      ],
-     "explain": "A study result about warm-ups and fewer injuries is evidence for the claim."
+     "explain": "'Their' shows ownership: their gym bag."
     },
     {
-     "q": "“Although the beam was narrow, Zoe stayed balanced.” Which part is the SUBORDINATE clause?",
+     "q": "Which sentence uses commas correctly in a series?",
      "choices": [
-      "Zoe stayed balanced",
-      "Although the beam was narrow",
-      "the beam",
-      "stayed balanced"
+      "Aniston packed grips chalk and, a water bottle.",
+      "Aniston packed grips, chalk, and a water bottle.",
+      "Aniston, packed grips chalk and a water bottle.",
+      "Aniston packed, grips chalk, and a water bottle."
      ],
      "a": 1,
-     "hint": "Find the part that starts with a subordinating conjunction and can't stand alone.",
+     "hint": "Items in a list need commas between them.",
      "steps": [
-      "'Zoe stayed balanced' makes sense alone, so it is the main clause.",
-      "'Although the beam was narrow…' leaves you waiting for more.",
-      "It starts with 'Although', a subordinating conjunction.",
-      "Answer: Although the beam was narrow ✔"
+      "The three items are grips, chalk, and a water bottle.",
+      "Put a comma after each item before the last.",
+      "A comma also goes before 'and' in a series (Oxford style here).",
+      "Answer: Aniston packed grips, chalk, and a water bottle. ✔"
      ],
-     "explain": "The clause that starts with 'Although' is subordinate."
+     "explain": "Separate series items with commas: grips, chalk, and a water bottle."
     },
     {
-     "q": "Which compound sentence is punctuated correctly?",
+     "q": "Which sentence correctly sets off an introductory element with a comma?",
      "choices": [
-      "The crowd cheered and, the judges smiled.",
-      "The crowd, cheered and the judges smiled.",
-      "The crowd cheered, and the judges smiled.",
-      "The crowd cheered the judges, smiled."
-     ],
-     "a": 2,
-     "hint": "Two main clauses joined by a FANBOYS word need a comma placed BEFORE the conjunction.",
-     "steps": [
-      "Main clause 1: The crowd cheered. Main clause 2: the judges smiled.",
-      "They are joined by 'and', which is a FANBOYS word.",
-      "The comma goes right before 'and'.",
-      "Answer: The crowd cheered, and the judges smiled. ✔"
-     ],
-     "explain": "Use a comma before the FANBOYS conjunction: “cheered, and”."
-    },
-    {
-     "q": "Which complex sentence is punctuated correctly?",
-     "choices": [
-      "Once the music starts she, begins her routine.",
-      "Once the music starts, she begins her routine.",
-      "Once, the music starts she begins her routine.",
-      "Once the music, starts she begins her routine."
+      "After the kip she, casts to handstand.",
+      "After the kip, she casts to handstand.",
+      "After, the kip she casts to handstand.",
+      "After the kip she casts, to handstand."
      ],
      "a": 1,
-     "hint": "When the subordinate clause comes first, put the comma at the END of that clause.",
+     "hint": "When an introductory phrase comes first, the comma goes at the END of that phrase.",
      "steps": [
-      "The subordinate clause is 'Once the music starts'.",
-      "It comes first in the sentence.",
-      "So the comma goes right after 'starts'.",
-      "Answer: Once the music starts, she begins her routine. ✔"
+      "The introductory phrase is 'After the kip'.",
+      "It comes before the main clause.",
+      "So the comma goes right after 'kip'.",
+      "Answer: After the kip, she casts to handstand. ✔"
      ],
-     "explain": "Put a comma after a subordinate clause that comes first."
+     "explain": "Put a comma after an introductory phrase: After the kip, …"
+    },
+    {
+     "q": "Which sentence correctly uses a comma with direct address?",
+     "choices": [
+      "Let's go Aniston, for the dismount!",
+      "Let's go, Aniston, for the dismount!",
+      "Let's, go Aniston for the dismount!",
+      "Let's go Aniston for, the dismount!"
+     ],
+     "a": 1,
+     "hint": "When you call someone by name, set the name off with commas.",
+     "steps": [
+      "'Aniston' is a direct address — she is being spoken to.",
+      "Names used this way are set off with commas.",
+      "So commas go before and after Aniston.",
+      "Answer: Let's go, Aniston, for the dismount! ✔"
+     ],
+     "explain": "Set off a name used in direct address with commas."
+    },
+    {
+     "q": "The word spectacular has the root spect. What does spectacular most nearly mean?",
+     "choices": [
+      "very quiet and hidden",
+      "impressive to look at",
+      "related to insects",
+      "moving backward"
+     ],
+     "a": 1,
+     "hint": "spect/spec means 'to look.' What would 'spectacular' have to do with looking?",
+     "steps": [
+      "The root spect means to look.",
+      "Something spectacular is amazing to look at.",
+      "It is not about being quiet or moving backward.",
+      "spectacular ≈ impressive to look at ✔"
+     ],
+     "explain": "spect = to look, so spectacular means impressive to look at."
+    },
+    {
+     "q": "An author claims, \"Every gymnast should stretch before practice.\" Which sentence is the BEST evidence?",
+     "choices": [
+      "Stretching is my favorite part of the day.",
+      "A study of young athletes found fewer pulled muscles after a stretch warm-up.",
+      "Leotards come in many colors.",
+      "Some gyms play loud music."
+     ],
+     "a": 1,
+     "hint": "Evidence is a fact or result that proves the claim — not just a feeling.",
+     "steps": [
+      "Choice A is an opinion (a feeling).",
+      "Choices C and D are facts, but not about stretching.",
+      "Choice B is a study result about stretching and injuries.",
+      "Best evidence: the study ✔"
+     ],
+     "explain": "A study result about fewer injuries supports the stretch claim."
+    },
+    {
+     "q": "The prefix pro- means 'moving forward.' Which word best shows that meaning?",
+     "choices": [
+      "protest only about the past",
+      "progress toward a goal",
+      "procrastinate forever",
+      "protect by standing still"
+     ],
+     "a": 1,
+     "hint": "Which choice shows something moving ahead?",
+     "steps": [
+      "pro- = moving forward.",
+      "'Progress' means moving ahead toward a goal.",
+      "The others do not show forward movement.",
+      "Answer: progress toward a goal ✔"
+     ],
+     "explain": "Progress uses pro- to mean moving forward."
     }
    ]
   },
@@ -535,9 +539,9 @@ window.WEEK = {
    "key": "beam",
    "name": "Balance Beam",
    "subject": "Science",
-   "topic": "Circuits: closed, open & switches",
+   "topic": "Electrical charges: attract, repel & static",
    "icon": "assets/beam.webp",
-   "color": "#a98bff",
+   "color": "#ffd34d",
    "skills": [
     "Relevé Pose",
     "Split Leap",
@@ -560,174 +564,174 @@ window.WEEK = {
    ],
    "notes": [
     {
-     "t": "Circuit recipe",
-     "b": "Every circuit needs a power source (like a battery), wires (a path) and a device that uses the energy (like a bulb)."
+     "t": "Charges",
+     "b": "Objects can have a positive charge, a negative charge, or be neutral (equal positive and negative). Charge comes from the balance of tiny charged particles in atoms."
     },
     {
-     "t": "Closed circuit",
-     "b": "A closed circuit is a complete loop with no gaps. Electric current flows, and the bulb lights."
+     "t": "Attract & repel",
+     "b": "Opposite charges attract (pull together). Like charges repel (push apart). This can happen without the objects touching."
     },
     {
-     "t": "Open circuit",
-     "b": "An open circuit has a gap or break, such as a loose wire or an open switch. The current stops, and the bulb goes out."
+     "t": "Static electricity",
+     "b": "Rubbing can move negative particles from one surface to another. One object becomes more negative and the other more positive — that imbalance is static electricity."
     },
     {
-     "t": "Switches",
-     "b": "A switch is a gate in the path. ON closes the circuit and OFF opens it."
+     "t": "Charged + neutral",
+     "b": "A charged object can attract a neutral object without touching it, because it rearranges the charges inside the neutral object."
     },
     {
-     "t": "Battery energy",
-     "b": "A battery changes stored chemical energy into electrical energy. The bulb then changes electrical energy into light and heat."
+     "t": "Everyday examples",
+     "b": "Shock from a doorknob after walking on carpet, hair standing up after a slide, a rubbed balloon sticking to a wall, and lightning are all static-charge events."
     },
     {
-     "t": "Evidence",
-     "b": "Use what you observe: bulb ON → closed circuit; bulb OFF → open circuit (or a dead battery)."
+     "t": "Fair tests",
+     "b": "A test variable is what you change. An outcome variable is what you measure. A control stays uncharged/unchanged for comparison. Repeat trials so results are more reliable."
     }
    ],
    "questions": [
     {
-     "q": "Which set has the three parts every circuit needs?",
+     "q": "A positively charged balloon is held near a negatively charged scrap of paper. What happens?",
      "choices": [
-      "a magnet, water and a bulb",
-      "a power source, wires and a device",
-      "only a light bulb",
-      "a switch and nothing else"
+      "They repel (push apart).",
+      "They attract (pull together).",
+      "Nothing — charges only work when touching.",
+      "They both become neutral instantly."
      ],
      "a": 1,
-     "hint": "Think: where does the energy come from, how does it travel, and what uses it?",
+     "hint": "Remember: opposite charges do what?",
      "steps": [
-      "The energy comes from a power source, like a battery.",
-      "Wires make the path it travels along.",
-      "A device, such as a bulb, uses the energy.",
-      "Answer: power source, wires and a device ✔"
+      "Positive and negative are opposite charges.",
+      "Opposite charges attract.",
+      "Attraction can happen without contact.",
+      "They pull together ✔"
      ],
-     "explain": "A circuit needs a power source, wires and a device."
+     "explain": "Opposite charges attract, so the balloon and paper pull together."
     },
     {
-     "q": "The scoreboard bulb is glowing. What does that tell you about its circuit?",
+     "q": "Two balloons are both rubbed the same way and get the same negative charge. What happens when they are brought close?",
      "choices": [
-      "It is open, with a gap in the path.",
-      "It has no battery.",
-      "It is closed: a complete loop.",
-      "The wires are cut."
-     ],
-     "a": 2,
-     "hint": "Current can only flow through a path with no gaps.",
-     "steps": [
-      "The bulb is ON, so current must be flowing.",
-      "Current flows only in a complete path.",
-      "A complete path is a closed circuit.",
-      "Answer: closed ✔"
-     ],
-     "explain": "A glowing bulb is evidence of a closed circuit."
-    },
-    {
-     "q": "During a test, one wire pops off the battery. What happens to the bulb?",
-     "choices": [
-      "It gets brighter.",
-      "It turns off because the circuit is now open.",
-      "It changes color.",
-      "Nothing changes."
+      "They attract.",
+      "They repel.",
+      "They stick permanently.",
+      "They turn into magnets."
      ],
      "a": 1,
-     "hint": "Did the loose wire make a gap in the loop?",
+     "hint": "Same (like) charges do what to each other?",
      "steps": [
-      "The wire came off, so now there is a gap.",
-      "A gap makes the circuit open.",
-      "With no complete path, the current stops.",
-      "The bulb turns off ✔"
+      "Both balloons are negative — like charges.",
+      "Like charges repel (push apart).",
+      "They do not need to touch to push apart.",
+      "They repel ✔"
      ],
-     "explain": "A loose wire opens the circuit, so the bulb goes out."
+     "explain": "Like charges repel, so the two negative balloons push apart."
     },
     {
-     "q": "What is the job of a switch in a circuit?",
+     "q": "How does rubbing a balloon on hair often create static electricity?",
      "choices": [
-      "It makes brand-new electricity.",
-      "It opens or closes the path to control the current.",
-      "It stores water.",
-      "It turns light into sound."
+      "It creates brand-new atoms.",
+      "It transfers some negative particles from one surface to the other.",
+      "It heats the air until it glows.",
+      "It turns the balloon into a battery."
      ],
      "a": 1,
-     "hint": "Think of a switch as a gate on the path.",
+     "hint": "Static charge is an imbalance — particles move from one place to another.",
      "steps": [
-      "A switch does not create energy. The battery supplies it.",
-      "Switch ON connects the path, so the circuit is closed.",
-      "Switch OFF breaks the path, so the circuit is open.",
-      "So it controls the flow ✔"
+      "Rubbing moves some negative particles from hair to balloon (or the other way).",
+      "One object ends up more negative and the other more positive.",
+      "That imbalance is static electricity.",
+      "Answer: particles transfer ✔"
      ],
-     "explain": "A switch opens or closes the circuit."
+     "explain": "Rubbing transfers charged particles, creating a static imbalance."
     },
     {
-     "q": "Inside a battery, what energy change happens?",
+     "q": "A charged plastic spoon is held near uncharged pepper flakes (without touching). What can happen?",
      "choices": [
-      "electrical → chemical",
-      "chemical → electrical",
-      "light → chemical",
-      "sound → electrical"
+      "Nothing — charged objects never affect neutral ones.",
+      "The spoon can attract the neutral pepper.",
+      "The pepper becomes a magnet.",
+      "The spoon instantly loses all charge."
      ],
      "a": 1,
-     "hint": "What kind of energy is STORED in a battery, and what comes out into the wires?",
+     "hint": "Can a charged object pull on something that is still neutral?",
      "steps": [
-      "A battery stores energy in chemicals.",
-      "When the circuit closes, the battery sends electrical energy into the wires.",
-      "So stored chemical energy becomes electrical energy.",
-      "Answer: chemical → electrical ✔"
+      "A nearby charged object can rearrange charges inside a neutral object.",
+      "That rearrangement lets the charged object attract the neutral one.",
+      "No contact is required.",
+      "The spoon can attract the pepper ✔"
      ],
-     "explain": "A battery changes chemical energy into electrical energy."
+     "explain": "A charged object can attract a neutral object without contact."
     },
     {
-     "q": "In a flashlight bulb, electrical energy is changed mostly into…",
+     "q": "Lightning is best described as…",
      "choices": [
-      "chemical energy",
-      "sound only",
-      "light and heat",
-      "nothing at all"
-     ],
-     "a": 2,
-     "hint": "What do you see, and feel, when a bulb is on?",
-     "steps": [
-      "The bulb glows, so there is light.",
-      "A bulb also gets warm, so there is heat.",
-      "Electrical energy becomes light and heat.",
-      "Answer: light and heat ✔"
-     ],
-     "explain": "A bulb changes electrical energy into light and heat."
-    },
-    {
-     "q": "Kai says, “My circuit is closed.” Which observation is the BEST evidence?",
-     "choices": [
-      "The wires are red.",
-      "The bulb is glowing.",
-      "The battery is brand new.",
-      "He built it fast."
+      "a permanent magnet between clouds",
+      "a sudden transfer of built-up static charge between clouds and ground",
+      "boiling rain water",
+      "sound waves only"
      ],
      "a": 1,
-     "hint": "Evidence should show whether current is flowing.",
+     "hint": "Think about charge building up, then suddenly moving.",
      "steps": [
-      "The wire color and build speed don't tell you whether current flows.",
-      "A new battery could still be in an open circuit.",
-      "A glowing bulb shows that current is flowing.",
-      "Best evidence: the bulb is glowing ✔"
+      "Charge builds up in clouds (and sometimes the ground).",
+      "When the imbalance is huge, charge jumps in a flash.",
+      "That jump is a transfer of static electricity.",
+      "Lightning = sudden static-charge transfer ✔"
      ],
-     "explain": "A glowing bulb shows that the circuit is closed."
+     "explain": "Lightning is a sudden transfer of built-up static charge."
     },
     {
-     "q": "The arena light switch is flipped to OFF. What kind of circuit is it now?",
+     "q": "In a balloon-and-cloth experiment, Aniston changes how many times she rubs the balloon and measures how far away it still attracts the cloth. What is the TEST variable?",
      "choices": [
-      "closed, so the light is on",
-      "open, so the light is off",
-      "brighter",
-      "a battery"
+      "how far the cloth is attracted",
+      "how many times the balloon is rubbed",
+      "the color of the balloon",
+      "the room temperature she did not change"
      ],
      "a": 1,
-     "hint": "Flipping a switch OFF makes a gap in the path.",
+     "hint": "The test variable is the one thing YOU purposely change.",
      "steps": [
-      "OFF lifts the switch's metal piece, which makes a gap.",
-      "A gap makes the circuit open.",
-      "With no current, the light is off.",
-      "Answer: open, so the light is off ✔"
+      "She changes the number of rubs on purpose.",
+      "She measures attraction distance — that is the outcome.",
+      "Color and room temperature are not what she changed for the test.",
+      "Test variable: number of rubs ✔"
      ],
-     "explain": "Switch OFF opens the circuit, so the light goes off."
+     "explain": "The test variable is how many times the balloon is rubbed."
+    },
+    {
+     "q": "Why do scientists repeat trials in an experiment about static charge?",
+     "choices": [
+      "To waste balloons",
+      "So one lucky result does not fool you — repeated results are more reliable",
+      "Because charges only work on Tuesdays",
+      "To change every variable at once"
+     ],
+     "a": 1,
+     "hint": "What if the first try was a fluke?",
+     "steps": [
+      "One trial might be an accident or a measuring mistake.",
+      "Repeating the test checks whether the result happens again.",
+      "Matching results make the conclusion stronger.",
+      "Repeated trials → more reliable ✔"
+     ],
+     "explain": "Repeating trials makes conclusions more reliable."
+    },
+    {
+     "q": "After walking across a carpet, Aniston reaches for a metal doorknob and feels a tiny shock. What most likely happened?",
+     "choices": [
+      "The carpet created a brand-new planet.",
+      "She built up static charge that discharged to the metal knob.",
+      "The doorknob turned into a battery.",
+      "Metal cannot carry charge, so nothing moved."
+     ],
+     "a": 1,
+     "hint": "Carpet friction can charge you up. Metal is a path for charge to jump.",
+     "steps": [
+      "Walking on carpet can transfer charge to her body (static).",
+      "Metal is a conductor, so charge can jump to the knob.",
+      "That sudden jump is the shock she feels.",
+      "Static charge discharged to the doorknob ✔"
+     ],
+     "explain": "Carpet rubbing built static charge that discharged to the metal doorknob."
     }
    ]
   },
@@ -735,7 +739,7 @@ window.WEEK = {
    "key": "floor",
    "name": "Floor Exercise",
    "subject": "Social Studies",
-   "topic": "Colonial trade & economic growth",
+   "topic": "Colonial governments & early democracy",
    "icon": "assets/floor.webp",
    "color": "#ff7ad9",
    "skills": [
@@ -760,174 +764,174 @@ window.WEEK = {
    ],
    "notes": [
     {
-     "t": "New England",
-     "b": "Rocky soil and cold winters → fishing, shipbuilding and logging (forests for lumber)."
+     "t": "Essential question",
+     "b": "How did early colonial governments show democracy? Colonists practiced self-government while still under the English king."
     },
     {
-     "t": "Middle Colonies",
-     "b": "Furs, iron and lots of grain. Busy ports shipped these goods out."
+     "t": "Indirect vs direct rule",
+     "b": "English colonies often had indirect rule: colonists elected some leaders but stayed loyal to the King and English law. French and Spanish settlements were under direct rule — the King held nearly absolute power (autocratic monarchy)."
     },
     {
-     "t": "Southern Colonies",
-     "b": "Cash crops grown to SELL: tobacco, rice, cotton and indigo (a blue dye)."
+     "t": "Mayflower Compact (1620)",
+     "b": "A written agreement for fair and equal laws, signed by the men aboard the Mayflower. They elected John Carver as governor and started Plymouth."
     },
     {
-     "t": "Jamestown tobacco",
-     "b": "John Rolfe grew a milder tobacco at Jamestown. It sold well in England and became Virginia's money crop."
+     "t": "House of Burgesses (1619)",
+     "b": "At Jamestown, Virginia: 22 elected members from 11 settlements. Property-holding males age 21+ voted. They met to decide laws and taxes — an early legislature."
     },
     {
-     "t": "Triangular Trade & mercantilism",
-     "b": "Mercantilism: colonies sent raw materials to Britain and bought its goods, making Britain rich. Trade routes linked the colonies, Britain and Europe, West Africa and the West Indies. Enslaved Africans were forced across the Atlantic against their will. This was cruel and wrong. Bringing enslaved people into the U.S. was banned in 1808."
+     "t": "Monarchy vs democracy",
+     "b": "Monarchy: one ruler, people usually do not choose the leader. Democracy: citizens share power by electing leaders."
     },
     {
-     "t": "Market economy",
-     "b": "Supply (how much there is) and demand (how much people want) set prices. Sellers try to make a profit, and competition between sellers keeps prices fair. Trade → profit → more jobs, ships and towns = economic growth."
+     "t": "Political participation",
+     "b": "Then and now: voting, town meetings, petitions, protests, writing to officials, and holding public office."
     }
    ],
    "questions": [
     {
-     "q": "Which list matches the New England colonies' economy?",
+     "q": "What was the Mayflower Compact?",
      "choices": [
-      "tobacco and rice",
-      "furs and iron only",
-      "fishing, shipbuilding and logging",
-      "cotton and indigo"
+      "A map of the Atlantic Ocean",
+      "A written agreement for fair and equal laws signed by the men on the Mayflower",
+      "A tax paid only to France",
+      "A list of Southern cash crops"
+     ],
+     "a": 1,
+     "hint": "Think about the settlers on the ship in 1620 and how they planned to govern themselves.",
+     "steps": [
+      "In 1620 the Mayflower settlers needed rules for their new community.",
+      "The men signed a written agreement for fair and equal laws.",
+      "They elected John Carver as governor of Plymouth.",
+      "Answer: a written self-government agreement ✔"
+     ],
+     "explain": "The Mayflower Compact was a written agreement for fair, equal laws."
+    },
+    {
+     "q": "Where and when was the House of Burgesses established?",
+     "choices": [
+      "Plymouth, 1620",
+      "Jamestown, Virginia, 1619",
+      "New York, 1776",
+      "Philadelphia, 1787"
+     ],
+     "a": 1,
+     "hint": "It was Virginia's early elected assembly at the first permanent English town.",
+     "steps": [
+      "Jamestown, Virginia, was the first permanent English settlement.",
+      "In 1619 colonists there created an elected assembly.",
+      "It was called the House of Burgesses.",
+      "Answer: Jamestown, 1619 ✔"
+     ],
+     "explain": "The House of Burgesses began at Jamestown in 1619."
+    },
+    {
+     "q": "How is a democracy different from a monarchy?",
+     "choices": [
+      "In a democracy one king makes every law alone.",
+      "In a democracy citizens share power by electing leaders; in a monarchy one ruler usually holds power.",
+      "They are exactly the same.",
+      "A monarchy always has town meetings."
+     ],
+     "a": 1,
+     "hint": "Who chooses the leaders in each system?",
+     "steps": [
+      "Monarchy: one ruler (often a king or queen); people usually do not choose the leader.",
+      "Democracy: citizens share power and elect leaders.",
+      "Colonial assemblies moved toward democratic ideas.",
+      "Democracy = elected sharing of power ✔"
+     ],
+     "explain": "Democracy shares power through elections; monarchy centers on one ruler."
+    },
+    {
+     "q": "What did 'indirect rule' mean for many English colonies?",
+     "choices": [
+      "The King lived in every colonial town.",
+      "Colonists could elect some leaders and make local laws while staying loyal to the King and English law.",
+      "No one followed any laws.",
+      "Only France could trade with them."
+     ],
+     "a": 1,
+     "hint": "Indirect means the King was still in charge overall, but locals handled a lot day to day.",
+     "steps": [
+      "Colonists stayed under the English King and English law.",
+      "In charter colonies, property-holding males often elected legislators.",
+      "Governors might still be appointed by the King.",
+      "That mix is indirect rule ✔"
+     ],
+     "explain": "Indirect rule: local elections plus loyalty to the King and English law."
+    },
+    {
+     "q": "Who could typically vote for members of the House of Burgesses?",
+     "choices": [
+      "All adults in Virginia",
+      "Only the King of France",
+      "Property-holding males (representatives also had to be at least 21)",
+      "Only children under 10"
      ],
      "a": 2,
-     "hint": "Think about rocky soil, cold winters, thick forests and the ocean.",
+     "hint": "Colonial voting rules were limited compared with today.",
      "steps": [
-      "Rocky soil made big farms hard.",
-      "The ocean gave fish, and forests gave lumber.",
-      "Lumber was used to build ships.",
-      "Answer: fishing, shipbuilding and logging ✔"
+      "Voting was not open to everyone.",
+      "Property-holding males could vote.",
+      "Burgesses (representatives) had to be at least 21.",
+      "Answer: property-holding males ✔"
      ],
-     "explain": "New England: fishing, shipbuilding and logging."
+     "explain": "Property-holding males voted; burgesses were at least 21."
     },
     {
-     "q": "Which was NOT a Southern cash crop?",
+     "q": "Which is an example of political participation in colonial times that still happens today?",
      "choices": [
-      "tobacco",
-      "rice",
-      "indigo",
-      "codfish"
-     ],
-     "a": 3,
-     "hint": "Cash crops are PLANTS grown to sell. Which one isn't a plant?",
-     "steps": [
-      "Tobacco, rice and indigo are all plants grown on Southern farms.",
-      "Codfish is a fish, not a crop.",
-      "Fishing belonged to New England.",
-      "Answer: codfish ✔"
-     ],
-     "explain": "Codfish came from New England fishing, not Southern farms."
-    },
-    {
-     "q": "The Middle Colonies traded which group of goods?",
-     "choices": [
-      "furs, iron and grain",
-      "only sugar",
-      "gold and silver mines",
-      "cotton and indigo"
-     ],
-     "a": 0,
-     "hint": "This region was known for its farms, its forests' animals and its metal.",
-     "steps": [
-      "Their farms grew lots of grain.",
-      "Furs came from trading for animal pelts.",
-      "Iron was mined and made into tools.",
-      "Answer: furs, iron and grain ✔"
-     ],
-     "explain": "Middle Colonies: furs, iron and grain."
-    },
-    {
-     "q": "Who grew a tobacco at Jamestown that became a money-making crop?",
-     "choices": [
-      "John Rolfe",
-      "William Penn",
-      "George Washington",
-      "Ben Franklin"
-     ],
-     "a": 0,
-     "hint": "He was a Jamestown settler, and the crop sold well in England.",
-     "steps": [
-      "Jamestown, Virginia, needed a way to earn money.",
-      "John Rolfe planted a milder kind of tobacco there.",
-      "English buyers wanted it.",
-      "Answer: John Rolfe ✔"
-     ],
-     "explain": "John Rolfe's tobacco became Jamestown's cash crop."
-    },
-    {
-     "q": "What was the main idea of mercantilism?",
-     "choices": [
-      "Colonies could trade with any country they wanted.",
-      "Colonies existed to make the home country rich: they sent it raw materials and bought its goods.",
-      "No one used money.",
-      "The colonies ruled Britain."
+      "Only kings writing secret laws",
+      "Voting, town meetings, petitions, and writing to officials",
+      "Refusing to have any government",
+      "Trading only indigo"
      ],
      "a": 1,
-     "hint": "Who was supposed to get richer from the colonies?",
+     "hint": "Participation means taking part in how a community is governed.",
      "steps": [
-      "Britain controlled colonial trade.",
-      "Colonies sent raw materials, like lumber and tobacco, to Britain.",
-      "Britain made finished goods and sold them back to the colonies.",
-      "That made Britain rich, which was the goal of mercantilism ✔"
+      "Colonists voted, held town meetings, and used petitions.",
+      "People today still vote, protest, petition, and contact officials.",
+      "Those are forms of political participation.",
+      "Answer: voting, town meetings, petitions… ✔"
      ],
-     "explain": "Under mercantilism, colonies helped make the home country wealthy."
+     "explain": "Voting, town meetings, and petitions are lasting forms of participation."
     },
     {
-     "q": "Which statement about the Triangular Trade is TRUE?",
+     "q": "How did French and Spanish colonial rule often differ from English indirect rule?",
      "choices": [
-      "It only moved goods between two colonies.",
-      "Enslaved Africans were forced across the Atlantic against their will, which was cruel and wrong.",
-      "It happened in Asia.",
-      "Everyone in it was paid fairly."
+      "They let every colonist vote for a king.",
+      "They used more direct, autocratic rule — the King held nearly absolute power.",
+      "They had no kings at all.",
+      "They copied the House of Burgesses exactly."
      ],
      "a": 1,
-     "hint": "The routes made a 'triangle' across the Atlantic Ocean. Think about who was forced to travel.",
+     "hint": "Autocratic means one ruler has almost all the power.",
      "steps": [
-      "The routes linked the colonies, Britain and Europe, West Africa and the West Indies.",
-      "Ships carried goods, and they also carried enslaved African people who were taken by force.",
-      "Enslaved people were not paid and were treated cruelly.",
-      "Bringing enslaved people into the U.S. was banned in 1808 ✔"
+      "French and Spanish settlements were under their kings' direct control.",
+      "That is an autocratic monarchy — little local election of top leaders.",
+      "English colonies more often elected local legislators.",
+      "Answer: direct / autocratic rule ✔"
      ],
-     "explain": "Enslaved Africans were taken by force, which was cruel and wrong. Importing enslaved people was banned in 1808."
+     "explain": "French and Spanish colonies were under more direct, autocratic royal rule."
     },
     {
-     "q": "Many colonists want sugar, but only a little sugar arrives at the port. What usually happens to the price?",
+     "q": "Why do historians say the Mayflower Compact and the House of Burgesses showed early democracy?",
      "choices": [
-      "It goes up.",
-      "It goes down.",
-      "It becomes free.",
-      "It never changes."
-     ],
-     "a": 0,
-     "hint": "High demand plus low supply means buyers compete for a small amount.",
-     "steps": [
-      "Demand is high, because lots of people want sugar.",
-      "Supply is low, because there is only a little.",
-      "Buyers will pay more to get some.",
-      "So the price goes up ✔"
-     ],
-     "explain": "Low supply and high demand make the price go up."
-    },
-    {
-     "q": "How did trade help the colonies' economies grow?",
-     "choices": [
-      "Trade stopped people from working.",
-      "Selling goods earned profit, which paid for more ships, farms, shops and jobs.",
-      "Trade made all prices zero.",
-      "Only kings could trade."
+      "Because a single king wrote every local law alone.",
+      "Because colonists agreed on rules and elected leaders to help govern themselves.",
+      "Because no one was allowed to vote.",
+      "Because they banned all meetings."
      ],
      "a": 1,
-     "hint": "Follow the money: what happens after a seller makes a profit?",
+     "hint": "Look for people sharing power and choosing leaders.",
      "steps": [
-      "Colonists sold fish, lumber, grain and crops.",
-      "Selling for more than it cost to make or grow earns a profit.",
-      "Profit was spent on more ships, land and workers.",
-      "More jobs and bigger towns mean economic growth ✔"
+      "The Compact was an agreement the settlers made together.",
+      "The House of Burgesses was an elected legislature.",
+      "Electing leaders and making shared rules are democratic ideas.",
+      "Early self-government ✔"
      ],
-     "explain": "Trade brought profit, and the profit was spent on more ships, farms and jobs, so the economy grew."
+     "explain": "Shared agreements and elected assemblies are early democratic practices."
     }
    ]
   }
