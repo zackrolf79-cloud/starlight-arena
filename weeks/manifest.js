@@ -2,7 +2,8 @@
    Each week: when a new week starts, MOVE the old week.js to weeks/<id>.js, update its "file" below,
    then put the new week.js in place and add it at the TOP of this list. */
 window.WEEKS = [
-  { id: "2026-wk-nov09", file: "week.js", label: "Week of Nov 9, 2026" },
+  { id: "2026-wk-nov16", file: "week.js", label: "Week of Nov 16, 2026" },
+  { id: "2026-wk-nov09", file: "weeks/2026-wk-nov09.js", label: "Week of Nov 9, 2026" },
   { id: "2026-wk-nov02", file: "weeks/2026-wk-nov02.js", label: "Week of Nov 2, 2026" },
   { id: "2026-wk-oct26", file: "weeks/2026-wk-oct26.js", label: "Week of Oct 26, 2026" }
 ];
